@@ -25,7 +25,7 @@ const softwareExperience = [
   'Google Workspace'
 ];
 
-const ReceptionistOnboardingPage = ({ onBack, onComplete }) => {
+const ReceptionistOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
@@ -846,4 +846,4 @@ const ReceptionistOnboardingPage = ({ onBack, onComplete }) => {
   );
 };
 
-export default ReceptionistOnboardingPage;
+export default ReceptionistOnboarding;

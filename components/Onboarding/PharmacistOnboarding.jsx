@@ -23,7 +23,7 @@ const certifications = [
   'Immunization Certified'
 ];
 
-const PharmacistOnboardingPage = ({ onBack, onComplete }) => {
+const PharmacistOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
@@ -831,4 +831,4 @@ const PharmacistOnboardingPage = ({ onBack, onComplete }) => {
   );
 };
 
-export default PharmacistOnboardingPage;
+export default PharmacistOnboarding;

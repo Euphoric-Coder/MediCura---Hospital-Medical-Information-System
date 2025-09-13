@@ -40,7 +40,7 @@ const systemAccess = [
   'Communication Systems'
 ];
 
-const AdminOnboardingPage = ({ onBack, onComplete }) => {
+const AdminOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
@@ -913,4 +913,4 @@ const AdminOnboardingPage = ({ onBack, onComplete }) => {
   );
 };
 
-export default AdminOnboardingPage;
+export default AdminOnboarding;

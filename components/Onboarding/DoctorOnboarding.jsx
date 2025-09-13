@@ -30,7 +30,7 @@ const hospitals = [
   'Cancer Treatment Center'
 ];
 
-const DoctorOnboardingPage = ({ onBack, onComplete }) => {
+const DoctorOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
@@ -792,4 +792,4 @@ const DoctorOnboardingPage = ({ onBack, onComplete }) => {
   );
 };
 
-export default DoctorOnboardingPage;
+export default DoctorOnboarding;
