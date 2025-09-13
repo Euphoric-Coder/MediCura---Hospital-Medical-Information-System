@@ -1,14 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Mail, Lock } from "lucide-react";
+import { Plus, Mail, Lock, ChevronDown, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import RedirectPage from "./RedirectPage";
+import { toast } from "sonner";
+import { Users } from "@/lib/schema";
+import { db } from "@/lib/dbConfig";
+import { eq } from "drizzle-orm";
 
 const SignInPage = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    role: "patient",
+  });
   const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
@@ -27,9 +36,36 @@ const SignInPage = () => {
     });
 
     if (result?.error) {
+      toast.error("Invalid email or password");
       setError("Invalid email or password");
-    } else {
-      router.push("/dashboard");
+      return;
+    }
+
+    try {
+      // Fetch session/user details from /api/auth/session
+      const sessionRes = await fetch("/api/auth/session");
+      const session = await sessionRes.json();
+
+      if (!session?.user) {
+        setError("Could not fetch user session.");
+        await signOut({ redirect: false });
+        return;
+      }
+
+      const UserRole = await db.select().from(Users).where(eq(Users.email, formData.email)).limit(1);
+
+      if (formData.role !== UserRole[0].role) {
+        setError("Role mismatch. Please select the correct role.");
+        toast.error("Role mismatch. Please select the correct role.");
+        await signOut({ redirect: false });
+        return;
+      }
+
+      router.push(`/${formData.role}/dashboard`);
+    } catch (err) {
+      console.error("Error checking user role:", err);
+      setError("Something went wrong, please try again.");
+      await signOut({ redirect: false });
     }
   };
 
@@ -57,6 +93,62 @@ const SignInPage = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Role Dropdown */}
+              <div>
+                <label className="shad-input-label block mb-2">Role</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                  >
+                    <span className="text-white capitalize">
+                      {formData.role}
+                    </span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                        showRoleDropdown ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {showRoleDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                      <div className="p-3 border-b border-dark-500">
+                        <span className="text-14-medium text-dark-700">
+                          Select Role
+                        </span>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {[
+                          "patient",
+                          "doctor",
+                          "pharmacist",
+                          "receptionist",
+                        ].map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, role }));
+                              setShowRoleDropdown(false);
+                            }}
+                            className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                          >
+                            <span className="text-16-medium text-white capitalize">
+                              {role}
+                            </span>
+                            {formData.role === role && (
+                              <Check className="w-5 h-5 text-green-500" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Email */}
               <div>
                 <label className="shad-input-label block mb-2">
@@ -102,6 +194,19 @@ const SignInPage = () => {
               </button>
               {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
+
+            {/* Sign Up Link */}
+            <div className="mt-6 text-center">
+              <span className="text-14-regular text-dark-600">
+                Don't have an account?{" "}
+              </span>
+              <button
+                onClick={() => router.push("/sign-up")}
+                className="text-14-regular text-green-500 hover:text-green-400 transition-colors"
+              >
+                Sign up
+              </button>
+            </div>
           </div>
         </div>
 

@@ -1,19 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, User, Mail, Phone, Lock } from "lucide-react";
+import {
+  Plus,
+  User,
+  Mail,
+  Phone,
+  Lock,
+  Briefcase,
+  ChevronDown,
+  Check,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { signUp } from "@/lib/auth";
 import RedirectPage from "./RedirectPage";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const router = useRouter();
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
     password: "",
+    role: "patient", // default role
   });
   const [error, setError] = useState("");
 
@@ -30,9 +42,11 @@ const LoginPage = () => {
       fullName: formData.fullName,
       email: formData.email,
       password: formData.password,
+      role: formData.role,
     });
 
     if (!res.success) {
+      toast.error(res.error || "Sign up failed, please try again.");
       setError(res.error);
       return;
     }
@@ -45,9 +59,10 @@ const LoginPage = () => {
     });
 
     if (result?.error) {
+      toast.error("Login failed, please try again.");
       setError("Login failed, please try again.");
     } else {
-      router.push("/dashboard");
+      router.push(`/${formData.role}/dashboard`);
     }
   };
 
@@ -67,9 +82,9 @@ const LoginPage = () => {
 
             {/* Welcome Text */}
             <div className="mb-10">
-              <h1 className="text-36-bold text-white mb-2">Hi there, ....</h1>
+              <h1 className="text-36-bold text-white mb-2">Hi there 👋</h1>
               <p className="text-16-regular text-dark-700">
-                Get Started with Appointments.
+                Create your account and get started.
               </p>
             </div>
 
@@ -92,6 +107,64 @@ const LoginPage = () => {
                 </div>
               </div>
 
+              {/* Role */}
+              <div>
+                <label className="shad-input-label block mb-2">Role</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                  >
+                    <span className="text-white">
+                      {formData.role.charAt(0).toUpperCase() +
+                        formData.role.slice(1)}
+                    </span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                        showRoleDropdown ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Role Dropdown */}
+                  {showRoleDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                      <div className="p-3 border-b border-dark-500">
+                        <span className="text-14-medium text-dark-700">
+                          Select Role
+                        </span>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {[
+                          "patient",
+                          "doctor",
+                          "pharmacist",
+                          "receptionist",
+                        ].map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, role }));
+                              setShowRoleDropdown(false);
+                            }}
+                            className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                          >
+                            <span className="text-16-medium text-white capitalize">
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </span>
+                            {formData.role === role && (
+                              <Check className="w-5 h-5 text-green-500" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Email */}
               <div>
                 <label className="shad-input-label block mb-2">
@@ -107,24 +180,6 @@ const LoginPage = () => {
                     placeholder="adrian@jsmastery.pr"
                     className="shad-input pl-10 w-full text-white"
                     required
-                  />
-                </div>
-              </div>
-
-              {/* Phone Number (not stored yet) */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Phone number
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="+00 0342 0453 34"
-                    className="shad-input pl-10 w-full text-white"
                   />
                 </div>
               </div>
@@ -155,6 +210,27 @@ const LoginPage = () => {
               </button>
               {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
+
+            {/* Sign In Link */}
+            <div className="mt-6 text-center">
+              <span className="text-14-regular text-dark-600">
+                Already have an account?{" "}
+              </span>
+              <button
+                onClick={() => router.push("/sign-in")}
+                className="text-14-regular text-green-500 hover:text-green-400 transition-colors"
+              >
+                Sign in
+              </button>
+            </div>
+
+            {/* Back Link */}
+            <button
+              onClick={() => router.push("/")}
+              className="mt-4 text-14-regular text-dark-600 hover:text-white transition-colors"
+            >
+              ← Back to Home
+            </button>
           </div>
         </div>
 
