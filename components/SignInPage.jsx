@@ -1,29 +1,40 @@
+"use client";
+
 import React, { useState } from "react";
 import { Plus, Mail, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import RedirectPage from "./RedirectPage";
 
 const SignInPage = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign in form submitted:", formData);
+    setError("");
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (result?.error) {
+      setError("Invalid email or password");
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
-    <>
+    <RedirectPage>
       <div className="min-h-screen flex">
         {/* Left Side - Form */}
         <div className="flex-1 flex items-center justify-center px-8 py-12 bg-dark-300">
@@ -33,7 +44,7 @@ const SignInPage = () => {
               <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                 <Plus className="w-5 h-5 text-white" />
               </div>
-              <span className="text-24-bold text-white">CarePulse</span>
+              <span className="text-24-bold text-white">MediCura</span>
             </div>
 
             {/* Welcome Text */}
@@ -52,9 +63,7 @@ const SignInPage = () => {
                   Email address
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="w-5 h-5 text-dark-600" />
-                  </div>
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
                   <input
                     type="email"
                     name="email"
@@ -71,9 +80,7 @@ const SignInPage = () => {
               <div>
                 <label className="shad-input-label block mb-2">Password</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="w-5 h-5 text-dark-600" />
-                  </div>
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
                   <input
                     type="password"
                     name="password"
@@ -86,16 +93,6 @@ const SignInPage = () => {
                 </div>
               </div>
 
-              {/* Forgot Password Link */}
-              <div className="text-right">
-                <button
-                  type="button"
-                  className="text-14-regular text-green-500 hover:text-green-400 transition-colors"
-                >
-                  Forgot password?
-                </button>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
@@ -103,33 +100,8 @@ const SignInPage = () => {
               >
                 Sign In
               </button>
+              {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
-
-            {/* Sign In Link */}
-            <div className="mt-6 text-center">
-              <span className="text-14-regular text-dark-600">
-                Don't have an account?{" "}
-              </span>
-              <button
-                onClick={() => router.push("/sign-up")}
-                className="text-14-regular text-green-500 hover:text-green-400 transition-colors"
-              >
-                Sign up
-              </button>
-            </div>
-
-            {/* Back Link */}
-            <button
-              //   onClick={onBack}
-              className="mt-6 text-14-regular text-dark-600 hover:text-white transition-colors"
-            >
-              ← Back to Home
-            </button>
-
-            {/* Copyright */}
-            <div className="mt-16">
-              <p className="copyright">©carepulse copyright</p>
-            </div>
           </div>
         </div>
 
@@ -140,12 +112,10 @@ const SignInPage = () => {
             alt="Healthcare professional with stethoscope"
             className="side-img max-h-screen w-full"
           />
-
-          {/* Overlay for better text readability if needed */}
           <div className="absolute inset-0 bg-gradient-to-l from-transparent to-dark-300/20"></div>
         </div>
       </div>
-    </>
+    </RedirectPage>
   );
 };
 
