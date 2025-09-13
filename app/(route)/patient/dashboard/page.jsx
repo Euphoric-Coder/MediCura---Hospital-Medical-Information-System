@@ -1,12 +1,12 @@
 "use client";
 
-import UserDashboard from "@/components/UserDashboard";
+import PatientDashboard from "@/components/PatientDashboard";
 import React from "react";
 
 const page = () => {
   return (
     <div>
-      <UserDashboard />
+      <PatientDashboard />
     </div>
   );
 };

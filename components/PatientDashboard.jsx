@@ -72,7 +72,7 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   );
 };
 
-const UserDashboard = ({ onLogout, onBookAppointment }) => {
+const PatientDashboard = ({ onLogout, onBookAppointment }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -405,4 +405,4 @@ const UserDashboard = ({ onLogout, onBookAppointment }) => {
   );
 };
 
-export default UserDashboard;
+export default PatientDashboard;
