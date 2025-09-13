@@ -1,6 +1,10 @@
 "use client";
 
+import AdminOnboarding from "@/components/Onboarding/AdministrationOnboarding";
+import DoctorOnboarding from "@/components/Onboarding/DoctorOnboarding";
 import PatientOnboarding from "@/components/Onboarding/PatientOnboarding";
+import PharmacistOnboarding from "@/components/Onboarding/PharmacistOnboarding";
+import ReceptionistOnboarding from "@/components/Onboarding/ReceptionistOnboarding";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -15,9 +19,7 @@ const page = () => {
     // Handle back action
     router.back();
   };
-  const onComplete = () => {
-
-  };
+  const onComplete = () => {};
 
   return (
     <div>
@@ -27,6 +29,10 @@ const page = () => {
         onBack={onBack}
         onComplete={onComplete}
       />
+      <DoctorOnboarding />
+      <PharmacistOnboarding />
+      <AdminOnboarding />
+      <ReceptionistOnboarding />
     </div>
   );
 };
