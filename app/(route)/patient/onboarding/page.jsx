@@ -9,7 +9,6 @@ const page = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
-  console.log(user);
 
   const onBack = () => {
     // Handle back action

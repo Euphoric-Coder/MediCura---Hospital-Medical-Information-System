@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Calendar,
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { Users } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -72,7 +74,7 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   );
 };
 
-const PatientDashboard = ({ onLogout, onBookAppointment }) => {
+const PatientDashboard = ({ name, email, onBookAppointment }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [showCancelModal, setShowCancelModal] = useState(false);

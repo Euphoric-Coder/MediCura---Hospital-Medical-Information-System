@@ -47,6 +47,8 @@ export const Patients = pgTable("patients", {
   treatmentConsent: boolean("treatmentConsent").default(true),
   disclosureConsent: boolean("disclosureConsent").default(false),
   privacyConsent: boolean("privacyConsent").default(true),
+
+  hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
 // Doctor Table
@@ -77,6 +79,8 @@ export const Doctors = pgTable("doctors", {
   practiceConsent: boolean("practiceConsent").default(true),
   dataConsent: boolean("dataConsent").default(true),
   ethicsConsent: boolean("ethicsConsent").default(true),
+
+  hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
 // Pharmacist Table
@@ -107,6 +111,8 @@ export const Pharmacists = pgTable("pharmacists", {
   practiceConsent: boolean("practiceConsent").default(true),
   dataConsent: boolean("dataConsent").default(true),
   regulatoryConsent: boolean("regulatoryConsent").default(true),
+
+  hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
 // Receptionist Table
@@ -135,4 +141,6 @@ export const Receptionists = pgTable("receptionists", {
   backgroundCheck: boolean("backgroundCheck").default(true),
   dataConsent: boolean("dataConsent").default(true),
   workAgreement: boolean("workAgreement").default(true),
+
+  hasOnboarded: boolean("hasOnboarded").default(false),
 });
