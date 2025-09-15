@@ -10,7 +10,13 @@ import { Label } from "./ui/label";
 const publicKey = process.env.NEXT_PUBLIC_PUBLIC_KEY;
 const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
 
-const uploadToImageKit = async (file, setProgress, setData, setFileId, folder) => {
+const uploadToImageKit = async (
+  file,
+  setProgress,
+  setData,
+  setFileId,
+  folder
+) => {
   const auth = await fetch("/api/upload-auth").then((res) => res.json());
 
   const imagekit = new ImageKit({
@@ -77,7 +83,7 @@ export default function FileUpload({
     if (uploadData && fileId) {
       handleFileUpload(uploadData.url, fileId);
     }
-  }, [uploadData, fileId, handleInputChange]);
+  }, [uploadData, fileId, handleFileUpload]);
 
   const handleUpload = async (file) => {
     if (!file?.type.startsWith("image/")) {

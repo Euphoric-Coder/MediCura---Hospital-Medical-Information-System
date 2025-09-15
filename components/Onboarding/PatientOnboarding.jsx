@@ -646,6 +646,7 @@ const PatientOnboarding = ({ email, name, onBack, onComplete }) => {
                   fileId={fileId}
                   setFileId={setFileId}
                   handleFileUpload={handleFileUpload}
+                  folder="Patient"
                 />
               </div>
             </div>
