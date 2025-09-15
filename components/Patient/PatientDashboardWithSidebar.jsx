@@ -5,6 +5,9 @@ import PatientProfile from './PatientProfile';
 import BillingHistory from './BillingHistory';
 import PatientBookAppointment from './PatientBookAppointment';
 import { Plus, Menu } from 'lucide-react';
+import PatientPrescriptions from './PatientPrescription';
+import PatientLabResults from './PatientLabResults';
+import PatientMedicalRecords from './PatientMedicalRecords';
 
 const PatientDashboardWithSidebar = ({ 
   onLogout, 
@@ -59,45 +62,15 @@ const PatientDashboardWithSidebar = ({
         );
       case 'prescriptions':
         return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-purple-500/20">
-                <Plus className="w-12 h-12 text-purple-400" />
-              </div>
-              <h3 className="text-24-bold text-white mb-4">Prescriptions Coming Soon</h3>
-              <p className="text-16-regular text-dark-700 max-w-md mx-auto">
-                Your prescription management interface will be available here soon.
-              </p>
-            </div>
-          </div>
+          <PatientPrescriptions />
         );
       case 'lab-results':
         return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-green-500/20">
-                <Plus className="w-12 h-12 text-green-400" />
-              </div>
-              <h3 className="text-24-bold text-white mb-4">Lab Results Coming Soon</h3>
-              <p className="text-16-regular text-dark-700 max-w-md mx-auto">
-                Your lab results and diagnostic reports will be displayed here.
-              </p>
-            </div>
-          </div>
+          <PatientLabResults />
         );
       case 'medical-records':
         return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-blue-500/20">
-                <Plus className="w-12 h-12 text-blue-400" />
-              </div>
-              <h3 className="text-24-bold text-white mb-4">Medical Records Coming Soon</h3>
-              <p className="text-16-regular text-dark-700 max-w-md mx-auto">
-                Your complete medical history and documents will be available here.
-              </p>
-            </div>
-          </div>
+          <PatientMedicalRecords />
         );
       case 'emergency':
         return (
