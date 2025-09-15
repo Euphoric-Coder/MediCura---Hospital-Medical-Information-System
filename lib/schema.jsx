@@ -25,30 +25,30 @@ export const Patients = pgTable("patients", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
-  phone: varchar("phone", { length: 20 }),
+  phone: varchar("phone"),
   dateOfBirth: date("dateOfBirth"),
-  gender: varchar("gender", { length: 20 }),
+  gender: varchar("gender"),
   address: text("address"),
-  occupation: varchar("occupation", { length: 255 }),
-  emergencyContactName: varchar("emergencyContactName", { length: 255 }),
-  emergencyPhone: varchar("emergencyPhone", { length: 20 }),
+  occupation: varchar("occupation"),
+  emergencyContactName: varchar("emergencyContactName"),
+  emergencyPhone: varchar("emergencyPhone"),
 
-  primaryPhysician: varchar("primaryPhysician", { length: 255 }),
-  insuranceProvider: varchar("insuranceProvider", { length: 255 }),
-  insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 255 }),
+  primaryPhysician: varchar("primaryPhysician"),
+  insuranceProvider: varchar("insuranceProvider"),
+  insurancePolicyNumber: varchar("insurancePolicyNumber"),
   allergies: text("allergies"),
   currentMedications: text("currentMedications"),
   familyMedicalHistory: text("familyMedicalHistory"),
   pastMedicalHistory: text("pastMedicalHistory"),
 
-  identificationType: varchar("identificationType", { length: 100 }),
-  identificationNumber: varchar("identificationNumber", { length: 255 }),
+  identificationType: varchar("identificationType"),
+  identificationNumber: varchar("identificationNumber"),
   identificationDocument: varchar("identificationDocument"),
   identificationDocumentId: varchar("identificationDocumentId"),
 
-  treatmentConsent: boolean("treatmentConsent").default(true),
+  treatmentConsent: boolean("treatmentConsent").default(false),
   disclosureConsent: boolean("disclosureConsent").default(false),
-  privacyConsent: boolean("privacyConsent").default(true),
+  privacyConsent: boolean("privacyConsent").default(false),
 
   hasOnboarded: boolean("hasOnboarded").default(false),
 });
