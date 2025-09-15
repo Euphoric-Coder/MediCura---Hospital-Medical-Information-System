@@ -43,6 +43,8 @@ export const Patients = pgTable("patients", {
 
   identificationType: varchar("identificationType", { length: 100 }),
   identificationNumber: varchar("identificationNumber", { length: 255 }),
+  identificationDocument: varchar("identificationDocument"),
+  identificationDocumentId: varchar("identificationDocumentId"),
 
   treatmentConsent: boolean("treatmentConsent").default(true),
   disclosureConsent: boolean("disclosureConsent").default(false),

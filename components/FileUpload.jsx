@@ -64,8 +64,8 @@ export default function FileUpload({
   setUploadData,
   fileId,
   setFileId,
-  handleInputChange,
-  tutorial = false,
+  handleFileUpload,
+  folder,
 }) {
   const inputRef = useRef(null);
   const [progress, setProgress] = useState(null);
@@ -74,12 +74,9 @@ export default function FileUpload({
   useEffect(() => {
     // Whenever uploadData or fileId changes, we call handleInputChange
     // Only call if both are defined, or tweak the logic as needed
-    // if (uploadData && fileId && !tutorial) {
-    //   handleInputChange("coverImage", {
-    //     data: uploadData,
-    //     fileId: fileId,
-    //   });
-    // }
+    if (uploadData && fileId) {
+      handleFileUpload(uploadData.url, fileId);
+    }
   }, [uploadData, fileId, handleInputChange]);
 
   const handleUpload = async (file) => {
@@ -94,7 +91,7 @@ export default function FileUpload({
     setUploadData(null);
     setFileId(null);
     setProgress(0);
-    await uploadToImageKit(file, setProgress, setUploadData, setFileId);
+    await uploadToImageKit(file, setProgress, setUploadData, setFileId, folder);
   };
 
   // const handleDrop = (e) => {
