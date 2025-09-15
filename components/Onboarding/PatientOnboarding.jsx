@@ -118,6 +118,7 @@ const PatientOnboarding = ({ email, name, onBack, onComplete }) => {
   };
 
   const handleFileUpload = (fileId, uploadData) => {
+    console.log("File uploaded:", fileId, uploadData);
     setFormData((prev) => ({
       ...prev,
       identificationDocument: uploadData,

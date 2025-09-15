@@ -1,5 +1,6 @@
 "use client";
 
+import OnboardingPage from "@/components/Onboarding/Onboarding";
 import PatientOnboarding from "@/components/Onboarding/PatientOnboarding";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -18,12 +19,13 @@ const page = () => {
 
   return (
     <div>
-      <PatientOnboarding
+      {/* <PatientOnboarding
         email={user?.email}
         name={user?.name}
         onBack={onBack}
         onComplete={onComplete}
-      />
+      /> */}
+      <OnboardingPage />
     </div>
   );
 };

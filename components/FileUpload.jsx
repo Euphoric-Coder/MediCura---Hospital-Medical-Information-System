@@ -83,7 +83,7 @@ export default function FileUpload({
     if (uploadData && fileId) {
       handleFileUpload(uploadData.url, fileId);
     }
-  }, [uploadData, fileId, handleFileUpload]);
+  }, [uploadData, fileId]);
 
   const handleUpload = async (file) => {
     if (!file?.type.startsWith("image/")) {
