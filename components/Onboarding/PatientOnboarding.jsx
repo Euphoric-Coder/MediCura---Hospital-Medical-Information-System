@@ -94,7 +94,6 @@ const PatientOnboarding = ({ email, name, onBack, onComplete }) => {
     privacyConsent: true,
   });
 
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadData, setUploadData] = useState(null);
   const [fileId, setFileId] = useState(null);
   const [showPhysicianDropdown, setShowPhysicianDropdown] = useState(false);

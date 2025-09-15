@@ -146,6 +146,7 @@ export default function FileUpload({
     setUploadData(null);
     setProgress(null);
     setFileId(null);
+    handleFileUpload(null, null);
     if (inputRef.current) inputRef.current.value = "";
   };
 
