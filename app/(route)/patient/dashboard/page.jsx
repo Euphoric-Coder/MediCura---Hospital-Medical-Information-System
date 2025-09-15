@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import PatientDashboard from "@/components/PatientDashboard";
+import PatientDashboard from "@/components/Patient/PatientDashboard";
 import OnboardingRedirect from "@/components/Onboarding/OnboardingRedirect";
+import PatientDashboardWithSidebar from "@/components/Patient/PatientDashboardWithSidebar";
 
 export default function PatientPage() {
   const { data: session, status } = useSession();
@@ -66,5 +67,6 @@ export default function PatientPage() {
   }
 
   // 🔹 Case 4: Authenticated + onboarded
-  return <PatientDashboard email={user.email} name={user.name} />;
+  // return <PatientDashboard email={user.email} name={user.name} />;
+  return <PatientDashboardWithSidebar />
 }

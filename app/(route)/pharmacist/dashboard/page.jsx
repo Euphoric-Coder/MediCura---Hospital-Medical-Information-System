@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import PatientDashboard from "@/components/PatientDashboard";
+import PatientDashboard from "@/components/Patient/PatientDashboard";
 import OnboardingRedirect from "@/components/Onboarding/OnboardingRedirect";
 
 export default function PatientPage() {
