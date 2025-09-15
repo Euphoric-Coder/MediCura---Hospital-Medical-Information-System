@@ -19,13 +19,12 @@ const page = () => {
 
   return (
     <div>
-      {/* <PatientOnboarding
+      <PatientOnboarding
         email={user?.email}
         name={user?.name}
         onBack={onBack}
         onComplete={onComplete}
-      /> */}
-      <OnboardingPage />
+      />
     </div>
   );
 };
