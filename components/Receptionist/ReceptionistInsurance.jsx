@@ -1,46 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, CreditCard, Search, CheckCircle, AlertTriangle, Clock, User, Phone, X, Shield, FileText } from 'lucide-react';
 
-interface ReceptionistInsuranceProps {
-  onBack: () => void;
-}
-
-interface InsuranceVerification {
-  id: string;
-  patientId: string;
-  patientName: string;
-  patientPhone: string;
-  insuranceProvider: string;
-  policyNumber: string;
-  groupNumber?: string;
-  status: 'pending' | 'verified' | 'rejected' | 'expired';
-  submittedDate: string;
-  verifiedDate?: string;
-  verifiedBy?: string;
-  coverage: {
-    deductible: number;
-    copay: number;
-    coinsurance: number;
-    outOfPocketMax: number;
-  };
-  eligibility: {
-    active: boolean;
-    effectiveDate: string;
-    terminationDate?: string;
-  };
-  benefits: string[];
-  notes?: string;
-  priority: 'low' | 'medium' | 'high';
-}
-
-interface VerificationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  verification: InsuranceVerification | null;
-  onUpdate: (verificationId: string, status: string, notes?: string) => void;
-}
-
-const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, verification, onUpdate }) => {
+const VerificationModal = ({ isOpen, onClose, verification, onUpdate }) => {
   const [notes, setNotes] = useState('');
   const [coverage, setCoverage] = useState({
     deductible: 0,
@@ -56,7 +17,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
     }
   }, [verification]);
 
-  const handleVerify = (status: string) => {
+  const handleVerify = (status) => {
     if (verification) {
       onUpdate(verification.id, status, notes);
       onClose();
@@ -202,8 +163,8 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
   );
 };
 
-const ReceptionistInsurance: React.FC<ReceptionistInsuranceProps> = ({ onBack }) => {
-  const [verifications, setVerifications] = useState<InsuranceVerification[]>([
+const ReceptionistInsurance = ({ onBack }) => {
+  const [verifications, setVerifications] = useState([
     {
       id: '1',
       patientId: 'P001',
@@ -280,10 +241,10 @@ const ReceptionistInsurance: React.FC<ReceptionistInsuranceProps> = ({ onBack })
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedVerification, setSelectedVerification] = useState<InsuranceVerification | null>(null);
+  const [selectedVerification, setSelectedVerification] = useState(null);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredVerifications = verifications.filter(verification => {
     const matchesSearch = verification.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -295,17 +256,17 @@ const ReceptionistInsurance: React.FC<ReceptionistInsuranceProps> = ({ onBack })
     return matchesSearch && matchesStatus;
   });
 
-  const handleVerificationClick = (verification: InsuranceVerification) => {
+  const handleVerificationClick = (verification) => {
     setSelectedVerification(verification);
     setShowVerificationModal(true);
   };
 
-  const handleUpdateVerification = (verificationId: string, status: string, notes?: string) => {
+  const handleUpdateVerification = (verificationId, status, notes) => {
     setVerifications(prev => prev.map(verification => 
       verification.id === verificationId 
         ? { 
             ...verification, 
-            status: status as any,
+            status: status,
             verifiedDate: new Date().toISOString().split('T')[0],
             verifiedBy: 'Emily Johnson',
             notes: notes || verification.notes
@@ -323,7 +284,7 @@ const ReceptionistInsurance: React.FC<ReceptionistInsuranceProps> = ({ onBack })
     }, 3000);
   };
 
-  const getStatusBadge = (status: string, priority: string) => {
+  const getStatusBadge = (status, priority) => {
     switch (status) {
       case 'pending':
         return (

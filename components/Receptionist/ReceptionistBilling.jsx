@@ -1,47 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, Receipt, Search, User, Calendar, DollarSign, Download, CreditCard, CheckCircle, AlertTriangle, Clock, X } from 'lucide-react';
+import { Plus, Receipt, Search, User, Calendar, DollarSign, Download, CreditCard, CheckCircle, AlertTriangle, Clock, X, Phone } from 'lucide-react';
 import jsPDF from 'jspdf';
 
-interface ReceptionistBillingProps {
-  onBack: () => void;
-}
-
-interface BillItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
-
-interface Bill {
-  id: string;
-  patientId: string;
-  patientName: string;
-  patientPhone: string;
-  date: string;
-  items: BillItem[];
-  subtotal: number;
-  tax: number;
-  discount: number;
-  total: number;
-  status: 'draft' | 'sent' | 'paid' | 'overdue';
-  paymentMethod?: string;
-  paidDate?: string;
-  dueDate: string;
-  doctor: string;
-  insuranceCovered: number;
-  patientResponsibility: number;
-}
-
-interface PaymentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  bill: Bill | null;
-  onProcessPayment: (billId: string, paymentMethod: string, amount: number) => void;
-}
-
-const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, bill, onProcessPayment }) => {
+const PaymentModal = ({ isOpen, onClose, bill, onProcessPayment }) => {
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [paymentAmount, setPaymentAmount] = useState(0);
 
@@ -51,7 +12,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, bill, onPr
     }
   }, [bill]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (bill) {
       onProcessPayment(bill.id, paymentMethod, paymentAmount);
@@ -130,8 +91,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, bill, onPr
   );
 };
 
-const ReceptionistBilling: React.FC<ReceptionistBillingProps> = ({ onBack }) => {
-  const [bills, setBills] = useState<Bill[]>([
+const ReceptionistBilling = ({ onBack }) => {
+  const [bills, setBills] = useState([
     {
       id: 'INV-2024-001',
       patientId: 'P001',
@@ -198,10 +159,10 @@ const ReceptionistBilling: React.FC<ReceptionistBillingProps> = ({ onBack }) => 
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [selectedBill, setSelectedBill] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredBills = bills.filter(bill => {
     const matchesSearch = bill.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -213,7 +174,7 @@ const ReceptionistBilling: React.FC<ReceptionistBillingProps> = ({ onBack }) => 
     return matchesSearch && matchesStatus;
   });
 
-  const generateBillPDF = (bill: Bill) => {
+  const generateBillPDF = (bill) => {
     const doc = new jsPDF();
     
     // Header
@@ -275,12 +236,12 @@ const ReceptionistBilling: React.FC<ReceptionistBillingProps> = ({ onBack }) => 
     doc.save(`medical-bill-${bill.id}.pdf`);
   };
 
-  const handleProcessPayment = (billId: string, paymentMethod: string, amount: number) => {
+  const handleProcessPayment = (billId, paymentMethod, amount) => {
     setBills(prev => prev.map(bill =>
       bill.id === billId
         ? { 
             ...bill, 
-            status: 'paid' as const, 
+            status: 'paid', 
             paymentMethod, 
             paidDate: new Date().toISOString().split('T')[0]
           }
@@ -297,12 +258,12 @@ const ReceptionistBilling: React.FC<ReceptionistBillingProps> = ({ onBack }) => 
     }, 3000);
   };
 
-  const handlePaymentClick = (bill: Bill) => {
+  const handlePaymentClick = (bill) => {
     setSelectedBill(bill);
     setShowPaymentModal(true);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'draft':
         return (

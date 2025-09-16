@@ -1,39 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, UserPlus, User, Mail, Phone, Calendar, MapPin, Upload, Shield, FileText, CheckCircle, AlertCircle, Save } from 'lucide-react';
 
-interface ReceptionistPatientRegistrationProps {
-  onBack: () => void;
-}
-
-interface PatientData {
-  // Personal Information
-  fullName: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-  gender: string;
-  address: string;
-  emergencyContactName: string;
-  emergencyPhone: string;
-  
-  // Insurance Information
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
-  insuranceGroupNumber: string;
-  
-  // Medical Information
-  allergies: string;
-  currentMedications: string;
-  medicalHistory: string;
-  primaryPhysician: string;
-  
-  // Documents
-  insuranceCard: File | null;
-  idDocument: File | null;
-}
-
-const ReceptionistPatientRegistration: React.FC<ReceptionistPatientRegistrationProps> = ({ onBack }) => {
-  const [formData, setFormData] = useState<PatientData>({
+const ReceptionistPatientRegistration = ({ onBack }) => {
+  const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
@@ -54,16 +23,16 @@ const ReceptionistPatientRegistration: React.FC<ReceptionistPatientRegistrationP
   });
 
   const [uploadedFiles, setUploadedFiles] = useState({
-    insuranceCard: null as string | null,
-    idDocument: null as string | null
+    insuranceCard: null,
+    idDocument: null
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -71,7 +40,7 @@ const ReceptionistPatientRegistration: React.FC<ReceptionistPatientRegistrationP
     }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+  const handleFileUpload = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedFiles(prev => ({
@@ -97,7 +66,7 @@ const ReceptionistPatientRegistration: React.FC<ReceptionistPatientRegistrationP
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');

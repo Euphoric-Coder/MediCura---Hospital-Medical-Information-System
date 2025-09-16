@@ -14,25 +14,14 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 
-interface ReceptionistReportsProps {
-  onBack: () => void;
-}
-
-interface ChartData {
-  label: string;
-  value: number;
-  change: number;
-  color: string;
-}
-
-const ReceptionistReports: React.FC<ReceptionistReportsProps> = ({
+const ReceptionistReports = ({
   onBack,
 }) => {
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedReport, setSelectedReport] = useState("overview");
 
   // Mock data for charts
-  const registrationsData: ChartData[] = [
+  const registrationsData = [
     { label: "Jan", value: 45, change: 5.2, color: "bg-purple-500" },
     { label: "Feb", value: 52, change: 15.6, color: "bg-purple-500" },
     { label: "Mar", value: 38, change: -26.9, color: "bg-purple-500" },
@@ -41,7 +30,7 @@ const ReceptionistReports: React.FC<ReceptionistReportsProps> = ({
     { label: "Jun", value: 65, change: 12.1, color: "bg-purple-500" },
   ];
 
-  const appointmentsData: ChartData[] = [
+  const appointmentsData = [
     { label: "Jan", value: 320, change: 8.1, color: "bg-blue-500" },
     { label: "Feb", value: 385, change: 20.3, color: "bg-blue-500" },
     { label: "Mar", value: 298, change: -22.6, color: "bg-blue-500" },
@@ -50,14 +39,14 @@ const ReceptionistReports: React.FC<ReceptionistReportsProps> = ({
     { label: "Jun", value: 445, change: 8.5, color: "bg-blue-500" },
   ];
 
-  const revenueData: ChartData[] = [
+  const revenueData = [
     { label: "Q1", value: 125000, change: 12.5, color: "bg-green-500" },
     { label: "Q2", value: 145000, change: 16.0, color: "bg-green-500" },
     { label: "Q3", value: 135000, change: -6.9, color: "bg-green-500" },
     { label: "Q4", value: 165000, change: 22.2, color: "bg-green-500" },
   ];
 
-  const callsData: ChartData[] = [
+  const callsData = [
     { label: "Jan", value: 850, change: 3.2, color: "bg-yellow-500" },
     { label: "Feb", value: 920, change: 8.2, color: "bg-yellow-500" },
     { label: "Mar", value: 780, change: -15.2, color: "bg-yellow-500" },
@@ -124,17 +113,13 @@ const ReceptionistReports: React.FC<ReceptionistReportsProps> = ({
     );
   };
 
-  const getMaxValue = (data: ChartData[]) =>
+  const getMaxValue = (data) =>
     Math.max(...data.map((d) => d.value));
 
   const BarChart = ({
     data,
     title,
     unit = "",
-  }: {
-    data: ChartData[],
-    title: string,
-    unit?: string,
   }) => {
     const maxValue = getMaxValue(data);
 
@@ -193,12 +178,6 @@ const ReceptionistReports: React.FC<ReceptionistReportsProps> = ({
     change,
     icon: Icon,
     color,
-  }: {
-    title: string,
-    value: string,
-    change: number,
-    icon: React.ElementType,
-    color: string,
   }) => (
     <div
       className={`bg-gradient-to-br ${color} backdrop-blur-sm border border-opacity-20 rounded-2xl p-4 lg:p-6`}

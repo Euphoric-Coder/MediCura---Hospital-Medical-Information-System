@@ -711,7 +711,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                             <span className="hidden sm:inline">{doctor.location}</span>
                             <span className="sm:hidden">{doctor.location.split(',')[0]}</span>
                           </div>
-                          <div className="flex items-center gap-2 hidden sm:flex">
+                          <div className="items-center gap-2 hidden sm:flex">
                             <Phone className="w-4 h-4 text-blue-400" />
                             <span>{doctor.phone}</span>
                           </div>
@@ -860,7 +860,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                       <span className="hidden sm:inline">{selectedDoctor.location}</span>
                       <span className="sm:hidden">{selectedDoctor.location.split(',')[0]}</span>
                     </div>
-                    <div className="flex items-center gap-2 hidden sm:flex">
+                    <div className="items-center gap-2 hidden sm:flex">
                       <Phone className="w-4 h-4 text-blue-400" />
                       <span>{selectedDoctor.phone}</span>
                     </div>

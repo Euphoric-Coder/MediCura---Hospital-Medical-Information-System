@@ -10,17 +10,11 @@ import ReceptionistInsurance from "./ReceptionistInsurance";
 import ReceptionistReports from "./ReceptionistReports";
 import { Plus, Menu } from "lucide-react";
 
-interface ReceptionistDashboardWithSidebarProps {
-  onLogout: () => void;
-}
-
-const ReceptionistDashboardWithSidebar: React.FC<
-  ReceptionistDashboardWithSidebarProps
-> = ({ onLogout }) => {
+const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page) => {
     setCurrentPage(page);
   };
 

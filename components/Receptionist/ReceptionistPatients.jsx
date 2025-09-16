@@ -1,49 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Users, Search, Eye, Phone, Mail, User, Calendar, Edit, FileText, X } from 'lucide-react';
+import { Plus, Users, Search, Eye, Phone, Mail, User, Calendar, Edit, FileText, X, CheckCircle, AlertTriangle } from 'lucide-react';
 
-interface ReceptionistPatientsProps {
-  onBack: () => void;
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  phone: string;
-  email: string;
-  address: string;
-  dateOfBirth: string;
-  registrationDate: string;
-  lastVisit: string;
-  nextAppointment?: string;
-  totalVisits: number;
-  status: 'active' | 'inactive';
-  primaryPhysician: string;
-  insurance: {
-    provider: string;
-    policyNumber: string;
-    verified: boolean;
-  };
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
-  allergies: string[];
-  notes?: string;
-}
-
-interface PatientDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  patient: Patient | null;
-  onUpdate: (patientId: string, updatedData: Partial<Patient>) => void;
-}
-
-const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClose, patient, onUpdate }) => {
+const PatientDetailsModal = ({ isOpen, onClose, patient, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<Partial<Patient>>({});
+  const [editData, setEditData] = useState({});
 
   React.useEffect(() => {
     if (patient) {
@@ -231,7 +191,7 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
                       value={editData.insurance?.provider || ''}
                       onChange={(e) => setEditData(prev => ({ 
                         ...prev, 
-                        insurance: { ...prev.insurance!, provider: e.target.value }
+                        insurance: { ...prev.insurance, provider: e.target.value }
                       }))}
                       className="shad-input w-full text-white mt-2"
                     />
@@ -247,7 +207,7 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
                       value={editData.insurance?.policyNumber || ''}
                       onChange={(e) => setEditData(prev => ({ 
                         ...prev, 
-                        insurance: { ...prev.insurance!, policyNumber: e.target.value }
+                        insurance: { ...prev.insurance, policyNumber: e.target.value }
                       }))}
                       className="shad-input w-full text-white mt-2"
                     />
@@ -280,7 +240,7 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
                       value={editData.emergencyContact?.name || ''}
                       onChange={(e) => setEditData(prev => ({ 
                         ...prev, 
-                        emergencyContact: { ...prev.emergencyContact!, name: e.target.value }
+                        emergencyContact: { ...prev.emergencyContact, name: e.target.value }
                       }))}
                       className="shad-input w-full text-white mt-2"
                     />
@@ -296,7 +256,7 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
                       value={editData.emergencyContact?.phone || ''}
                       onChange={(e) => setEditData(prev => ({ 
                         ...prev, 
-                        emergencyContact: { ...prev.emergencyContact!, phone: e.target.value }
+                        emergencyContact: { ...prev.emergencyContact, phone: e.target.value }
                       }))}
                       className="shad-input w-full text-white mt-2"
                     />
@@ -312,7 +272,7 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
                       value={editData.emergencyContact?.relationship || ''}
                       onChange={(e) => setEditData(prev => ({ 
                         ...prev, 
-                        emergencyContact: { ...prev.emergencyContact!, relationship: e.target.value }
+                        emergencyContact: { ...prev.emergencyContact, relationship: e.target.value }
                       }))}
                       className="shad-input w-full text-white mt-2"
                     />
@@ -347,8 +307,8 @@ const PatientDetailsModal: React.FC<PatientDetailsModalProps> = ({ isOpen, onClo
   );
 };
 
-const ReceptionistPatients: React.FC<ReceptionistPatientsProps> = ({ onBack }) => {
-  const [patients, setPatients] = useState<Patient[]>([
+const ReceptionistPatients = ({ onBack }) => {
+  const [patients, setPatients] = useState([
     {
       id: 'P001',
       name: 'John Smith',
@@ -434,10 +394,10 @@ const ReceptionistPatients: React.FC<ReceptionistPatientsProps> = ({ onBack }) =
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredPatients = patients.filter(patient => {
     const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -449,12 +409,12 @@ const ReceptionistPatients: React.FC<ReceptionistPatientsProps> = ({ onBack }) =
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewDetails = (patient: Patient) => {
+  const handleViewDetails = (patient) => {
     setSelectedPatient(patient);
     setShowDetailsModal(true);
   };
 
-  const handleUpdatePatient = (patientId: string, updatedData: Partial<Patient>) => {
+  const handleUpdatePatient = (patientId, updatedData) => {
     setPatients(prev => prev.map(patient => 
       patient.id === patientId 
         ? { ...patient, ...updatedData }

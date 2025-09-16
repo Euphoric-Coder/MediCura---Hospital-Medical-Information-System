@@ -1,32 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, Clock, User, ChevronLeft, ChevronRight, Search, CheckCircle, AlertTriangle, Phone, Edit, X, Save } from 'lucide-react';
 
-interface ReceptionistAppointmentsProps {
-  onBack: () => void;
-}
-
-interface Appointment {
-  id: string;
-  patientName: string;
-  patientId: string;
-  patientPhone: string;
-  date: string;
-  time: string;
-  doctor: string;
-  type: string;
-  status: 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no-show';
-  reason: string;
-  isNewPatient: boolean;
-  insuranceVerified: boolean;
-  notes?: string;
-}
-
-interface NewAppointmentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (appointmentData: any) => void;
-}
-
 const doctors = [
   { id: '1', name: 'Dr. Sarah Safari', specialty: 'General Medicine' },
   { id: '2', name: 'Dr. Ava Williams', specialty: 'Cardiology' },
@@ -42,7 +16,7 @@ const appointmentTypes = [
   'Vaccination'
 ];
 
-const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const NewAppointmentModal = ({ isOpen, onClose, onSubmit }) => {
   const [appointmentData, setAppointmentData] = useState({
     patientName: '',
     patientPhone: '',
@@ -54,7 +28,7 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({ isOpen, onClo
     notes: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(appointmentData);
     setAppointmentData({
@@ -207,8 +181,8 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({ isOpen, onClo
   );
 };
 
-const ReceptionistAppointments: React.FC<ReceptionistAppointmentsProps> = ({ onBack }) => {
-  const [appointments, setAppointments] = useState<Appointment[]>([
+const ReceptionistAppointments = ({ onBack }) => {
+  const [appointments, setAppointments] = useState([
     {
       id: '1',
       patientName: 'John Smith',
@@ -258,7 +232,7 @@ const ReceptionistAppointments: React.FC<ReceptionistAppointmentsProps> = ({ onB
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredAppointments = appointments.filter(appointment => {
     const matchesSearch = appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -270,8 +244,8 @@ const ReceptionistAppointments: React.FC<ReceptionistAppointmentsProps> = ({ onB
     return matchesSearch && matchesStatus && matchesDate;
   });
 
-  const handleNewAppointment = (appointmentData: any) => {
-    const newAppointment: Appointment = {
+  const handleNewAppointment = (appointmentData) => {
+    const newAppointment = {
       id: (appointments.length + 1).toString(),
       patientName: appointmentData.patientName,
       patientId: `P${String(appointments.length + 1).padStart(3, '0')}`,
@@ -297,10 +271,10 @@ const ReceptionistAppointments: React.FC<ReceptionistAppointmentsProps> = ({ onB
     }, 3000);
   };
 
-  const handleStatusUpdate = (appointmentId: string, newStatus: string) => {
+  const handleStatusUpdate = (appointmentId, newStatus) => {
     setAppointments(prev => prev.map(appointment => 
       appointment.id === appointmentId 
-        ? { ...appointment, status: newStatus as any }
+        ? { ...appointment, status: newStatus }
         : appointment
     ));
 
@@ -314,7 +288,7 @@ const ReceptionistAppointments: React.FC<ReceptionistAppointmentsProps> = ({ onB
     }, 3000);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'scheduled':
         return (

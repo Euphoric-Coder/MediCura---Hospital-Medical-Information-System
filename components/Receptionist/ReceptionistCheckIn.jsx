@@ -1,27 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, CheckCircle, Clock, User, Phone, Calendar, AlertTriangle, Search, Edit } from 'lucide-react';
 
-interface ReceptionistCheckInProps {
-  onBack: () => void;
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  appointmentTime: string;
-  doctor: string;
-  type: string;
-  status: 'waiting' | 'arrived' | 'checked-in' | 'in-consultation' | 'completed';
-  phone: string;
-  isNewPatient: boolean;
-  insuranceVerified: boolean;
-  reason: string;
-  arrivalTime?: string;
-  waitTime?: number;
-}
-
-const ReceptionistCheckIn: React.FC<ReceptionistCheckInProps> = ({ onBack }) => {
-  const [patients, setPatients] = useState<Patient[]>([
+const ReceptionistCheckIn = ({ onBack }) => {
+  const [patients, setPatients] = useState([
     {
       id: 'P001',
       name: 'John Smith',
@@ -80,7 +61,7 @@ const ReceptionistCheckIn: React.FC<ReceptionistCheckInProps> = ({ onBack }) => 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredPatients = patients.filter(patient => {
     const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,10 +72,10 @@ const ReceptionistCheckIn: React.FC<ReceptionistCheckInProps> = ({ onBack }) => 
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusUpdate = (patientId: string, newStatus: string) => {
+  const handleStatusUpdate = (patientId, newStatus) => {
     setPatients(prev => prev.map(patient => {
       if (patient.id === patientId) {
-        const updatedPatient = { ...patient, status: newStatus as any };
+        const updatedPatient = { ...patient, status: newStatus };
         
         if (newStatus === 'arrived') {
           updatedPatient.arrivalTime = new Date().toLocaleTimeString('en-US', { 
@@ -140,7 +121,7 @@ const ReceptionistCheckIn: React.FC<ReceptionistCheckInProps> = ({ onBack }) => 
     }, 3000);
   };
 
-  const getStatusBadge = (status: string, waitTime?: number) => {
+  const getStatusBadge = (status, waitTime) => {
     const isLongWait = waitTime && waitTime > 30;
     
     switch (status) {
@@ -194,7 +175,7 @@ const ReceptionistCheckIn: React.FC<ReceptionistCheckInProps> = ({ onBack }) => 
     }
   };
 
-  const getActionButton = (patient: Patient) => {
+  const getActionButton = (patient) => {
     switch (patient.status) {
       case 'waiting':
         return (

@@ -19,15 +19,7 @@ import {
   Headphones,
 } from "lucide-react";
 
-interface ReceptionistSidebarProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
-  onLogout: () => void;
-  isOpen?: boolean;
-  onToggle?: () => void;
-}
-
-const ReceptionistSidebar: React.FC<ReceptionistSidebarProps> = ({
+const ReceptionistSidebar = ({
   currentPage,
   onNavigate,
   onLogout,
@@ -109,7 +101,7 @@ const ReceptionistSidebar: React.FC<ReceptionistSidebarProps> = ({
     },
   ];
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page) => {
     onNavigate(page);
     // Close sidebar on mobile after navigation
     if (onToggle && window.innerWidth < 1024) {

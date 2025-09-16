@@ -1,44 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, UserPlus, Calendar, Clock, Users, Phone, CheckCircle, AlertTriangle, TrendingUp, Bell, User, Mail, Edit } from 'lucide-react';
+import { Plus, UserPlus, Calendar, Clock, Users, Phone, CheckCircle, AlertTriangle, TrendingUp, Bell, User, Mail, Edit, Headphones } from 'lucide-react';
 
-interface ReceptionistDashboardProps {
-  onLogout: () => void;
-}
-
-interface TodayAppointment {
-  id: string;
-  patientName: string;
-  patientId: string;
-  time: string;
-  doctor: string;
-  type: string;
-  status: 'scheduled' | 'checked-in' | 'in-consultation' | 'completed' | 'cancelled' | 'no-show';
-  phone: string;
-  isNewPatient: boolean;
-  insuranceVerified: boolean;
-}
-
-interface WaitingPatient {
-  id: string;
-  name: string;
-  appointmentTime: string;
-  doctor: string;
-  status: 'waiting' | 'called' | 'in-consultation';
-  waitTime: number; // minutes
-  phone: string;
-}
-
-interface PendingTask {
-  id: string;
-  type: 'insurance-verification' | 'callback' | 'registration' | 'billing';
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-  dueTime: string;
-  patientName?: string;
-}
-
-const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout }) => {
-  const [todayAppointments] = useState<TodayAppointment[]>([
+const ReceptionistDashboard = ({ onLogout }) => {
+  const [todayAppointments] = useState([
     {
       id: '1',
       patientName: 'John Smith',
@@ -77,7 +41,7 @@ const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout 
     }
   ]);
 
-  const [waitingPatients] = useState<WaitingPatient[]>([
+  const [waitingPatients] = useState([
     {
       id: '1',
       name: 'John Smith',
@@ -98,7 +62,7 @@ const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout 
     }
   ]);
 
-  const [pendingTasks] = useState<PendingTask[]>([
+  const [pendingTasks] = useState([
     {
       id: '1',
       type: 'insurance-verification',
@@ -125,7 +89,7 @@ const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout 
     }
   ]);
 
-  const getAppointmentStatusBadge = (status: string) => {
+  const getAppointmentStatusBadge = (status) => {
     switch (status) {
       case 'scheduled':
         return (
@@ -174,7 +138,7 @@ const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout 
     }
   };
 
-  const getWaitingStatusBadge = (status: string, waitTime: number) => {
+  const getWaitingStatusBadge = (status, waitTime) => {
     const isLongWait = waitTime > 30;
     
     switch (status) {
@@ -212,7 +176,7 @@ const ReceptionistDashboard: React.FC<ReceptionistDashboardProps> = ({ onLogout 
     }
   };
 
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityBadge = (priority) => {
     switch (priority) {
       case 'high':
         return (
