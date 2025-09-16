@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, User, Mail, Phone, Shield, Stethoscope, Pill, Headphones, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Plus, Users, Search, Edit, Trash2, User, Mail, Phone, Shield, Stethoscope, Pill, Headphones, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
   const [formData, setFormData] = useState({
@@ -9,7 +9,9 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
     role: editingStaff?.role || 'doctor',
     department: editingStaff?.department || '',
     specialization: editingStaff?.specialization || '',
-    licenseNumber: editingStaff?.licenseNumber || ''
+    licenseNumber: editingStaff?.licenseNumber || '',
+    salary: editingStaff?.salary || 0,
+    workSchedule: editingStaff?.workSchedule || ''
   });
 
   const handleSubmit = (e) => {
@@ -38,10 +40,10 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-2xl">
-        <div className="p-8">
+      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 lg:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-24-bold text-white">
+            <h2 className="text-18-bold sm:text-20-bold lg:text-24-bold text-white">
               {editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}
             </h2>
             <button onClick={onClose} className="text-dark-600 hover:text-white transition-colors">
@@ -50,7 +52,7 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="shad-input-label block mb-2">Full Name *</label>
                 <input
@@ -125,7 +127,29 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div>
+                <label className="shad-input-label block mb-2">Salary ($)</label>
+                <input
+                  type="number"
+                  value={formData.salary}
+                  onChange={(e) => setFormData(prev => ({ ...prev, salary: parseInt(e.target.value) || 0 }))}
+                  placeholder="120000"
+                  className="shad-input w-full text-white"
+                />
+              </div>
+
+              <div>
+                <label className="shad-input-label block mb-2">Work Schedule</label>
+                <input
+                  type="text"
+                  value={formData.workSchedule}
+                  onChange={(e) => setFormData(prev => ({ ...prev, workSchedule: e.target.value }))}
+                  placeholder="Mon-Fri 9AM-5PM"
+                  className="shad-input w-full text-white"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
                 <label className="shad-input-label block mb-2">Specialization</label>
                 <input
                   type="text"
@@ -137,17 +161,17 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
               </div>
             </div>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-16-semibold transition-colors"
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-4 rounded-lg text-16-semibold transition-all duration-300 shadow-lg hover:shadow-red-500/25"
+                className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-red-500/25"
               >
                 {editingStaff ? 'Update Staff' : 'Add Staff'}
               </button>
@@ -159,7 +183,7 @@ const AddStaffModal = ({ isOpen, onClose, onAdd, editingStaff }) => {
   );
 };
 
-const UserManagement = ({ onBack }) => {
+const AdminStaffManagement = ({ onBack }) => {
   const [staff, setStaff] = useState([
     {
       id: '1',
@@ -172,7 +196,9 @@ const UserManagement = ({ onBack }) => {
       joinDate: '2023-01-15',
       avatar: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
       specialization: 'Internal Medicine',
-      licenseNumber: 'MD123456'
+      licenseNumber: 'MD123456',
+      salary: 180000,
+      workSchedule: 'Mon-Fri 8AM-6PM'
     },
     {
       id: '2',
@@ -185,7 +211,9 @@ const UserManagement = ({ onBack }) => {
       joinDate: '2023-03-20',
       avatar: 'https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
       specialization: 'Clinical Pharmacy',
-      licenseNumber: 'RPH789012'
+      licenseNumber: 'RPH789012',
+      salary: 95000,
+      workSchedule: 'Mon-Sat 9AM-7PM'
     },
     {
       id: '3',
@@ -196,7 +224,9 @@ const UserManagement = ({ onBack }) => {
       department: 'Front Desk',
       status: 'active',
       joinDate: '2023-06-10',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+      salary: 45000,
+      workSchedule: 'Mon-Fri 7AM-3PM'
     },
     {
       id: '4',
@@ -208,7 +238,9 @@ const UserManagement = ({ onBack }) => {
       status: 'pending',
       joinDate: '2024-01-15',
       avatar: 'https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-      specialization: 'Hospital Management'
+      specialization: 'Hospital Management',
+      salary: 85000,
+      workSchedule: 'Mon-Fri 8AM-5PM'
     }
   ]);
 
@@ -252,21 +284,21 @@ const UserManagement = ({ onBack }) => {
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-12-medium text-green-400">Active</span>
+            <span className="text-10-medium sm:text-12-medium text-green-400">Active</span>
           </div>
         );
       case 'inactive':
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-full">
             <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-            <span className="text-12-medium text-gray-400">Inactive</span>
+            <span className="text-10-medium sm:text-12-medium text-gray-400">Inactive</span>
           </div>
         );
       case 'pending':
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
             <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-            <span className="text-12-medium text-yellow-400">Pending</span>
+            <span className="text-10-medium sm:text-12-medium text-yellow-400">Pending</span>
           </div>
         );
       default:
@@ -325,32 +357,32 @@ const UserManagement = ({ onBack }) => {
       <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
         {/* Header */}
         <div className="bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-10">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <User className="w-6 h-6 text-white" />
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <div>
-                  <span className="text-24-bold text-white">User Management</span>
-                  <p className="text-14-regular text-dark-700">Manage hospital staff and permissions</p>
+                  <span className="text-20-bold lg:text-24-bold text-white">Staff Management</span>
+                  <p className="text-12-regular lg:text-14-regular text-dark-700">Manage hospital staff and roles</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-red-500/25 flex items-center gap-2"
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-12-medium lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-red-500/25 flex items-center gap-2"
               >
-                <Plus className="w-5 h-5" />
-                Add Staff
+                <Plus className="w-4 h-4 lg:w-5 lg:h-5" />
+                <span className="hidden sm:inline">Add Staff</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
           {/* Message */}
           {message && (
-            <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-8 ${
+            <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
               messageType === 'success' 
                 ? 'bg-green-500/10 border-green-500/30 text-green-400' 
                 : 'bg-red-500/10 border-red-500/30 text-red-400'
@@ -360,66 +392,66 @@ const UserManagement = ({ onBack }) => {
               ) : (
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
               )}
-              <span className="text-16-regular">{message}</span>
+              <span className="text-14-regular lg:text-16-regular">{message}</span>
             </div>
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <User className="w-7 h-7 text-white" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Users className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-32-bold text-white">{totalStaff}</div>
-                  <div className="text-14-regular text-blue-400">Total Staff</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">{totalStaff}</div>
+                  <div className="text-10-regular lg:text-14-regular text-blue-400">Total Staff</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <CheckCircle className="w-7 h-7 text-white" />
+            <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <CheckCircle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-32-bold text-white">{activeCount}</div>
-                  <div className="text-14-regular text-green-400">Active</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">{activeCount}</div>
+                  <div className="text-10-regular lg:text-14-regular text-green-400">Active</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <AlertCircle className="w-7 h-7 text-white" />
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <AlertCircle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-32-bold text-white">{pendingCount}</div>
-                  <div className="text-14-regular text-yellow-400">Pending</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">{pendingCount}</div>
+                  <div className="text-10-regular lg:text-14-regular text-yellow-400">Pending</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Stethoscope className="w-7 h-7 text-white" />
+            <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Stethoscope className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-32-bold text-white">{doctorCount}</div>
-                  <div className="text-14-regular text-green-400">Doctors</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">{doctorCount}</div>
+                  <div className="text-10-regular lg:text-14-regular text-green-400">Doctors</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 mb-8">
-            <div className="flex flex-col md:flex-row gap-4">
+          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8">
+            <div className="flex flex-col gap-4">
               {/* Search */}
-              <div className="flex-1 relative">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="w-5 h-5 text-dark-600" />
                 </div>
@@ -432,76 +464,77 @@ const UserManagement = ({ onBack }) => {
                 />
               </div>
 
-              {/* Role Filter */}
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="shad-select-trigger text-white"
-              >
-                <option value="all">All Roles</option>
-                <option value="doctor">Doctors</option>
-                <option value="pharmacist">Pharmacists</option>
-                <option value="receptionist">Receptionists</option>
-                <option value="admin">Administrators</option>
-              </select>
+              {/* Filter Row */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="shad-select-trigger text-white flex-1"
+                >
+                  <option value="all">All Roles</option>
+                  <option value="doctor">Doctors</option>
+                  <option value="pharmacist">Pharmacists</option>
+                  <option value="receptionist">Receptionists</option>
+                  <option value="admin">Administrators</option>
+                </select>
 
-              {/* Status Filter */}
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="shad-select-trigger text-white"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="pending">Pending</option>
-              </select>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="shad-select-trigger text-white flex-1"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Staff List */}
-          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
+          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
+            <div className="flex items-center gap-3 mb-6 lg:mb-8">
+              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                <Users className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <h2 className="text-24-bold text-white">Staff Members</h2>
+              <h2 className="text-18-bold lg:text-24-bold text-white">Staff Members</h2>
             </div>
 
             <div className="space-y-4">
               {filteredStaff.map((member) => (
-                <div key={member.id} className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-6 hover:border-dark-500/80 transition-all duration-300">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
+                <div key={member.id} className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 lg:gap-6">
                       <div className="relative">
                         <img
                           src={member.avatar}
                           alt={member.name}
-                          className="w-16 h-16 rounded-2xl object-cover border-2 border-dark-500/50"
+                          className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover border-2 border-dark-500/50"
                         />
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center border-2 border-dark-400">
                           {getRoleIcon(member.role)}
                         </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-4">
-                          <h3 className="text-20-bold text-white">{member.name}</h3>
+                      <div className="space-y-2 min-w-0 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                          <h3 className="text-16-bold lg:text-20-bold text-white">{member.name}</h3>
                           {getStatusBadge(member.status)}
                         </div>
                         
-                        <div className="flex items-center gap-6 text-14-regular text-dark-700">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div className="flex items-center gap-2">
-                            <Mail className="w-4 h-4 text-blue-400" />
+                            <Mail className="w-3 h-3 lg:w-4 lg:h-4 text-blue-400" />
                             <span>{member.email}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Phone className="w-4 h-4 text-green-400" />
+                            <Phone className="w-3 h-3 lg:w-4 lg:h-4 text-green-400" />
                             <span>{member.phone}</span>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-6 text-14-regular text-dark-700">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div>
                             <span className="text-white">Role:</span> {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                           </div>
@@ -515,39 +548,47 @@ const UserManagement = ({ onBack }) => {
                         
                         {member.specialization && (
                           <div className="bg-dark-500/30 rounded-lg px-3 py-2 inline-block">
-                            <p className="text-12-regular text-dark-600">
+                            <p className="text-10-regular lg:text-12-regular text-dark-600">
                               <span className="text-white">Specialization:</span> {member.specialization}
                             </p>
+                          </div>
+                        )}
+
+                        {member.salary && (
+                          <div className="text-12-regular lg:text-14-regular text-dark-700">
+                            <span className="text-white">Salary:</span> ${member.salary.toLocaleString()}/year
                           </div>
                         )}
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handleStatusToggle(member.id)}
-                        className={`px-4 py-2 rounded-lg text-14-medium transition-all duration-300 ${
-                          member.status === 'active'
-                            ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                            : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                        }`}
-                      >
-                        {member.status === 'active' ? 'Deactivate' : 'Activate'}
-                      </button>
-                      
-                      <button
-                        onClick={() => handleEditStaff(member)}
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      
-                      <button
-                        onClick={() => handleDeleteStaff(member.id)}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-500/25"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div className="flex flex-row lg:flex-col items-start lg:items-end gap-2 lg:gap-4 flex-shrink-0">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleStatusToggle(member.id)}
+                          className={`px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 ${
+                            member.status === 'active'
+                              ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                              : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                          }`}
+                        >
+                          {member.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                        
+                        <button
+                          onClick={() => handleEditStaff(member)}
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        
+                        <button
+                          onClick={() => handleDeleteStaff(member.id)}
+                          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-500/25"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -555,12 +596,12 @@ const UserManagement = ({ onBack }) => {
             </div>
 
             {filteredStaff.length === 0 && (
-              <div className="text-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-red-500/20">
-                  <User className="w-12 h-12 text-red-400" />
+              <div className="text-center py-12 lg:py-20">
+                <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-red-500/20">
+                  <Users className="w-8 h-8 lg:w-12 lg:h-12 text-red-400" />
                 </div>
-                <h3 className="text-24-bold text-white mb-4">No staff members found</h3>
-                <p className="text-16-regular text-dark-700 max-w-md mx-auto">
+                <h3 className="text-20-bold lg:text-24-bold text-white mb-4">No staff members found</h3>
+                <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
                   No staff members match your search criteria. Try adjusting your filters or add new staff members.
                 </p>
               </div>
@@ -570,7 +611,7 @@ const UserManagement = ({ onBack }) => {
           {/* Back Button */}
           <button
             onClick={onBack}
-            className="mt-8 text-16-regular text-dark-600 hover:text-white transition-colors"
+            className="mt-6 lg:mt-8 text-14-regular lg:text-16-regular text-dark-600 hover:text-white transition-colors"
           >
             ← Back to Dashboard
           </button>
@@ -591,4 +632,4 @@ const UserManagement = ({ onBack }) => {
   );
 };
 
-export default UserManagement;
+export default AdminStaffManagement;
