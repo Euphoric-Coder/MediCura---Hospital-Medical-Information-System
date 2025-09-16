@@ -85,6 +85,33 @@ export const Doctors = pgTable("doctors", {
   hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
+// Appointments Table
+export const Appointments = pgTable("appointments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+
+  patientId: uuid("patientId")
+    .notNull()
+    .references(() => Patients.userId, { onDelete: "cascade" }),
+
+  doctorId: uuid("doctorId")
+    .notNull()
+    .references(() => Doctors.userId, { onDelete: "cascade" }),
+
+  date: date("date").notNull(),
+  time: varchar("time").notNull(), // e.g. "10:30 AM"
+  reason: text("reason"),
+  notes: text("notes"),
+
+  status: varchar("status")
+    .default("upcoming"), // upcoming, completed, cancelled
+
+  type: varchar("type").default("Consultation"), // Consultation, Follow-up, etc.
+
+  bookingDate: timestamp("bookingDate").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+
 // Pharmacist Table
 export const Pharmacists = pgTable("pharmacists", {
   userId: uuid("userId")
