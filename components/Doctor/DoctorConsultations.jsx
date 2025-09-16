@@ -26,8 +26,8 @@ const admissionTypes = [
 ];
 
 const DoctorConsultations = ({ onBack }) => {
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [consultationData, setConsultationData] = useState<ConsultationData>({
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [consultationData, setConsultationData] = useState({
     patientId: '',
     chiefComplaint: '',
     historyOfPresentIllness: '',
@@ -43,7 +43,7 @@ const DoctorConsultations = ({ onBack }) => {
     nextAppointment: ''
   });
 
-  const [newPrescription, setNewPrescription] = useState<Prescription>({
+  const [newPrescription, setNewPrescription] = useState({
     medication: '',
     dosage: '',
     frequency: '',

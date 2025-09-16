@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Calendar, Clock, User, ChevronLeft, ChevronRight, Search, Filter, CheckCircle, AlertTriangle, Phone, Mail, Edit, Save, X } from 'lucide-react';
+import { Plus, Calendar, Clock, User, ChevronLeft, ChevronRight, Search, Filter, CheckCircle, AlertTriangle, Phone, Mail, Edit, Save, X, Users } from 'lucide-react';
 
 const AvailabilityModal = ({ isOpen, onClose, selectedDate, onSaveAvailability }) => {
   const [timeSlots, setTimeSlots] = useState(() => {
@@ -80,12 +80,12 @@ const AvailabilityModal = ({ isOpen, onClose, selectedDate, onSaveAvailability }
 
 const DoctorAppointments = ({ onBack }) => {
   const [currentWeek, setCurrentWeek] = useState(0);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   // Generate week schedule with appointments
   const generateWeekSchedule = (weekOffset) => {

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Calendar, Clock, Users, FileText, Pill, TestTube, Bed, TrendingUp, Bell, ChevronLeft, ChevronRight, User, Phone, Mail } from 'lucide-react';
+import { Plus, Calendar, Clock, Users, FileText, Pill, TestTube, Bed, TrendingUp, Bell, ChevronLeft, ChevronRight, User, Phone, Mail, Stethoscope, Activity } from 'lucide-react';
 
 const DoctorDashboard = ({ onLogout }) => {
   const [currentWeek, setCurrentWeek] = useState(0);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Generate week schedule
   const generateWeekSchedule = (weekOffset) => {
