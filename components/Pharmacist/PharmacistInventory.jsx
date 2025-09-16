@@ -239,9 +239,9 @@ const PharmacistInventory = ({ onBack }) => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
+  const [editingMedicine, setEditingMedicine] = useState(null);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const categories = ['all', ...Array.from(new Set(medicines.map(m => m.category)))];
 

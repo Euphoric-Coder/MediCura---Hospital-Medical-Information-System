@@ -3,7 +3,7 @@ import { Plus, Receipt, Search, User, Calendar, DollarSign, Download, Printer as
 import jsPDF from 'jspdf';
 
 const NewBillModal = ({ isOpen, onClose, onCreateBill }) => {
-  const [billData, setBillData] = useState<Partial<Bill>>({
+  const [billData, setBillData] = useState({
     patientId: '',
     patientName: '',
     patientPhone: '',
@@ -15,7 +15,7 @@ const NewBillModal = ({ isOpen, onClose, onCreateBill }) => {
     status: 'draft'
   });
 
-  const [newItem, setNewItem] = useState<Partial<BillItem>>({
+  const [newItem, setNewItem] = useState({
     medication: '',
     quantity: 1,
     unitPrice: 0,
@@ -301,7 +301,7 @@ const PharmacistBilling = ({ onBack }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showNewBillModal, setShowNewBillModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [messageType, setMessageType] = useState('');
 
   const filteredBills = bills.filter(bill =>
     bill.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||

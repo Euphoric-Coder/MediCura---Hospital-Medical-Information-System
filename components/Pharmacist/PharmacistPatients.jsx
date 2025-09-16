@@ -233,7 +233,7 @@ const PharmacistPatients = ({ onBack }) => {
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const filteredPatients = patients.filter(patient =>
