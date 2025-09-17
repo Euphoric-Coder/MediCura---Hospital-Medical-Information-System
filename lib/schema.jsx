@@ -88,7 +88,7 @@ export const Doctors = pgTable("doctors", {
   consultationFee: varchar("consultationFee"),
   rating: numeric("rating").default(0),
   availableDays: jsonb("availableDays"),
-  availableHours: varchar("availableHours"),
+  availableHours: jsonb("availableHours"),
   languagesSpoken: jsonb("languagesSpoken"),
 
   // Documents

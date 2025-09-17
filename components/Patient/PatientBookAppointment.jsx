@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Calendar,
@@ -18,6 +18,8 @@ import {
   CheckCircle,
   X,
 } from "lucide-react";
+import { db } from "@/lib/dbConfig";
+import { Doctors } from "@/lib/schema";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -295,53 +297,6 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
   );
 };
 
-const doctors = [
-  {
-    id: "1",
-    name: "Dr. Sarah Safari",
-    speciality: "General Medicine",
-    avatar:
-      "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    rating: 4.9,
-    yearsOfExperience: "12 years",
-    phone: "+1 (555) 123-4567",
-    consultationFee: 150,
-  },
-  {
-    id: "2",
-    name: "Dr. Ava Williams",
-    speciality: "Cardiology",
-    avatar:
-      "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    rating: 4.8,
-    yearsOfExperience: "15 years",
-    phone: "+1 (555) 234-5678",
-    consultationFee: 200,
-  },
-  {
-    id: "3",
-    name: "Dr. Adam Smith",
-    speciality: "Pediatrics",
-    avatar:
-      "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    rating: 4.7,
-    yearsOfExperience: "10 years",
-    phone: "+1 (555) 345-6789",
-    consultationFee: 175,
-  },
-  {
-    id: "4",
-    name: "Dr. Emily Chen",
-    speciality: "Dermatology",
-    avatar:
-      "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    rating: 4.9,
-    yearsOfExperience: "8 years",
-    phone: "+1 (555) 456-7890",
-    consultationFee: 180,
-  },
-];
-
 const appointmentTypes = [
   "Consultation",
   "Follow-up",
@@ -352,6 +307,8 @@ const appointmentTypes = [
 ];
 
 const PatientBookAppointment = ({ onBack, onSuccess }) => {
+  const [doctors, setDoctors] = useState([]); // store doctors here
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
   const [step, setStep] = useState("select-doctor");
   const [appointmentType, setAppointmentType] = useState("Consultation");
@@ -370,6 +327,22 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const data = await db.select().from(Doctors);
+        console.log(data);
+        setDoctors(data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   // Mock existing appointments
   const [existingAppointments, setExistingAppointments] = useState([
@@ -405,7 +378,8 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
   ]);
 
   // Generate week schedule for selected doctor
-  const generateWeekSchedule = (weekOffset) => {
+  const generateWeekSchedule = (doctor, weekOffset = 0) => {
+    console.log(doctor);
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() + weekOffset * 7);
@@ -416,32 +390,50 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
 
-      const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
       const dateStr = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       });
       const fullDate = date.toISOString().split("T")[0];
 
-      // Generate time slots (9 AM to 5 PM)
-      const slots = [];
-      for (let hour = 9; hour < 17; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const time = `${hour.toString().padStart(2, "0")}:${minute
-            .toString()
-            .padStart(2, "0")}`;
-          const available = Math.random() > 0.4; // Random availability
+      let slots = [];
 
-          slots.push({ time, available });
+      // Check if doctor is available on this day
+      if (doctor.availableDays?.includes(dayName) && doctor.availableHours) {
+        const startStr = doctor.availableHours.start;
+        const endStr = doctor.availableHours.end;
+
+        if (!startStr || !endStr) return schedule; // skip if invalid
+
+        const startHour = parseInt(startStr.split(":")[0], 10);
+        const startMinute = parseInt(startStr.split(":")[1], 10);
+        const endHour = parseInt(endStr.split(":")[0], 10);
+        const endMinute = parseInt(endStr.split(":")[1], 10);
+
+        const startTime = new Date(date);
+        startTime.setHours(startHour, startMinute, 0, 0);
+
+        const endTime = new Date(date);
+        endTime.setHours(endHour, endMinute, 0, 0);
+
+        const tempSlots = [];
+        let currentTime = new Date(startTime);
+
+        while (currentTime <= endTime) {
+          const timeStr = currentTime.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          tempSlots.push({ time: timeStr, available: true });
+          currentTime.setMinutes(currentTime.getMinutes() + 30);
         }
+
+        slots = tempSlots;
       }
 
-      schedule.push({
-        date: dateStr,
-        dayName,
-        fullDate,
-        slots,
-      });
+      schedule.push({ date: dateStr, dayName, fullDate, slots });
     }
 
     return schedule;
@@ -465,7 +457,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
-    setWeekSchedule(generateWeekSchedule(0));
+    setWeekSchedule(generateWeekSchedule(doctor, 0));
     setStep("select-time");
   };
 
@@ -475,10 +467,10 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
     setStep("confirm");
   };
 
-  const handleWeekChange = (direction) => {
+  const handleWeekChange = (direction, doctor) => {
     const newWeek = direction === "next" ? currentWeek + 1 : currentWeek - 1;
     setCurrentWeek(newWeek);
-    setWeekSchedule(generateWeekSchedule(newWeek));
+    setWeekSchedule(generateWeekSchedule(doctor, newWeek));
   };
 
   const handleConfirmBooking = () => {
@@ -645,6 +637,18 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
     ));
   };
 
+  // If still loading → show loader
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white text-lg">Loading your data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
@@ -810,7 +814,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                     {filteredDoctors.map((doctor) => (
                       <div
-                        key={doctor.id}
+                        key={doctor.userId}
                         className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-green-500/50 transition-all duration-300 cursor-pointer group"
                         onClick={() => handleDoctorSelect(doctor)}
                       >
@@ -920,24 +924,22 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                     </h2>
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => handleWeekChange("prev")}
-                        className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
+                        onClick={() => handleWeekChange("prev", selectedDoctor)}
+                        className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors disabled:opacity-50"
+                        disabled={currentWeek === 0}
                       >
                         <ChevronLeft className="w-5 h-5 text-white" />
                       </button>
                       <span className="text-14-medium lg:text-16-medium text-white px-2 lg:px-4 text-center">
                         {currentWeek === 0
                           ? "This Week"
-                          : currentWeek > 0
-                          ? `${currentWeek} Week${
+                          : `${currentWeek} Week${
                               currentWeek > 1 ? "s" : ""
                             } Ahead`
-                          : `${Math.abs(currentWeek)} Week${
-                              Math.abs(currentWeek) > 1 ? "s" : ""
-                            } Ago`}
+                        }
                       </span>
                       <button
-                        onClick={() => handleWeekChange("next")}
+                        onClick={() => handleWeekChange("next", selectedDoctor)}
                         className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
                       >
                         <ChevronRight className="w-5 h-5 text-white" />
@@ -962,23 +964,23 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                         </div>
 
                         <div className="space-y-1 lg:space-y-2 max-h-48 lg:max-h-96 overflow-y-auto">
-                          {day.slots.map((slot, slotIndex) => (
-                            <button
-                              key={slotIndex}
-                              onClick={() =>
-                                slot.available &&
-                                handleTimeSelect(day.fullDate, slot.time)
-                              }
-                              disabled={!slot.available}
-                              className={`w-full p-1 lg:p-2 rounded text-8-medium lg:text-12-medium transition-all duration-200 ${
-                                slot.available
-                                  ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
-                                  : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
-                              }`}
-                            >
-                              {slot.time}
-                            </button>
-                          ))}
+                          {day.slots.length > 0 ? (
+                            day.slots.map((slot, slotIndex) => (
+                              <button
+                                key={slotIndex}
+                                onClick={() =>
+                                  handleTimeSelect(day.fullDate, slot.time)
+                                }
+                                className="w-full p-2 rounded bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
+                              >
+                                {slot.time}
+                              </button>
+                            ))
+                          ) : (
+                            <p className="text-center text-dark-600 text-sm">
+                              Not Available
+                            </p>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1029,7 +1031,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                         </div>
                       </div>
                       <div className="space-y-2 text-12-regular lg:text-14-regular text-dark-700">
-                        <div className="flex items-center gap-2">
+                        {/* <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-green-400" />
                           <span className="hidden sm:inline">
                             {selectedDoctor.location}
@@ -1037,7 +1039,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                           <span className="sm:hidden">
                             {selectedDoctor.location.split(",")[0]}
                           </span>
-                        </div>
+                        </div> */}
                         <div className="items-center gap-2 hidden sm:flex">
                           <Phone className="w-4 h-4 text-blue-400" />
                           <span>{selectedDoctor.phone}</span>

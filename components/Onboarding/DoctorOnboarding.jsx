@@ -106,7 +106,7 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
     consultationFee: "",
     availableDays: [],
     availableHours: "",
-    languagesSpoken: "",
+    languagesSpoken: [],
     insuranceAccepted: "",
 
     // Documents
