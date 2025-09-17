@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { db } from "@/lib/dbConfig";
 import { Patients, Users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
+import { ArrowRight, ShieldAlert } from "lucide-react";
 
 export default function PatientPage() {
   const { data: session } = useSession();
@@ -32,6 +33,7 @@ export default function PatientPage() {
           .where(eq(Users.email, userEmail));
 
         if (data.length > 0) {
+          console.log(data[0].role);
           setRole(data[0].role);
 
           const patient = await db
@@ -67,6 +69,36 @@ export default function PatientPage() {
 
   if (onboardingStatus === false) {
     return <OnboardingRedirect userType={role} name={userName} />;
+  }
+
+  if (!userId || !userEmail) {
+    return <div>Not Logged In</div>;
+  }
+
+  if (role !== "patient") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 p-6">
+        <div className="bg-dark-400/70 border border-red-500/30 rounded-3xl p-8 max-w-md w-full text-center shadow-lg">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 rounded-2xl bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+              <ShieldAlert className="w-10 h-10 text-red-400" />
+            </div>
+          </div>
+          <h2 className="text-24-bold text-white mb-4">Access Denied</h2>
+          <p className="text-dark-600 text-16-regular mb-6">
+            Hello <span className="text-white">{userName || "User"}</span>, you
+            don’t have access to the Patient Dashboard. Please proceed to your{" "}
+            <span className="text-green-400">{role}</span> dashboard.
+          </p>
+          <button
+            onClick={() => router.push(`/${role}-dashboard`)}
+            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+          >
+            Go to {role} Dashboard <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return <PatientDashboardWithSidebar />;
