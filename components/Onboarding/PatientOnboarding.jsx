@@ -127,7 +127,7 @@ const countryCodes = [
 const OnboardingPage = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
-    fullName: "",
+    name: "",
     email: "",
     phone: "",
     dateOfBirth: "",
@@ -141,6 +141,8 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     primaryPhysician: "",
     insuranceProvider: "",
     insurancePolicyNumber: "",
+    insurancePolicyDocument: null,
+    insurancePolicyDocumentId: null,
     allergies: [],
     currentMedications: [],
     familyMedicalHistory: [],
@@ -150,6 +152,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     identificationType: "Birth Certificate",
     identificationNumber: "",
     identificationDocument: null,
+    identificationDocumentId: null,
 
     // Consent
     treatmentConsent: true,
@@ -417,8 +420,8 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   </div>
                   <input
                     type="text"
-                    name="fullName"
-                    value={formData.fullName}
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     placeholder="ex: Adam"
                     className="shad-input pl-10 w-full text-white"

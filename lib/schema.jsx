@@ -27,6 +27,9 @@ export const Patients = pgTable("patients", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
+  // Profile
+  name: varchar("name"),
+  email: varchar("email"),
   phone: varchar("phone"),
   dateOfBirth: date("dateOfBirth"),
   gender: varchar("gender"),
@@ -38,10 +41,12 @@ export const Patients = pgTable("patients", {
   primaryPhysician: varchar("primaryPhysician"),
   insuranceProvider: varchar("insuranceProvider"),
   insurancePolicyNumber: varchar("insurancePolicyNumber"),
-  allergies: text("allergies"),
-  currentMedications: text("currentMedications"),
-  familyMedicalHistory: text("familyMedicalHistory"),
-  pastMedicalHistory: text("pastMedicalHistory"),
+  insurancePolicyDocument: varchar("insurancePolicyDocument"),
+  insurancePolicyDocumentId: varchar("insurancePolicyDocumentId"),
+  allergies: jsonb("allergies"),
+  currentMedications: jsonb("currentMedications"),
+  familyMedicalHistory: jsonb("familyMedicalHistory"),
+  pastMedicalHistory: jsonb("pastMedicalHistory"),
 
   identificationType: varchar("identificationType"),
   identificationNumber: varchar("identificationNumber"),
