@@ -62,6 +62,7 @@ export const Doctors = pgTable("doctors", {
 
   name: varchar("name"),
   phone: varchar("phone"),
+  avatar: varchar("avatar"),
   medicalLicenseNumber: varchar("medicalLicenseNumber"),
   speciality: varchar("speciality"),
   yearsOfExperience: integer("yearsOfExperience"),

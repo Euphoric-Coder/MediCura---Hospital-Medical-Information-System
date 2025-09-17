@@ -306,7 +306,6 @@ const doctors = [
     yearsOfExperience: "12 years",
     phone: "+1 (555) 123-4567",
     consultationFee: 150,
-    nextAvailable: "Today 2:00 PM",
   },
   {
     id: "2",
@@ -318,7 +317,6 @@ const doctors = [
     yearsOfExperience: "15 years",
     phone: "+1 (555) 234-5678",
     consultationFee: 200,
-    nextAvailable: "Tomorrow 10:00 AM",
   },
   {
     id: "3",
@@ -330,7 +328,6 @@ const doctors = [
     yearsOfExperience: "10 years",
     phone: "+1 (555) 345-6789",
     consultationFee: 175,
-    nextAvailable: "Jan 25 9:00 AM",
   },
   {
     id: "4",
@@ -342,7 +339,6 @@ const doctors = [
     yearsOfExperience: "8 years",
     phone: "+1 (555) 456-7890",
     consultationFee: 180,
-    nextAvailable: "Jan 26 11:30 AM",
   },
 ];
 
@@ -854,12 +850,6 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                               <div className="items-center gap-2 hidden sm:flex">
                                 <Phone className="w-4 h-4 text-blue-400" />
                                 <span>{doctor.phone}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-purple-400" />
-                                <span>
-                                  Next available: {doctor.nextAvailable}
-                                </span>
                               </div>
                             </div>
 
