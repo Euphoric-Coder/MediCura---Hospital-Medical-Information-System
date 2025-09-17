@@ -588,22 +588,14 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     }
   };
 
-  const handleRescheduleAppointment = (newDate, newTime) => {
+  const handleRescheduleAppointment = async (newDate, newTime) => {
     if (selectedAppointment) {
-      const formattedDate = new Date(newDate).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+      const reschedule = await db.update(Appointments).set({
+        date: newDate,
+        time: newTime,
+        updatedAt: new Date(),
       });
-
-      console.log(formattedDate, newTime);
-      // setExistingAppointments((prev) =>
-      //   prev.map((apt) =>
-      //     apt.id === selectedAppointment.id
-      //       ? { ...apt, date: formattedDate, time: newTime }
-      //       : apt
-      //   )
-      // );
+      refreshAppointment();
 
       setMessage(
         `Appointment with ${selectedAppointment.doctor.name} rescheduled successfully`
