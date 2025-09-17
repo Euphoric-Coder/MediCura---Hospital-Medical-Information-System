@@ -8,9 +8,14 @@ import { db } from "@/lib/dbConfig";
 import { Patients, Users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { ArrowRight, ShieldAlert } from "lucide-react";
+import { useRouter } from "next/navigation";
+import LoginRedirect from "@/components/Onboarding/LoginRedirect";
 
 export default function PatientPage() {
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  console.log(status);
 
   // Extract user details from session
   const userName = session?.user?.name;
@@ -53,8 +58,18 @@ export default function PatientPage() {
       }
     };
 
-    checkOnboardingStatus();
-  }, [userId, userEmail]);
+    if (status === "authenticated") checkOnboardingStatus();
+
+    // Timeout fallback → after 4s stop loading if unauthenticated
+    const timer = setTimeout(() => {
+      console.log("timeout");
+      if (status === "unauthenticated") {
+        setLoading(false);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [userId, userEmail, status]);
 
   if (loading) {
     return (
@@ -71,8 +86,8 @@ export default function PatientPage() {
     return <OnboardingRedirect userType={role} name={userName} />;
   }
 
-  if (!userId || !userEmail) {
-    return <div>Not Logged In</div>;
+  if (status === "unauthenticated") {
+    return <LoginRedirect />;
   }
 
   if (role !== "patient") {
@@ -91,7 +106,7 @@ export default function PatientPage() {
             <span className="text-green-400">{role}</span> dashboard.
           </p>
           <button
-            onClick={() => router.push(`/${role}-dashboard`)}
+            onClick={() => router.push(`/${role}/dashboard`)}
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
           >
             Go to {role} Dashboard <ArrowRight className="w-5 h-5" />
