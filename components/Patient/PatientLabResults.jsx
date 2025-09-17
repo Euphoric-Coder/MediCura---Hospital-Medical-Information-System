@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
-import { TestTube, Search, Download, Eye, Calendar, User, Clock, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Activity } from 'lucide-react';
-import jsPDF from 'jspdf';
+import React, { useState } from "react";
+import {
+  TestTube,
+  Search,
+  Download,
+  Eye,
+  Calendar,
+  User,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+} from "lucide-react";
+import jsPDF from "jspdf";
 
-const LabResultDetailsModal = ({ 
-  isOpen, 
-  onClose, 
-  labResult, 
-  onDownloadPDF 
+const LabResultDetailsModal = ({
+  isOpen,
+  onClose,
+  labResult,
+  onDownloadPDF,
 }) => {
   if (!isOpen || !labResult) return null;
 
   const getParameterStatusIcon = (status) => {
     switch (status) {
-      case 'high':
+      case "high":
         return <TrendingUp className="w-4 h-4 text-red-400" />;
-      case 'low':
+      case "low":
         return <TrendingDown className="w-4 h-4 text-blue-400" />;
-      case 'critical':
+      case "critical":
         return <AlertTriangle className="w-4 h-4 text-red-500" />;
       default:
         return <CheckCircle className="w-4 h-4 text-green-400" />;
@@ -25,14 +38,14 @@ const LabResultDetailsModal = ({
 
   const getParameterStatusColor = (status) => {
     switch (status) {
-      case 'high':
-        return 'text-red-400 bg-red-500/10 border-red-500/30';
-      case 'low':
-        return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
-      case 'critical':
-        return 'text-red-500 bg-red-500/20 border-red-500/40';
+      case "high":
+        return "text-red-400 bg-red-500/10 border-red-500/30";
+      case "low":
+        return "text-blue-400 bg-blue-500/10 border-blue-500/30";
+      case "critical":
+        return "text-red-500 bg-red-500/20 border-red-500/40";
       default:
-        return 'text-green-400 bg-green-500/10 border-green-500/30';
+        return "text-green-400 bg-green-500/10 border-green-500/30";
     }
   };
 
@@ -41,7 +54,9 @@ const LabResultDetailsModal = ({
       <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-4 sm:p-6 lg:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-18-bold sm:text-20-bold lg:text-24-bold text-white">Lab Result Details</h2>
+            <h2 className="text-18-bold sm:text-20-bold lg:text-24-bold text-white">
+              Lab Result Details
+            </h2>
             <button
               onClick={onClose}
               className="text-dark-600 hover:text-white transition-colors"
@@ -57,31 +72,40 @@ const LabResultDetailsModal = ({
                 <TestTube className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
               <div>
-                <h3 className="text-16-bold sm:text-18-bold lg:text-20-bold text-white">{labResult.testName}</h3>
-                <p className="text-12-regular sm:text-14-regular text-green-400">{labResult.category}</p>
+                <h3 className="text-16-bold sm:text-18-bold lg:text-20-bold text-white">
+                  {labResult.testName}
+                </h3>
+                <p className="text-12-regular sm:text-14-regular text-green-400">
+                  {labResult.category}
+                </p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-12-regular sm:text-14-regular text-dark-700">
               <div>
-                <span className="text-white">Ordered by:</span> {labResult.orderedBy}
+                <span className="text-white">Ordered by:</span>{" "}
+                {labResult.orderedBy}
               </div>
               <div>
-                <span className="text-white">Ordered Date:</span> {labResult.orderedDate}
+                <span className="text-white">Ordered Date:</span>{" "}
+                {labResult.orderedDate}
               </div>
               <div>
-                <span className="text-white">Collection:</span> {labResult.collectionDate}
+                <span className="text-white">Collection:</span>{" "}
+                {labResult.collectionDate}
               </div>
               {labResult.resultDate && (
                 <div>
-                  <span className="text-white">Result Date:</span> {labResult.resultDate}
+                  <span className="text-white">Result Date:</span>{" "}
+                  {labResult.resultDate}
                 </div>
               )}
               <div>
                 <span className="text-white">Lab:</span> {labResult.lab}
               </div>
               <div>
-                <span className="text-white">Cost:</span> ${labResult.cost.toFixed(2)}
+                <span className="text-white">Cost:</span> $
+                {labResult.cost.toFixed(2)}
               </div>
             </div>
           </div>
@@ -89,23 +113,43 @@ const LabResultDetailsModal = ({
           {/* Test Results */}
           {labResult.results && labResult.results.length > 0 && (
             <div className="bg-dark-500/30 rounded-2xl p-4 sm:p-6 mb-6">
-              <h4 className="text-16-bold sm:text-18-bold text-white mb-4">Test Results</h4>
+              <h4 className="text-16-bold sm:text-18-bold text-white mb-4">
+                Test Results
+              </h4>
               <div className="space-y-3">
                 {labResult.results.map((result, index) => (
-                  <div key={index} className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg border ${getParameterStatusColor(result.status)}`}>
+                  <div
+                    key={index}
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg border ${getParameterStatusColor(
+                      result.status
+                    )}`}
+                  >
                     <div className="flex items-center gap-3 mb-2 sm:mb-0">
                       {getParameterStatusIcon(result.status)}
                       <div>
-                        <div className="text-14-medium sm:text-16-medium text-white">{result.parameter}</div>
-                        <div className="text-12-regular text-dark-600">Normal: {result.normalRange}</div>
+                        <div className="text-14-medium sm:text-16-medium text-white">
+                          {result.parameter}
+                        </div>
+                        <div className="text-12-regular text-dark-600">
+                          Normal: {result.normalRange}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-16-semibold sm:text-18-semibold text-white">
                         {result.value} {result.unit}
                       </div>
-                      <div className={`text-12-medium ${result.status === 'normal' ? 'text-green-400' : result.status === 'critical' ? 'text-red-500' : 'text-yellow-400'}`}>
-                        {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
+                      <div
+                        className={`text-12-medium ${
+                          result.status === "normal"
+                            ? "text-green-400"
+                            : result.status === "critical"
+                            ? "text-red-500"
+                            : "text-yellow-400"
+                        }`}
+                      >
+                        {result.status.charAt(0).toUpperCase() +
+                          result.status.slice(1)}
                       </div>
                     </div>
                   </div>
@@ -117,8 +161,12 @@ const LabResultDetailsModal = ({
           {/* Notes */}
           {labResult.notes && (
             <div className="bg-blue-500/10 rounded-2xl p-4 sm:p-6 mb-6">
-              <h4 className="text-16-bold sm:text-18-bold text-white mb-4">Doctor's Notes</h4>
-              <p className="text-12-regular sm:text-14-regular text-blue-300">{labResult.notes}</p>
+              <h4 className="text-16-bold sm:text-18-bold text-white mb-4">
+                Doctor's Notes
+              </h4>
+              <p className="text-12-regular sm:text-14-regular text-blue-300">
+                {labResult.notes}
+              </p>
             </div>
           )}
 
@@ -141,118 +189,188 @@ const LabResultDetailsModal = ({
 const PatientLabResults = ({ onBack }) => {
   const [labResults] = useState([
     {
-      id: '1',
-      testName: 'Complete Blood Count (CBC)',
-      category: 'Hematology',
-      orderedBy: 'Dr. Sarah Safari',
-      orderedDate: '2024-01-10',
-      collectionDate: '2024-01-12',
-      resultDate: '2024-01-13',
-      status: 'completed',
+      id: "1",
+      testName: "Complete Blood Count (CBC)",
+      category: "Hematology",
+      orderedBy: "Dr. Sarah Safari",
+      orderedDate: "2024-01-10",
+      collectionDate: "2024-01-12",
+      resultDate: "2024-01-13",
+      status: "completed",
       results: [
-        { parameter: 'White Blood Cells', value: '7.2', unit: 'K/uL', normalRange: '4.0-11.0', status: 'normal' },
-        { parameter: 'Red Blood Cells', value: '4.8', unit: 'M/uL', normalRange: '4.2-5.4', status: 'normal' },
-        { parameter: 'Hemoglobin', value: '14.5', unit: 'g/dL', normalRange: '12.0-16.0', status: 'normal' },
-        { parameter: 'Hematocrit', value: '42.1', unit: '%', normalRange: '36.0-46.0', status: 'normal' },
-        { parameter: 'Platelets', value: '285', unit: 'K/uL', normalRange: '150-450', status: 'normal' }
+        {
+          parameter: "White Blood Cells",
+          value: "7.2",
+          unit: "K/uL",
+          normalRange: "4.0-11.0",
+          status: "normal",
+        },
+        {
+          parameter: "Red Blood Cells",
+          value: "4.8",
+          unit: "M/uL",
+          normalRange: "4.2-5.4",
+          status: "normal",
+        },
+        {
+          parameter: "Hemoglobin",
+          value: "14.5",
+          unit: "g/dL",
+          normalRange: "12.0-16.0",
+          status: "normal",
+        },
+        {
+          parameter: "Hematocrit",
+          value: "42.1",
+          unit: "%",
+          normalRange: "36.0-46.0",
+          status: "normal",
+        },
+        {
+          parameter: "Platelets",
+          value: "285",
+          unit: "K/uL",
+          normalRange: "150-450",
+          status: "normal",
+        },
       ],
-      overallResult: 'normal',
-      notes: 'All blood count parameters are within normal limits. Continue current medications.',
-      cost: 85.00,
-      lab: 'CarePulse Laboratory'
+      overallResult: "normal",
+      notes:
+        "All blood count parameters are within normal limits. Continue current medications.",
+      cost: 85.0,
+      lab: "MediCura Laboratory",
     },
     {
-      id: '2',
-      testName: 'Lipid Profile',
-      category: 'Chemistry',
-      orderedBy: 'Dr. Sarah Safari',
-      orderedDate: '2024-01-10',
-      collectionDate: '2024-01-12',
-      resultDate: '2024-01-14',
-      status: 'completed',
+      id: "2",
+      testName: "Lipid Profile",
+      category: "Chemistry",
+      orderedBy: "Dr. Sarah Safari",
+      orderedDate: "2024-01-10",
+      collectionDate: "2024-01-12",
+      resultDate: "2024-01-14",
+      status: "completed",
       results: [
-        { parameter: 'Total Cholesterol', value: '195', unit: 'mg/dL', normalRange: '<200', status: 'normal' },
-        { parameter: 'LDL Cholesterol', value: '125', unit: 'mg/dL', normalRange: '<100', status: 'high' },
-        { parameter: 'HDL Cholesterol', value: '45', unit: 'mg/dL', normalRange: '>40', status: 'normal' },
-        { parameter: 'Triglycerides', value: '150', unit: 'mg/dL', normalRange: '<150', status: 'normal' }
+        {
+          parameter: "Total Cholesterol",
+          value: "195",
+          unit: "mg/dL",
+          normalRange: "<200",
+          status: "normal",
+        },
+        {
+          parameter: "LDL Cholesterol",
+          value: "125",
+          unit: "mg/dL",
+          normalRange: "<100",
+          status: "high",
+        },
+        {
+          parameter: "HDL Cholesterol",
+          value: "45",
+          unit: "mg/dL",
+          normalRange: ">40",
+          status: "normal",
+        },
+        {
+          parameter: "Triglycerides",
+          value: "150",
+          unit: "mg/dL",
+          normalRange: "<150",
+          status: "normal",
+        },
       ],
-      overallResult: 'abnormal',
-      notes: 'LDL cholesterol slightly elevated. Recommend dietary modifications and follow-up in 3 months.',
-      cost: 65.00,
-      lab: 'CarePulse Laboratory'
+      overallResult: "abnormal",
+      notes:
+        "LDL cholesterol slightly elevated. Recommend dietary modifications and follow-up in 3 months.",
+      cost: 65.0,
+      lab: "MediCura Laboratory",
     },
     {
-      id: '3',
-      testName: 'Thyroid Function Tests',
-      category: 'Endocrinology',
-      orderedBy: 'Dr. Ava Williams',
-      orderedDate: '2024-01-15',
-      collectionDate: '2024-01-16',
-      status: 'in-progress',
-      cost: 120.00,
-      lab: 'External Lab Partners'
+      id: "3",
+      testName: "Thyroid Function Tests",
+      category: "Endocrinology",
+      orderedBy: "Dr. Ava Williams",
+      orderedDate: "2024-01-15",
+      collectionDate: "2024-01-16",
+      status: "in-progress",
+      cost: 120.0,
+      lab: "External Lab Partners",
     },
     {
-      id: '4',
-      testName: 'Basic Metabolic Panel',
-      category: 'Chemistry',
-      orderedBy: 'Dr. Sarah Safari',
-      orderedDate: '2024-01-18',
-      collectionDate: '2024-01-20',
-      status: 'pending',
-      cost: 45.00,
-      lab: 'CarePulse Laboratory'
-    }
+      id: "4",
+      testName: "Basic Metabolic Panel",
+      category: "Chemistry",
+      orderedBy: "Dr. Sarah Safari",
+      orderedDate: "2024-01-18",
+      collectionDate: "2024-01-20",
+      status: "pending",
+      cost: 45.0,
+      lab: "MediCura Laboratory",
+    },
   ]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedLabResult, setSelectedLabResult] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  const categories = ['all', ...Array.from(new Set(labResults.map(r => r.category)))];
+  const categories = [
+    "all",
+    ...Array.from(new Set(labResults.map((r) => r.category))),
+  ];
 
-  const filteredResults = labResults.filter(result => {
-    const matchesSearch = result.testName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         result.orderedBy.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || result.status === statusFilter;
-    const matchesCategory = categoryFilter === 'all' || result.category === categoryFilter;
-    
+  const filteredResults = labResults.filter((result) => {
+    const matchesSearch =
+      result.testName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      result.orderedBy.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || result.status === statusFilter;
+    const matchesCategory =
+      categoryFilter === "all" || result.category === categoryFilter;
+
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
             <CheckCircle className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-green-400">Completed</span>
+            <span className="text-10-medium sm:text-12-medium text-green-400">
+              Completed
+            </span>
           </div>
         );
-      case 'pending':
+      case "pending":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
             <Clock className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-yellow-400">Pending</span>
+            <span className="text-10-medium sm:text-12-medium text-yellow-400">
+              Pending
+            </span>
           </div>
         );
-      case 'in-progress':
+      case "in-progress":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
             <Activity className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-blue-400">In Progress</span>
+            <span className="text-10-medium sm:text-12-medium text-blue-400">
+              In Progress
+            </span>
           </div>
         );
-      case 'cancelled':
+      case "cancelled":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
             <AlertTriangle className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-red-400">Cancelled</span>
+            <span className="text-10-medium sm:text-12-medium text-red-400">
+              Cancelled
+            </span>
           </div>
         );
       default:
@@ -262,23 +380,23 @@ const PatientLabResults = ({ onBack }) => {
 
   const getOverallResultBadge = (result) => {
     if (!result) return null;
-    
+
     switch (result) {
-      case 'normal':
+      case "normal":
         return (
           <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
             <CheckCircle className="w-4 h-4" />
             <span className="text-14-medium text-green-400">Normal</span>
           </div>
         );
-      case 'abnormal':
+      case "abnormal":
         return (
           <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
             <AlertTriangle className="w-4 h-4" />
             <span className="text-14-medium text-yellow-400">Abnormal</span>
           </div>
         );
-      case 'critical':
+      case "critical":
         return (
           <div className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full">
             <AlertTriangle className="w-4 h-4" />
@@ -292,33 +410,33 @@ const PatientLabResults = ({ onBack }) => {
 
   const generateLabResultPDF = (labResult) => {
     const doc = new jsPDF();
-    
+
     // Header
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('CarePulse Medical Center', 20, 30);
-    
+    doc.text("MediCura Medical Center", 20, 30);
+
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text('123 Healthcare Drive, Medical City, MC 12345', 20, 40);
-    doc.text('Phone: (555) 123-4567 | Email: lab@carepulse.com', 20, 50);
-    
+    doc.text("123 Healthcare Drive, Medical City, MC 12345", 20, 40);
+    doc.text("Phone: (555) 123-4567 | Email: lab@medicura.com", 20, 50);
+
     // Title
     doc.setFontSize(16);
     doc.setTextColor(40, 40, 40);
-    doc.text('LABORATORY REPORT', 20, 70);
-    
+    doc.text("LABORATORY REPORT", 20, 70);
+
     // Patient Information
     doc.setFontSize(14);
-    doc.text('Patient Information:', 20, 90);
+    doc.text("Patient Information:", 20, 90);
     doc.setFontSize(12);
-    doc.text('Patient: John Smith', 30, 105);
-    doc.text('Patient ID: P001', 30, 115);
+    doc.text("Patient: John Smith", 30, 105);
+    doc.text("Patient ID: P001", 30, 115);
     doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 30, 125);
-    
+
     // Test Information
     doc.setFontSize(14);
-    doc.text('Test Information:', 20, 145);
+    doc.text("Test Information:", 20, 145);
     doc.setFontSize(12);
     doc.text(`Test Name: ${labResult.testName}`, 30, 160);
     doc.text(`Category: ${labResult.category}`, 30, 170);
@@ -329,49 +447,61 @@ const PatientLabResults = ({ onBack }) => {
       doc.text(`Result Date: ${labResult.resultDate}`, 30, 210);
     }
     doc.text(`Laboratory: ${labResult.lab}`, 30, 220);
-    
+
     let yPos = 255;
-    
+
     // Results
     if (labResult.results && labResult.results.length > 0) {
       doc.setFontSize(14);
-      doc.text('Test Results:', 20, 240);
+      doc.text("Test Results:", 20, 240);
       doc.setFontSize(12);
-      
+
       labResult.results.forEach((result) => {
-        doc.text(`${result.parameter}: ${result.value} ${result.unit}`, 30, yPos);
+        doc.text(
+          `${result.parameter}: ${result.value} ${result.unit}`,
+          30,
+          yPos
+        );
         doc.text(`Normal Range: ${result.normalRange}`, 30, yPos + 10);
         doc.text(`Status: ${result.status.toUpperCase()}`, 30, yPos + 20);
         yPos += 35;
       });
     }
-    
+
     // Notes
     if (labResult.notes) {
       doc.setFontSize(14);
-      doc.text('Doctor\'s Notes:', 20, yPos + 10);
+      doc.text("Doctor's Notes:", 20, yPos + 10);
       doc.setFontSize(12);
       const noteLines = doc.splitTextToSize(labResult.notes, 160);
       doc.text(noteLines, 30, yPos + 25);
     }
-    
+
     // Footer
     doc.setFontSize(10);
     doc.setTextColor(150, 150, 150);
-    doc.text('This report is confidential and intended for the patient and healthcare provider only.', 20, 280);
-    
+    doc.text(
+      "This report is confidential and intended for the patient and healthcare provider only.",
+      20,
+      280
+    );
+
     // Save the PDF
-    doc.save(`lab-result-${labResult.testName.toLowerCase().replace(/\s+/g, '-')}-${labResult.id}.pdf`);
+    doc.save(
+      `lab-result-${labResult.testName.toLowerCase().replace(/\s+/g, "-")}-${
+        labResult.id
+      }.pdf`
+    );
   };
 
   const handleDownloadPDF = (labResult) => {
     generateLabResultPDF(labResult);
     setMessage(`PDF downloaded for ${labResult.testName}`);
-    setMessageType('success');
-    
+    setMessageType("success");
+
     setTimeout(() => {
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
     }, 3000);
   };
 
@@ -380,10 +510,16 @@ const PatientLabResults = ({ onBack }) => {
     setShowDetailsModal(true);
   };
 
-  const completedCount = labResults.filter(r => r.status === 'completed').length;
-  const pendingCount = labResults.filter(r => r.status === 'pending').length;
-  const inProgressCount = labResults.filter(r => r.status === 'in-progress').length;
-  const abnormalCount = labResults.filter(r => r.overallResult === 'abnormal' || r.overallResult === 'critical').length;
+  const completedCount = labResults.filter(
+    (r) => r.status === "completed"
+  ).length;
+  const pendingCount = labResults.filter((r) => r.status === "pending").length;
+  const inProgressCount = labResults.filter(
+    (r) => r.status === "in-progress"
+  ).length;
+  const abnormalCount = labResults.filter(
+    (r) => r.overallResult === "abnormal" || r.overallResult === "critical"
+  ).length;
 
   return (
     <>
@@ -396,8 +532,12 @@ const PatientLabResults = ({ onBack }) => {
                 <TestTube className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
               <div>
-                <span className="text-20-bold lg:text-24-bold text-white">Lab Results</span>
-                <p className="text-12-regular lg:text-14-regular text-dark-700">View your test results</p>
+                <span className="text-20-bold lg:text-24-bold text-white">
+                  Lab Results
+                </span>
+                <p className="text-12-regular lg:text-14-regular text-dark-700">
+                  View your test results
+                </p>
               </div>
             </div>
           </div>
@@ -406,17 +546,21 @@ const PatientLabResults = ({ onBack }) => {
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
           {/* Message */}
           {message && (
-            <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
-              messageType === 'success' 
-                ? 'bg-green-500/10 border-green-500/30 text-green-400' 
-                : 'bg-red-500/10 border-red-500/30 text-red-400'
-            }`}>
-              {messageType === 'success' ? (
+            <div
+              className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
+                messageType === "success"
+                  ? "bg-green-500/10 border-green-500/30 text-green-400"
+                  : "bg-red-500/10 border-red-500/30 text-red-400"
+              }`}
+            >
+              {messageType === "success" ? (
                 <CheckCircle className="w-5 h-5 flex-shrink-0" />
               ) : (
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
               )}
-              <span className="text-14-regular lg:text-16-regular">{message}</span>
+              <span className="text-14-regular lg:text-16-regular">
+                {message}
+              </span>
             </div>
           )}
 
@@ -428,8 +572,12 @@ const PatientLabResults = ({ onBack }) => {
                   <CheckCircle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">{completedCount}</div>
-                  <div className="text-10-regular lg:text-14-regular text-green-400">Completed</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {completedCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-green-400">
+                    Completed
+                  </div>
                 </div>
               </div>
             </div>
@@ -440,8 +588,12 @@ const PatientLabResults = ({ onBack }) => {
                   <Clock className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">{pendingCount}</div>
-                  <div className="text-10-regular lg:text-14-regular text-yellow-400">Pending</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {pendingCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-yellow-400">
+                    Pending
+                  </div>
                 </div>
               </div>
             </div>
@@ -452,8 +604,12 @@ const PatientLabResults = ({ onBack }) => {
                   <Activity className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">{inProgressCount}</div>
-                  <div className="text-10-regular lg:text-14-regular text-blue-400">In Progress</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {inProgressCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-blue-400">
+                    In Progress
+                  </div>
                 </div>
               </div>
             </div>
@@ -464,8 +620,12 @@ const PatientLabResults = ({ onBack }) => {
                   <AlertTriangle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">{abnormalCount}</div>
-                  <div className="text-10-regular lg:text-14-regular text-red-400">Abnormal</div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {abnormalCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-red-400">
+                    Abnormal
+                  </div>
                 </div>
               </div>
             </div>
@@ -507,9 +667,9 @@ const PatientLabResults = ({ onBack }) => {
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="shad-select-trigger text-white flex-1"
                 >
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <option key={category} value={category}>
-                      {category === 'all' ? 'All Categories' : category}
+                      {category === "all" ? "All Categories" : category}
                     </option>
                   ))}
                 </select>
@@ -523,50 +683,63 @@ const PatientLabResults = ({ onBack }) => {
               <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
                 <TestTube className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <h2 className="text-20-bold lg:text-24-bold text-white">Your Lab Results</h2>
+              <h2 className="text-20-bold lg:text-24-bold text-white">
+                Your Lab Results
+              </h2>
             </div>
 
             <div className="space-y-4">
               {filteredResults.map((result) => (
-                <div key={result.id} className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300">
+                <div
+                  key={result.id}
+                  className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
+                >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex items-center gap-4 lg:gap-6">
                       <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                         <TestTube className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
                       </div>
-                      
+
                       <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                          <h3 className="text-16-bold lg:text-20-bold text-white">{result.testName}</h3>
+                          <h3 className="text-16-bold lg:text-20-bold text-white">
+                            {result.testName}
+                          </h3>
                           {getStatusBadge(result.status)}
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div>
-                            <span className="text-white">Category:</span> {result.category}
+                            <span className="text-white">Category:</span>{" "}
+                            {result.category}
                           </div>
                           <div>
-                            <span className="text-white">Ordered by:</span> {result.orderedBy}
+                            <span className="text-white">Ordered by:</span>{" "}
+                            {result.orderedBy}
                           </div>
                           <div className="hidden sm:block">
-                            <span className="text-white">Date:</span> {result.orderedDate}
+                            <span className="text-white">Date:</span>{" "}
+                            {result.orderedDate}
                           </div>
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div>
-                            <span className="text-white">Collection:</span> {result.collectionDate}
+                            <span className="text-white">Collection:</span>{" "}
+                            {result.collectionDate}
                           </div>
                           {result.resultDate && (
                             <div>
-                              <span className="text-white">Result:</span> {result.resultDate}
+                              <span className="text-white">Result:</span>{" "}
+                              {result.resultDate}
                             </div>
                           )}
                           <div>
-                            <span className="text-white">Cost:</span> ${result.cost.toFixed(2)}
+                            <span className="text-white">Cost:</span> $
+                            {result.cost.toFixed(2)}
                           </div>
                         </div>
-                        
+
                         {result.overallResult && (
                           <div className="mt-2">
                             {getOverallResultBadge(result.overallResult)}
@@ -574,10 +747,10 @@ const PatientLabResults = ({ onBack }) => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-row lg:flex-col items-start lg:items-end gap-2 lg:gap-4 flex-shrink-0">
                       <div className="flex gap-2">
-                        {result.status === 'completed' && (
+                        {result.status === "completed" && (
                           <>
                             <button
                               onClick={() => handleViewDetails(result)}
@@ -586,7 +759,7 @@ const PatientLabResults = ({ onBack }) => {
                               <Eye className="w-4 h-4" />
                               <span className="hidden sm:inline">View</span>
                             </button>
-                            
+
                             <button
                               onClick={() => handleDownloadPDF(result)}
                               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
@@ -596,14 +769,14 @@ const PatientLabResults = ({ onBack }) => {
                             </button>
                           </>
                         )}
-                        
-                        {result.status === 'pending' && (
+
+                        {result.status === "pending" && (
                           <div className="text-12-medium lg:text-14-medium text-yellow-400 px-3 lg:px-4 py-2">
                             Awaiting Collection
                           </div>
                         )}
-                        
-                        {result.status === 'in-progress' && (
+
+                        {result.status === "in-progress" && (
                           <div className="text-12-medium lg:text-14-medium text-blue-400 px-3 lg:px-4 py-2">
                             Processing...
                           </div>
@@ -620,9 +793,12 @@ const PatientLabResults = ({ onBack }) => {
                 <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-green-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-green-500/20">
                   <TestTube className="w-8 h-8 lg:w-12 lg:h-12 text-green-400" />
                 </div>
-                <h3 className="text-20-bold lg:text-24-bold text-white mb-4">No lab results found</h3>
+                <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+                  No lab results found
+                </h3>
                 <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
-                  No lab results match your search criteria. Try adjusting your filters.
+                  No lab results match your search criteria. Try adjusting your
+                  filters.
                 </p>
               </div>
             )}

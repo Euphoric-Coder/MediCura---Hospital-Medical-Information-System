@@ -12,9 +12,9 @@ import {
 // Users Table
 export const Users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  fullName: varchar("fullName", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
+  fullName: varchar("fullName").notNull(),
+  email: varchar("email").notNull().unique(),
+  password: varchar("password").notNull(),
   role: varchar("role", { length: 50 }).notNull(), // "patient", "doctor", "pharmacist", "receptionist"
   createdAt: timestamp("createdAt").defaultNow(),
 });
@@ -59,22 +59,23 @@ export const Doctors = pgTable("doctors", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
-  medicalLicenseNumber: varchar("medicalLicenseNumber", { length: 255 }),
-  specialty: varchar("specialty", { length: 255 }),
-  subSpecialty: varchar("subSpecialty", { length: 255 }),
+  medicalLicenseNumber: varchar("medicalLicenseNumber"),
+  speciality: varchar("speciality"),
+  subSpecialty: varchar("subSpecialty"),
   yearsOfExperience: integer("yearsOfExperience"),
-  currentHospital: varchar("currentHospital", { length: 255 }),
+  currentHospital: varchar("currentHospital"),
   previousHospitals: text("previousHospitals"),
 
-  medicalSchool: varchar("medicalSchool", { length: 255 }),
-  graduationYear: varchar("graduationYear", { length: 4 }),
-  residencyProgram: varchar("residencyProgram", { length: 255 }),
-  fellowshipProgram: varchar("fellowshipProgram", { length: 255 }),
+  medicalSchool: varchar("medicalSchool"),
+  graduationYear: varchar("graduationYear"),
+  residencyProgram: varchar("residencyProgram"),
+  fellowshipProgram: varchar("fellowshipProgram"),
   boardCertifications: text("boardCertifications"),
   continuingEducation: text("continuingEducation"),
 
-  consultationFee: varchar("consultationFee", { length: 50 }),
-  availableHours: varchar("availableHours", { length: 255 }),
+  consultationFee: varchar("consultationFee"),
+  availableDays: varchar("availableDays"),
+  availableHours: varchar("availableHours"),
   languagesSpoken: text("languagesSpoken"),
   insuranceAccepted: text("insuranceAccepted"),
 
@@ -102,8 +103,7 @@ export const Appointments = pgTable("appointments", {
   reason: text("reason"),
   notes: text("notes"),
 
-  status: varchar("status")
-    .default("upcoming"), // upcoming, completed, cancelled
+  status: varchar("status").default("upcoming"), // upcoming, completed, cancelled
 
   type: varchar("type").default("Consultation"), // Consultation, Follow-up, etc.
 
@@ -111,28 +111,27 @@ export const Appointments = pgTable("appointments", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-
 // Pharmacist Table
 export const Pharmacists = pgTable("pharmacists", {
   userId: uuid("userId")
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
-  pharmacyLicenseNumber: varchar("pharmacyLicenseNumber", { length: 255 }),
-  deaNumber: varchar("deaNumber", { length: 255 }),
-  npiNumber: varchar("npiNumber", { length: 255 }),
-  pharmacyType: varchar("pharmacyType", { length: 255 }),
-  currentPharmacy: varchar("currentPharmacy", { length: 255 }),
+  pharmacyLicenseNumber: varchar("pharmacyLicenseNumber"),
+  deaNumber: varchar("deaNumber"),
+  npiNumber: varchar("npiNumber"),
+  pharmacyType: varchar("pharmacyType"),
+  currentPharmacy: varchar("currentPharmacy"),
   yearsOfExperience: integer("yearsOfExperience"),
   specializations: text("specializations"),
 
-  pharmacySchool: varchar("pharmacySchool", { length: 255 }),
+  pharmacySchool: varchar("pharmacySchool"),
   graduationYear: varchar("graduationYear", { length: 4 }),
-  residencyProgram: varchar("residencyProgram", { length: 255 }),
+  residencyProgram: varchar("residencyProgram"),
   certifications: text("certifications"),
   continuingEducation: text("continuingEducation"),
 
-  workSchedule: varchar("workSchedule", { length: 255 }),
+  workSchedule: varchar("workSchedule"),
   languagesSpoken: text("languagesSpoken"),
   clinicalServices: text("clinicalServices"),
   insuranceExperience: text("insuranceExperience"),
@@ -150,22 +149,22 @@ export const Receptionists = pgTable("receptionists", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
-  department: varchar("department", { length: 255 }),
+  department: varchar("department"),
   previousExperience: text("previousExperience"),
   yearsOfExperience: integer("yearsOfExperience"),
-  currentEmployer: varchar("currentEmployer", { length: 255 }),
+  currentEmployer: varchar("currentEmployer"),
   reasonForLeaving: text("reasonForLeaving"),
 
-  education: varchar("education", { length: 255 }),
+  education: varchar("education"),
   certifications: text("certifications"),
   softwareSkills: text("softwareSkills"),
   languagesSpoken: text("languagesSpoken"),
   typingSpeed: varchar("typingSpeed", { length: 50 }),
 
-  workSchedule: varchar("workSchedule", { length: 255 }),
-  shiftPreference: varchar("shiftPreference", { length: 255 }),
-  availableHours: varchar("availableHours", { length: 255 }),
-  transportationMethod: varchar("transportationMethod", { length: 255 }),
+  workSchedule: varchar("workSchedule"),
+  shiftPreference: varchar("shiftPreference"),
+  availableHours: varchar("availableHours"),
+  transportationMethod: varchar("transportationMethod"),
 
   backgroundCheck: boolean("backgroundCheck").default(true),
   dataConsent: boolean("dataConsent").default(true),

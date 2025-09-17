@@ -1,82 +1,98 @@
-import React, { useState } from 'react';
-import { Plus, User, Mail, Phone, Calendar, MapPin, Briefcase, Edit, Save, X, Lock, Shield, Camera, CheckCircle, AlertCircle } from 'lucide-react';
-import UpdatePassword from '../UpdatePassword';
+import React, { useState } from "react";
+import {
+  Plus,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Briefcase,
+  Edit,
+  Save,
+  X,
+  Lock,
+  Shield,
+  Camera,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import UpdatePassword from "../UpdatePassword";
 
 const PatientProfile = ({ onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
   const [profileData, setProfileData] = useState({
-    fullName: 'John Smith',
-    email: 'john.smith@email.com',
-    phone: '+1 (555) 123-4567',
-    dateOfBirth: '1990-05-15',
-    gender: 'Male',
-    address: '123 Main Street, New York, NY 10001',
-    occupation: 'Software Engineer',
-    emergencyContactName: 'Jane Smith',
-    emergencyPhone: '+1 (555) 987-6543',
-    insuranceProvider: 'BlueCross BlueShield',
-    insurancePolicyNumber: 'BC123456789',
-    allergies: 'Penicillin, Peanuts',
-    currentMedications: 'Lisinopril 10mg daily',
-    primaryPhysician: 'Dr. Sarah Johnson'
+    fullName: "John Smith",
+    email: "john.smith@email.com",
+    phone: "+1 (555) 123-4567",
+    dateOfBirth: "1990-05-15",
+    gender: "Male",
+    address: "123 Main Street, New York, NY 10001",
+    occupation: "Software Engineer",
+    emergencyContactName: "Jane Smith",
+    emergencyPhone: "+1 (555) 987-6543",
+    insuranceProvider: "BlueCross BlueShield",
+    insurancePolicyNumber: "BC123456789",
+    allergies: "Penicillin, Peanuts",
+    currentMedications: "Lisinopril 10mg daily",
+    primaryPhysician: "Dr. Sarah Johnson",
   });
 
   const [editData, setEditData] = useState(profileData);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditData(prev => ({
+    setEditData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleEdit = () => {
     setIsEditing(true);
     setEditData(profileData);
-    setMessage('');
-    setMessageType('');
+    setMessage("");
+    setMessageType("");
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setEditData(profileData);
-    setMessage('');
-    setMessageType('');
+    setMessage("");
+    setMessageType("");
   };
 
   const handleSave = async () => {
     setIsSaving(true);
-    setMessage('');
+    setMessage("");
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       setProfileData(editData);
       setIsEditing(false);
-      setMessage('Profile updated successfully!');
-      setMessageType('success');
+      setMessage("Profile updated successfully!");
+      setMessageType("success");
     } catch (error) {
-      setMessage('Failed to update profile. Please try again.');
-      setMessageType('error');
+      setMessage("Failed to update profile. Please try again.");
+      setMessageType("error");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const ProfileField = ({ 
-    label, 
-    name, 
-    value, 
-    type = 'text', 
+  const ProfileField = ({
+    label,
+    name,
+    value,
+    type = "text",
     icon: Icon,
-    isTextArea = false 
+    isTextArea = false,
   }) => (
     <div>
       <label className="shad-input-label block mb-2">{label}</label>
@@ -91,7 +107,7 @@ const PatientProfile = ({ onBack }) => {
             onChange={handleInputChange}
             disabled={!isEditing}
             className={`shad-textArea pl-10 w-full text-white min-h-[80px] resize-none ${
-              !isEditing ? 'bg-dark-500/50 cursor-not-allowed' : ''
+              !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
             }`}
             rows={3}
           />
@@ -103,7 +119,7 @@ const PatientProfile = ({ onBack }) => {
             onChange={handleInputChange}
             disabled={!isEditing}
             className={`shad-input pl-10 w-full text-white ${
-              !isEditing ? 'bg-dark-500/50 cursor-not-allowed' : ''
+              !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
             }`}
           />
         )}
@@ -122,14 +138,16 @@ const PatientProfile = ({ onBack }) => {
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Plus className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-24-bold text-white">CarePulse</span>
+                <span className="text-24-bold text-white">MediCura</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3 bg-dark-400/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-dark-500/50">
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-14-medium text-white">Profile Settings</span>
+                  <span className="text-14-medium text-white">
+                    Profile Settings
+                  </span>
                 </div>
               </div>
             </div>
@@ -151,15 +169,21 @@ const PatientProfile = ({ onBack }) => {
                   </button>
                 </div>
                 <div>
-                  <h1 className="text-36-bold text-white mb-2">{profileData.fullName}</h1>
-                  <p className="text-16-regular text-dark-700">{profileData.email}</p>
+                  <h1 className="text-36-bold text-white mb-2">
+                    {profileData.fullName}
+                  </h1>
+                  <p className="text-16-regular text-dark-700">
+                    {profileData.email}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-14-regular text-green-400">Active Patient</span>
+                    <span className="text-14-regular text-green-400">
+                      Active Patient
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 {!isEditing ? (
                   <>
@@ -211,12 +235,14 @@ const PatientProfile = ({ onBack }) => {
 
             {/* Message */}
             {message && (
-              <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm ${
-                messageType === 'success' 
-                  ? 'bg-green-500/10 border-green-500/30 text-green-400' 
-                  : 'bg-red-500/10 border-red-500/30 text-red-400'
-              }`}>
-                {messageType === 'success' ? (
+              <div
+                className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm ${
+                  messageType === "success"
+                    ? "bg-green-500/10 border-green-500/30 text-green-400"
+                    : "bg-red-500/10 border-red-500/30 text-red-400"
+                }`}
+              >
+                {messageType === "success" ? (
                   <CheckCircle className="w-5 h-5 flex-shrink-0" />
                 ) : (
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -234,9 +260,11 @@ const PatientProfile = ({ onBack }) => {
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                   <User className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-24-bold text-white">Personal Information</h2>
+                <h2 className="text-24-bold text-white">
+                  Personal Information
+                </h2>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
                   label="Full Name"
@@ -268,18 +296,24 @@ const PatientProfile = ({ onBack }) => {
                 <div>
                   <label className="shad-input-label block mb-2">Gender</label>
                   <div className="flex gap-4">
-                    {['Male', 'Female', 'Other'].map((gender) => (
+                    {["Male", "Female", "Other"].map((gender) => (
                       <label key={gender} className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="gender"
                           value={gender}
-                          checked={(isEditing ? editData.gender : profileData.gender) === gender}
+                          checked={
+                            (isEditing
+                              ? editData.gender
+                              : profileData.gender) === gender
+                          }
                           onChange={handleInputChange}
                           disabled={!isEditing}
                           className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500 disabled:opacity-50"
                         />
-                        <span className="text-14-regular text-white">{gender}</span>
+                        <span className="text-14-regular text-white">
+                          {gender}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -309,7 +343,7 @@ const PatientProfile = ({ onBack }) => {
                 </div>
                 <h2 className="text-24-bold text-white">Emergency Contact</h2>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
                   label="Emergency Contact Name"
@@ -335,7 +369,7 @@ const PatientProfile = ({ onBack }) => {
                 </div>
                 <h2 className="text-24-bold text-white">Medical Information</h2>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
                   label="Primary Physician"

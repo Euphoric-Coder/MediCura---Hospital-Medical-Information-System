@@ -88,7 +88,7 @@ const UserDashboard = ({ onLogout, onBookAppointment }) => {
         name: "Dr. Sarah Safari",
         avatar:
           "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        specialty: "General Medicine",
+        speciality: "General Medicine",
       },
       reason: "Annual check-up",
     },
@@ -101,7 +101,7 @@ const UserDashboard = ({ onLogout, onBookAppointment }) => {
         name: "Dr. Ava Williams",
         avatar:
           "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        specialty: "Cardiology",
+        speciality: "Cardiology",
       },
       reason: "Heart consultation",
     },
@@ -114,7 +114,7 @@ const UserDashboard = ({ onLogout, onBookAppointment }) => {
         name: "Dr. Adam Smith",
         avatar:
           "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        specialty: "Pediatrics",
+        speciality: "Pediatrics",
       },
       reason: "Routine examination",
     },
@@ -322,7 +322,7 @@ const UserDashboard = ({ onLogout, onBookAppointment }) => {
                           </h3>
                           <p className="text-14-regular text-green-400 flex items-center gap-2">
                             <Activity className="w-4 h-4" />
-                            {appointment.doctor.specialty}
+                            {appointment.doctor.speciality}
                           </p>
                         </div>
                         <div className="flex items-center gap-6 text-14-regular text-dark-700">

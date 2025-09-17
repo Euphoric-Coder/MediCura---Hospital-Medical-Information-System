@@ -1,78 +1,93 @@
-import React, { useState } from 'react';
-import { Plus, User, Mail, Phone, Calendar, MapPin, Briefcase, Upload, ChevronDown, GraduationCap, Award, Stethoscope, Clock, Building } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Plus,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Briefcase,
+  Upload,
+  ChevronDown,
+  GraduationCap,
+  Award,
+  Stethoscope,
+  Clock,
+  Building,
+} from "lucide-react";
 
 const specialties = [
-  'General Medicine',
-  'Internal Medicine',
-  'Family Medicine',
-  'Cardiology',
-  'Dermatology',
-  'Endocrinology',
-  'Gastroenterology',
-  'Neurology',
-  'Oncology',
-  'Orthopedics',
-  'Pediatrics',
-  'Psychiatry',
-  'Radiology',
-  'Surgery',
-  'Urology'
+  "General Medicine",
+  "Internal Medicine",
+  "Family Medicine",
+  "Cardiology",
+  "Dermatology",
+  "Endocrinology",
+  "Gastroenterology",
+  "Neurology",
+  "Oncology",
+  "Orthopedics",
+  "Pediatrics",
+  "Psychiatry",
+  "Radiology",
+  "Surgery",
+  "Urology",
 ];
 
 const hospitals = [
-  'City General Hospital',
-  'Metropolitan Medical Center',
-  'St. Mary\'s Hospital',
-  'University Medical Center',
-  'Regional Health System',
-  'Community Hospital',
-  'Children\'s Hospital',
-  'Cancer Treatment Center'
+  "City General Hospital",
+  "Metropolitan Medical Center",
+  "St. Mary's Hospital",
+  "University Medical Center",
+  "Regional Health System",
+  "Community Hospital",
+  "Children's Hospital",
+  "Cancer Treatment Center",
 ];
 
 const DoctorOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
-    fullName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    address: '',
-    emergencyContactName: '',
-    emergencyPhone: '',
-    
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    emergencyContactName: "",
+    emergencyPhone: "",
+
     // Professional Information
-    medicalLicenseNumber: '',
-    specialty: '',
-    subSpecialty: '',
-    yearsOfExperience: '',
-    currentHospital: '',
-    previousHospitals: '',
-    
+    medicalLicenseNumber: "",
+    speciality: "",
+    subSpecialty: "",
+    yearsOfExperience: "",
+    currentHospital: "",
+    previousHospitals: "",
+
     // Education & Certifications
-    medicalSchool: '',
-    graduationYear: '',
-    residencyProgram: '',
-    fellowshipProgram: '',
-    boardCertifications: '',
-    continuingEducation: '',
-    
+    medicalSchool: "",
+    graduationYear: "",
+    residencyProgram: "",
+    fellowshipProgram: "",
+    boardCertifications: "",
+    continuingEducation: "",
+
     // Practice Information
-    consultationFee: '',
-    availableHours: '',
-    languagesSpoken: '',
-    insuranceAccepted: '',
-    
+    consultationFee: "",
+    availableHours: "",
+    languagesSpoken: "",
+    insuranceAccepted: "",
+
     // Documents
     medicalLicense: null,
     cv: null,
     certifications: null,
-    
+
     // Consent
     practiceConsent: true,
     dataConsent: true,
-    ethicsConsent: true
+    ethicsConsent: true,
   });
 
   const [showSpecialtyDropdown, setShowSpecialtyDropdown] = useState(false);
@@ -80,21 +95,21 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
   const [uploadedFiles, setUploadedFiles] = useState({
     medicalLicense: null,
     cv: null,
-    certifications: null
+    certifications: null,
   });
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      const checked = (e.target).checked;
-      setFormData(prev => ({
+    if (type === "checkbox") {
+      const checked = e.target.checked;
+      setFormData((prev) => ({
         ...prev,
-        [name]: checked
+        [name]: checked,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -102,36 +117,36 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
   const handleFileUpload = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFiles(prev => ({
+      setUploadedFiles((prev) => ({
         ...prev,
-        [fieldName]: file.name
+        [fieldName]: file.name,
       }));
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [fieldName]: file
+        [fieldName]: file,
       }));
     }
   };
 
-  const handleSpecialtySelect = (specialty) => {
-    setFormData(prev => ({
+  const handleSpecialtySelect = (speciality) => {
+    setFormData((prev) => ({
       ...prev,
-      specialty: specialty
+      speciality: speciality,
     }));
     setShowSpecialtyDropdown(false);
   };
 
   const handleHospitalSelect = (hospital) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      currentHospital: hospital
+      currentHospital: hospital,
     }));
     setShowHospitalDropdown(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Doctor onboarding form submitted:', formData);
+    console.log("Doctor onboarding form submitted:", formData);
     onComplete();
   };
 
@@ -143,7 +158,7 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Plus className="w-5 h-5 text-white" />
           </div>
-          <span className="text-24-bold text-white">CarePulse</span>
+          <span className="text-24-bold text-white">MediCura</span>
         </div>
       </div>
 
@@ -154,7 +169,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <Stethoscope className="w-8 h-8 text-green-500" />
-              <span className="text-18-bold text-green-500">Doctor Registration</span>
+              <span className="text-18-bold text-green-500">
+                Doctor Registration
+              </span>
             </div>
             <h1 className="text-36-bold text-white mb-2">Welcome, Doctor 👨‍⚕️</h1>
             <p className="text-16-regular text-dark-700">
@@ -165,12 +182,16 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Personal Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Personal Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Personal Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Full name</label>
+                  <label className="shad-input-label block mb-2">
+                    Full name
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User className="w-5 h-5 text-dark-600" />
@@ -189,7 +210,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Email */}
                 <div>
-                  <label className="shad-input-label block mb-2">Email address</label>
+                  <label className="shad-input-label block mb-2">
+                    Email address
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="w-5 h-5 text-dark-600" />
@@ -208,7 +231,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Phone */}
                 <div>
-                  <label className="shad-input-label block mb-2">Phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -227,7 +252,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Date of Birth */}
                 <div>
-                  <label className="shad-input-label block mb-2">Date of birth</label>
+                  <label className="shad-input-label block mb-2">
+                    Date of birth
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="w-5 h-5 text-dark-600" />
@@ -252,7 +279,7 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Male"
-                        checked={formData.gender === 'Male'}
+                        checked={formData.gender === "Male"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500"
                       />
@@ -263,7 +290,7 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Female"
-                        checked={formData.gender === 'Female'}
+                        checked={formData.gender === "Female"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500"
                       />
@@ -293,7 +320,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Emergency Contact */}
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency contact name</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency contact name
+                  </label>
                   <input
                     type="text"
                     name="emergencyContactName"
@@ -306,7 +335,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                 </div>
 
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -327,12 +358,16 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
             {/* Professional Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Professional Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Professional Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Medical License Number */}
                 <div>
-                  <label className="shad-input-label block mb-2">Medical license number</label>
+                  <label className="shad-input-label block mb-2">
+                    Medical license number
+                  </label>
                   <input
                     type="text"
                     name="medicalLicenseNumber"
@@ -346,31 +381,45 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Specialty */}
                 <div>
-                  <label className="shad-input-label block mb-2">Primary specialty</label>
+                  <label className="shad-input-label block mb-2">
+                    Primary speciality
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowSpecialtyDropdown(!showSpecialtyDropdown)}
+                      onClick={() =>
+                        setShowSpecialtyDropdown(!showSpecialtyDropdown)
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
                     >
-                      <span className="text-white">{formData.specialty || 'Select specialty'}</span>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showSpecialtyDropdown ? 'rotate-180' : ''}`} />
+                      <span className="text-white">
+                        {formData.speciality || "Select speciality"}
+                      </span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showSpecialtyDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showSpecialtyDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Medical Specialties</span>
+                          <span className="text-14-medium text-dark-700">
+                            Medical Specialties
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
-                          {specialties.map((specialty) => (
+                          {specialties.map((speciality) => (
                             <button
-                              key={specialty}
+                              key={speciality}
                               type="button"
-                              onClick={() => handleSpecialtySelect(specialty)}
+                              onClick={() => handleSpecialtySelect(speciality)}
                               className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
                             >
-                              <span className="text-16-medium text-white">{specialty}</span>
+                              <span className="text-16-medium text-white">
+                                {speciality}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -379,9 +428,11 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                   </div>
                 </div>
 
-                {/* Sub-specialty */}
+                {/* Sub-speciality */}
                 <div>
-                  <label className="shad-input-label block mb-2">Sub-specialty (if any)</label>
+                  <label className="shad-input-label block mb-2">
+                    Sub-speciality (if any)
+                  </label>
                   <input
                     type="text"
                     name="subSpecialty"
@@ -394,7 +445,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Years of Experience */}
                 <div>
-                  <label className="shad-input-label block mb-2">Years of experience</label>
+                  <label className="shad-input-label block mb-2">
+                    Years of experience
+                  </label>
                   <input
                     type="number"
                     name="yearsOfExperience"
@@ -408,24 +461,36 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Current Hospital */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Current hospital/clinic</label>
+                  <label className="shad-input-label block mb-2">
+                    Current hospital/clinic
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowHospitalDropdown(!showHospitalDropdown)}
+                      onClick={() =>
+                        setShowHospitalDropdown(!showHospitalDropdown)
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Building className="w-5 h-5 text-dark-600" />
-                        <span className="text-white">{formData.currentHospital || 'Select hospital/clinic'}</span>
+                        <span className="text-white">
+                          {formData.currentHospital || "Select hospital/clinic"}
+                        </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showHospitalDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showHospitalDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showHospitalDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Hospitals & Clinics</span>
+                          <span className="text-14-medium text-dark-700">
+                            Hospitals & Clinics
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {hospitals.map((hospital) => (
@@ -436,7 +501,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                               className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
                             >
                               <Building className="w-5 h-5 text-dark-600" />
-                              <span className="text-16-medium text-white">{hospital}</span>
+                              <span className="text-16-medium text-white">
+                                {hospital}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -447,7 +514,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Previous Hospitals */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Previous hospitals/clinics</label>
+                  <label className="shad-input-label block mb-2">
+                    Previous hospitals/clinics
+                  </label>
                   <textarea
                     name="previousHospitals"
                     value={formData.previousHospitals}
@@ -462,12 +531,16 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
             {/* Education & Certifications */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Education & Certifications</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Education & Certifications
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Medical School */}
                 <div>
-                  <label className="shad-input-label block mb-2">Medical school</label>
+                  <label className="shad-input-label block mb-2">
+                    Medical school
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <GraduationCap className="w-5 h-5 text-dark-600" />
@@ -486,7 +559,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Graduation Year */}
                 <div>
-                  <label className="shad-input-label block mb-2">Graduation year</label>
+                  <label className="shad-input-label block mb-2">
+                    Graduation year
+                  </label>
                   <input
                     type="number"
                     name="graduationYear"
@@ -500,7 +575,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Residency Program */}
                 <div>
-                  <label className="shad-input-label block mb-2">Residency program</label>
+                  <label className="shad-input-label block mb-2">
+                    Residency program
+                  </label>
                   <input
                     type="text"
                     name="residencyProgram"
@@ -514,7 +591,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Fellowship Program */}
                 <div>
-                  <label className="shad-input-label block mb-2">Fellowship program (if any)</label>
+                  <label className="shad-input-label block mb-2">
+                    Fellowship program (if any)
+                  </label>
                   <input
                     type="text"
                     name="fellowshipProgram"
@@ -527,7 +606,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Board Certifications */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Board certifications</label>
+                  <label className="shad-input-label block mb-2">
+                    Board certifications
+                  </label>
                   <textarea
                     name="boardCertifications"
                     value={formData.boardCertifications}
@@ -541,7 +622,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Continuing Education */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Recent continuing education</label>
+                  <label className="shad-input-label block mb-2">
+                    Recent continuing education
+                  </label>
                   <textarea
                     name="continuingEducation"
                     value={formData.continuingEducation}
@@ -556,12 +639,16 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
             {/* Practice Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Practice Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Practice Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Consultation Fee */}
                 <div>
-                  <label className="shad-input-label block mb-2">Consultation fee</label>
+                  <label className="shad-input-label block mb-2">
+                    Consultation fee
+                  </label>
                   <input
                     type="number"
                     name="consultationFee"
@@ -575,7 +662,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Available Hours */}
                 <div>
-                  <label className="shad-input-label block mb-2">Available hours</label>
+                  <label className="shad-input-label block mb-2">
+                    Available hours
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Clock className="w-5 h-5 text-dark-600" />
@@ -594,7 +683,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Languages Spoken */}
                 <div>
-                  <label className="shad-input-label block mb-2">Languages spoken</label>
+                  <label className="shad-input-label block mb-2">
+                    Languages spoken
+                  </label>
                   <input
                     type="text"
                     name="languagesSpoken"
@@ -608,7 +699,9 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Insurance Accepted */}
                 <div>
-                  <label className="shad-input-label block mb-2">Insurance accepted</label>
+                  <label className="shad-input-label block mb-2">
+                    Insurance accepted
+                  </label>
                   <input
                     type="text"
                     name="insuranceAccepted"
@@ -625,17 +718,19 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
             {/* Document Upload */}
             <section>
               <h2 className="text-24-bold text-white mb-8">Document Upload</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Medical License */}
                 <div>
-                  <label className="shad-input-label block mb-2">Medical license document</label>
+                  <label className="shad-input-label block mb-2">
+                    Medical license document
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="medicalLicense"
                       name="medicalLicense"
-                      onChange={(e) => handleFileUpload(e, 'medicalLicense')}
+                      onChange={(e) => handleFileUpload(e, "medicalLicense")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       className="hidden"
                     />
@@ -646,9 +741,12 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-green-500">
-                            {uploadedFiles.medicalLicense || 'Upload medical license'}
+                            {uploadedFiles.medicalLicense ||
+                              "Upload medical license"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, JPG, PNG (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, JPG, PNG (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -657,13 +755,15 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* CV/Resume */}
                 <div>
-                  <label className="shad-input-label block mb-2">CV/Resume</label>
+                  <label className="shad-input-label block mb-2">
+                    CV/Resume
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="cv"
                       name="cv"
-                      onChange={(e) => handleFileUpload(e, 'cv')}
+                      onChange={(e) => handleFileUpload(e, "cv")}
                       accept=".pdf,.doc,.docx"
                       className="hidden"
                     />
@@ -674,9 +774,11 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-blue-500">
-                            {uploadedFiles.cv || 'Upload CV/Resume'}
+                            {uploadedFiles.cv || "Upload CV/Resume"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, DOC, DOCX (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, DOC, DOCX (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -685,13 +787,15 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Certifications */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Board certifications documents</label>
+                  <label className="shad-input-label block mb-2">
+                    Board certifications documents
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="certifications"
                       name="certifications"
-                      onChange={(e) => handleFileUpload(e, 'certifications')}
+                      onChange={(e) => handleFileUpload(e, "certifications")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       multiple
                       className="hidden"
@@ -703,9 +807,12 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-purple-500">
-                            {uploadedFiles.certifications || 'Upload certifications'}
+                            {uploadedFiles.certifications ||
+                              "Upload certifications"}
                           </p>
-                          <p className="text-12-regular text-dark-600">Multiple files allowed - PDF, JPG, PNG</p>
+                          <p className="text-12-regular text-dark-600">
+                            Multiple files allowed - PDF, JPG, PNG
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -716,8 +823,10 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
             {/* Consent and Agreement */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Professional Agreement</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Professional Agreement
+              </h2>
+
               <div className="space-y-6">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -729,7 +838,8 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I agree to practice medicine in accordance with professional standards and hospital policies.
+                    I agree to practice medicine in accordance with professional
+                    standards and hospital policies.
                   </span>
                 </label>
 
@@ -743,7 +853,8 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I consent to the collection and use of my professional data for credentialing and practice management.
+                    I consent to the collection and use of my professional data
+                    for credentialing and practice management.
                   </span>
                 </label>
 
@@ -757,7 +868,8 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I acknowledge and agree to abide by the medical ethics code and professional conduct guidelines.
+                    I acknowledge and agree to abide by the medical ethics code
+                    and professional conduct guidelines.
                   </span>
                 </label>
               </div>
@@ -784,7 +896,7 @@ const DoctorOnboarding = ({ onBack, onComplete }) => {
 
           {/* Copyright */}
           <div className="mt-16">
-            <p className="copyright">©carepulse copyright</p>
+            <p className="copyright">©medicura copyright</p>
           </div>
         </div>
       </div>

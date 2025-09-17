@@ -1,116 +1,133 @@
-import React, { useState } from 'react';
-import { Plus, User, Mail, Phone, Calendar, MapPin, Upload, ChevronDown, GraduationCap, Award, Shield, Clock, Building, Users, Settings } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Plus,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Upload,
+  ChevronDown,
+  GraduationCap,
+  Award,
+  Shield,
+  Clock,
+  Building,
+  Users,
+  Settings,
+} from "lucide-react";
 
 const adminRoles = [
-  'Hospital Administrator',
-  'Department Manager',
-  'IT Administrator',
-  'Finance Manager',
-  'HR Manager',
-  'Quality Assurance Manager',
-  'Operations Manager',
-  'Compliance Officer',
-  'Medical Records Manager',
-  'Facilities Manager'
+  "Hospital Administrator",
+  "Department Manager",
+  "IT Administrator",
+  "Finance Manager",
+  "HR Manager",
+  "Quality Assurance Manager",
+  "Operations Manager",
+  "Compliance Officer",
+  "Medical Records Manager",
+  "Facilities Manager",
 ];
 
 const departments = [
-  'Administration',
-  'Human Resources',
-  'Information Technology',
-  'Finance & Billing',
-  'Quality Assurance',
-  'Operations',
-  'Medical Records',
-  'Facilities Management',
-  'Compliance',
-  'Patient Services'
+  "Administration",
+  "Human Resources",
+  "Information Technology",
+  "Finance & Billing",
+  "Quality Assurance",
+  "Operations",
+  "Medical Records",
+  "Facilities Management",
+  "Compliance",
+  "Patient Services",
 ];
 
 const systemAccess = [
-  'Electronic Health Records (EHR)',
-  'Hospital Information System (HIS)',
-  'Financial Management System',
-  'Human Resources System',
-  'Inventory Management',
-  'Scheduling System',
-  'Reporting & Analytics',
-  'Compliance Management',
-  'Document Management',
-  'Communication Systems'
+  "Electronic Health Records (EHR)",
+  "Hospital Information System (HIS)",
+  "Financial Management System",
+  "Human Resources System",
+  "Inventory Management",
+  "Scheduling System",
+  "Reporting & Analytics",
+  "Compliance Management",
+  "Document Management",
+  "Communication Systems",
 ];
 
 const AdminOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
-    fullName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    address: '',
-    emergencyContactName: '',
-    emergencyPhone: '',
-    
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    emergencyContactName: "",
+    emergencyPhone: "",
+
     // Professional Information
-    adminRole: '',
-    department: '',
-    employeeId: '',
-    reportingManager: '',
-    yearsOfExperience: '',
-    previousRole: '',
-    
+    adminRole: "",
+    department: "",
+    employeeId: "",
+    reportingManager: "",
+    yearsOfExperience: "",
+    previousRole: "",
+
     // Education & Qualifications
-    education: '',
-    certifications: '',
-    specialTraining: '',
-    languagesSpoken: '',
-    
+    education: "",
+    certifications: "",
+    specialTraining: "",
+    languagesSpoken: "",
+
     // System Access & Permissions
-    systemAccess: '',
-    securityClearance: '',
-    accessLevel: '',
-    
+    systemAccess: "",
+    securityClearance: "",
+    accessLevel: "",
+
     // Work Information
-    workSchedule: '',
-    startDate: '',
-    salary: '',
-    benefits: '',
-    
+    workSchedule: "",
+    startDate: "",
+    salary: "",
+    benefits: "",
+
     // Documents
     resume: null,
     certificationDocs: null,
     backgroundCheck: null,
-    
+
     // Consent & Security
     securityAgreement: true,
     dataConsent: true,
     confidentialityAgreement: true,
-    codeOfConduct: true
+    codeOfConduct: true,
   });
 
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
-  const [showSystemAccessDropdown, setShowSystemAccessDropdown] = useState(false);
+  const [showSystemAccessDropdown, setShowSystemAccessDropdown] =
+    useState(false);
   const [selectedSystemAccess, setSelectedSystemAccess] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState({
     resume: null,
     certificationDocs: null,
-    backgroundCheck: null
+    backgroundCheck: null,
   });
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      const checked = (e.target).checked;
-      setFormData(prev => ({
+    if (type === "checkbox") {
+      const checked = e.target.checked;
+      setFormData((prev) => ({
         ...prev,
-        [name]: checked
+        [name]: checked,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -118,48 +135,48 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
   const handleFileUpload = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFiles(prev => ({
+      setUploadedFiles((prev) => ({
         ...prev,
-        [fieldName]: file.name
+        [fieldName]: file.name,
       }));
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [fieldName]: file
+        [fieldName]: file,
       }));
     }
   };
 
   const handleRoleSelect = (role) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      adminRole: role
+      adminRole: role,
     }));
     setShowRoleDropdown(false);
   };
 
   const handleDepartmentSelect = (dept) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      department: dept
+      department: dept,
     }));
     setShowDepartmentDropdown(false);
   };
 
   const handleSystemAccessToggle = (system) => {
     const updatedAccess = selectedSystemAccess.includes(system)
-      ? selectedSystemAccess.filter(s => s !== system)
+      ? selectedSystemAccess.filter((s) => s !== system)
       : [...selectedSystemAccess, system];
-    
+
     setSelectedSystemAccess(updatedAccess);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      systemAccess: updatedAccess.join(', ')
+      systemAccess: updatedAccess.join(", "),
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Admin onboarding form submitted:', formData);
+    console.log("Admin onboarding form submitted:", formData);
     onComplete();
   };
 
@@ -171,7 +188,7 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Plus className="w-5 h-5 text-white" />
           </div>
-          <span className="text-24-bold text-white">CarePulse</span>
+          <span className="text-24-bold text-white">MediCura</span>
         </div>
       </div>
 
@@ -182,23 +199,32 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-8 h-8 text-red-500" />
-              <span className="text-18-bold text-red-500">Administrator Registration</span>
+              <span className="text-18-bold text-red-500">
+                Administrator Registration
+              </span>
             </div>
-            <h1 className="text-36-bold text-white mb-2">Welcome, Administrator 🛡️</h1>
+            <h1 className="text-36-bold text-white mb-2">
+              Welcome, Administrator 🛡️
+            </h1>
             <p className="text-16-regular text-dark-700">
-              Complete your administrative profile to manage our healthcare system
+              Complete your administrative profile to manage our healthcare
+              system
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Personal Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Personal Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Personal Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Full name</label>
+                  <label className="shad-input-label block mb-2">
+                    Full name
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User className="w-5 h-5 text-dark-600" />
@@ -217,7 +243,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Email */}
                 <div>
-                  <label className="shad-input-label block mb-2">Email address</label>
+                  <label className="shad-input-label block mb-2">
+                    Email address
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="w-5 h-5 text-dark-600" />
@@ -236,7 +264,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Phone */}
                 <div>
-                  <label className="shad-input-label block mb-2">Phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -255,7 +285,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Date of Birth */}
                 <div>
-                  <label className="shad-input-label block mb-2">Date of birth</label>
+                  <label className="shad-input-label block mb-2">
+                    Date of birth
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="w-5 h-5 text-dark-600" />
@@ -280,7 +312,7 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Male"
-                        checked={formData.gender === 'Male'}
+                        checked={formData.gender === "Male"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-red-500 bg-dark-400 border-dark-500 focus:ring-red-500"
                       />
@@ -291,7 +323,7 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Female"
-                        checked={formData.gender === 'Female'}
+                        checked={formData.gender === "Female"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-red-500 bg-dark-400 border-dark-500 focus:ring-red-500"
                       />
@@ -321,7 +353,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Emergency Contact */}
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency contact name</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency contact name
+                  </label>
                   <input
                     type="text"
                     name="emergencyContactName"
@@ -334,7 +368,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                 </div>
 
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -355,12 +391,16 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
             {/* Professional Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Professional Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Professional Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Admin Role */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Administrative role</label>
+                  <label className="shad-input-label block mb-2">
+                    Administrative role
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
@@ -369,15 +409,23 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     >
                       <div className="flex items-center gap-3">
                         <Shield className="w-5 h-5 text-dark-600" />
-                        <span className="text-white">{formData.adminRole || 'Select administrative role'}</span>
+                        <span className="text-white">
+                          {formData.adminRole || "Select administrative role"}
+                        </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showRoleDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showRoleDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showRoleDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Administrative Roles</span>
+                          <span className="text-14-medium text-dark-700">
+                            Administrative Roles
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {adminRoles.map((role) => (
@@ -388,7 +436,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                               className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
                             >
                               <Shield className="w-5 h-5 text-dark-600" />
-                              <span className="text-16-medium text-white">{role}</span>
+                              <span className="text-16-medium text-white">
+                                {role}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -399,24 +449,36 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Department */}
                 <div>
-                  <label className="shad-input-label block mb-2">Department</label>
+                  <label className="shad-input-label block mb-2">
+                    Department
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowDepartmentDropdown(!showDepartmentDropdown)}
+                      onClick={() =>
+                        setShowDepartmentDropdown(!showDepartmentDropdown)
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-red-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Building className="w-5 h-5 text-dark-600" />
-                        <span className="text-white">{formData.department || 'Select department'}</span>
+                        <span className="text-white">
+                          {formData.department || "Select department"}
+                        </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showDepartmentDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showDepartmentDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showDepartmentDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Departments</span>
+                          <span className="text-14-medium text-dark-700">
+                            Departments
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {departments.map((dept) => (
@@ -427,7 +489,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                               className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
                             >
                               <Building className="w-5 h-5 text-dark-600" />
-                              <span className="text-16-medium text-white">{dept}</span>
+                              <span className="text-16-medium text-white">
+                                {dept}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -438,7 +502,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Employee ID */}
                 <div>
-                  <label className="shad-input-label block mb-2">Employee ID</label>
+                  <label className="shad-input-label block mb-2">
+                    Employee ID
+                  </label>
                   <input
                     type="text"
                     name="employeeId"
@@ -452,7 +518,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Reporting Manager */}
                 <div>
-                  <label className="shad-input-label block mb-2">Reporting manager</label>
+                  <label className="shad-input-label block mb-2">
+                    Reporting manager
+                  </label>
                   <input
                     type="text"
                     name="reportingManager"
@@ -466,7 +534,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Years of Experience */}
                 <div>
-                  <label className="shad-input-label block mb-2">Years of management experience</label>
+                  <label className="shad-input-label block mb-2">
+                    Years of management experience
+                  </label>
                   <input
                     type="number"
                     name="yearsOfExperience"
@@ -480,7 +550,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Previous Role */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Previous role/experience</label>
+                  <label className="shad-input-label block mb-2">
+                    Previous role/experience
+                  </label>
                   <textarea
                     name="previousRole"
                     value={formData.previousRole}
@@ -495,12 +567,16 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
             {/* Education & Qualifications */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Education & Qualifications</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Education & Qualifications
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Education */}
                 <div>
-                  <label className="shad-input-label block mb-2">Highest education level</label>
+                  <label className="shad-input-label block mb-2">
+                    Highest education level
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <GraduationCap className="w-5 h-5 text-dark-600" />
@@ -513,18 +589,24 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                       required
                     >
                       <option value="">Select education level</option>
-                      <option value="Bachelor's Degree">Bachelor's Degree</option>
+                      <option value="Bachelor's Degree">
+                        Bachelor's Degree
+                      </option>
                       <option value="Master's Degree">Master's Degree</option>
                       <option value="MBA">MBA</option>
                       <option value="Doctorate">Doctorate</option>
-                      <option value="Professional Certification">Professional Certification</option>
+                      <option value="Professional Certification">
+                        Professional Certification
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 {/* Languages Spoken */}
                 <div>
-                  <label className="shad-input-label block mb-2">Languages spoken</label>
+                  <label className="shad-input-label block mb-2">
+                    Languages spoken
+                  </label>
                   <input
                     type="text"
                     name="languagesSpoken"
@@ -538,7 +620,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Certifications */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Professional certifications</label>
+                  <label className="shad-input-label block mb-2">
+                    Professional certifications
+                  </label>
                   <textarea
                     name="certifications"
                     value={formData.certifications}
@@ -551,7 +635,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Special Training */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Special training or courses</label>
+                  <label className="shad-input-label block mb-2">
+                    Special training or courses
+                  </label>
                   <textarea
                     name="specialTraining"
                     value={formData.specialTraining}
@@ -566,34 +652,45 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
             {/* System Access & Permissions */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">System Access & Permissions</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                System Access & Permissions
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* System Access */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Required system access</label>
+                  <label className="shad-input-label block mb-2">
+                    Required system access
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowSystemAccessDropdown(!showSystemAccessDropdown)}
+                      onClick={() =>
+                        setShowSystemAccessDropdown(!showSystemAccessDropdown)
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-red-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Settings className="w-5 h-5 text-dark-600" />
                         <span className="text-white">
-                          {selectedSystemAccess.length > 0 
+                          {selectedSystemAccess.length > 0
                             ? `${selectedSystemAccess.length} system(s) selected`
-                            : 'Select system access'
-                          }
+                            : "Select system access"}
                         </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showSystemAccessDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showSystemAccessDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showSystemAccessDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">System Access</span>
+                          <span className="text-14-medium text-dark-700">
+                            System Access
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {systemAccess.map((system) => (
@@ -604,10 +701,14 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                               <input
                                 type="checkbox"
                                 checked={selectedSystemAccess.includes(system)}
-                                onChange={() => handleSystemAccessToggle(system)}
+                                onChange={() =>
+                                  handleSystemAccessToggle(system)
+                                }
                                 className="w-4 h-4 text-red-500 bg-dark-400 border-dark-500 rounded focus:ring-red-500"
                               />
-                              <span className="text-14-regular text-white">{system}</span>
+                              <span className="text-14-regular text-white">
+                                {system}
+                              </span>
                             </label>
                           ))}
                         </div>
@@ -618,7 +719,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Security Clearance */}
                 <div>
-                  <label className="shad-input-label block mb-2">Security clearance level</label>
+                  <label className="shad-input-label block mb-2">
+                    Security clearance level
+                  </label>
                   <select
                     name="securityClearance"
                     value={formData.securityClearance}
@@ -636,7 +739,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Access Level */}
                 <div>
-                  <label className="shad-input-label block mb-2">System access level</label>
+                  <label className="shad-input-label block mb-2">
+                    System access level
+                  </label>
                   <select
                     name="accessLevel"
                     value={formData.accessLevel}
@@ -649,7 +754,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     <option value="Standard User">Standard User</option>
                     <option value="Power User">Power User</option>
                     <option value="Administrator">Administrator</option>
-                    <option value="Super Administrator">Super Administrator</option>
+                    <option value="Super Administrator">
+                      Super Administrator
+                    </option>
                   </select>
                 </div>
               </div>
@@ -658,11 +765,13 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
             {/* Work Information */}
             <section>
               <h2 className="text-24-bold text-white mb-8">Work Information</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Work Schedule */}
                 <div>
-                  <label className="shad-input-label block mb-2">Work schedule</label>
+                  <label className="shad-input-label block mb-2">
+                    Work schedule
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Clock className="w-5 h-5 text-dark-600" />
@@ -681,7 +790,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Start Date */}
                 <div>
-                  <label className="shad-input-label block mb-2">Expected start date</label>
+                  <label className="shad-input-label block mb-2">
+                    Expected start date
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="w-5 h-5 text-dark-600" />
@@ -699,7 +810,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Salary Expectation */}
                 <div>
-                  <label className="shad-input-label block mb-2">Salary expectation (annual)</label>
+                  <label className="shad-input-label block mb-2">
+                    Salary expectation (annual)
+                  </label>
                   <input
                     type="number"
                     name="salary"
@@ -712,7 +825,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Benefits */}
                 <div>
-                  <label className="shad-input-label block mb-2">Benefits package</label>
+                  <label className="shad-input-label block mb-2">
+                    Benefits package
+                  </label>
                   <select
                     name="benefits"
                     value={formData.benefits}
@@ -732,17 +847,19 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
             {/* Document Upload */}
             <section>
               <h2 className="text-24-bold text-white mb-8">Document Upload</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Resume */}
                 <div>
-                  <label className="shad-input-label block mb-2">Resume/CV</label>
+                  <label className="shad-input-label block mb-2">
+                    Resume/CV
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="resume"
                       name="resume"
-                      onChange={(e) => handleFileUpload(e, 'resume')}
+                      onChange={(e) => handleFileUpload(e, "resume")}
                       accept=".pdf,.doc,.docx"
                       className="hidden"
                     />
@@ -753,9 +870,11 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-red-500">
-                            {uploadedFiles.resume || 'Upload resume'}
+                            {uploadedFiles.resume || "Upload resume"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, DOC, DOCX (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, DOC, DOCX (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -764,27 +883,35 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Certification Documents */}
                 <div>
-                  <label className="shad-input-label block mb-2">Certification documents</label>
+                  <label className="shad-input-label block mb-2">
+                    Certification documents
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="certificationDocs"
                       name="certificationDocs"
-                      onChange={(e) => handleFileUpload(e, 'certificationDocs')}
+                      onChange={(e) => handleFileUpload(e, "certificationDocs")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       multiple
                       className="hidden"
                     />
-                    <label htmlFor="certificationDocs" className="cursor-pointer">
+                    <label
+                      htmlFor="certificationDocs"
+                      className="cursor-pointer"
+                    >
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
                           <Award className="w-6 h-6 text-white" />
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-blue-500">
-                            {uploadedFiles.certificationDocs || 'Upload certifications'}
+                            {uploadedFiles.certificationDocs ||
+                              "Upload certifications"}
                           </p>
-                          <p className="text-12-regular text-dark-600">Multiple files allowed - PDF, JPG, PNG</p>
+                          <p className="text-12-regular text-dark-600">
+                            Multiple files allowed - PDF, JPG, PNG
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -793,13 +920,15 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Background Check */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Background check authorization</label>
+                  <label className="shad-input-label block mb-2">
+                    Background check authorization
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="backgroundCheck"
                       name="backgroundCheck"
-                      onChange={(e) => handleFileUpload(e, 'backgroundCheck')}
+                      onChange={(e) => handleFileUpload(e, "backgroundCheck")}
                       accept=".pdf,.doc,.docx"
                       className="hidden"
                     />
@@ -810,9 +939,12 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-green-500">
-                            {uploadedFiles.backgroundCheck || 'Upload background check form'}
+                            {uploadedFiles.backgroundCheck ||
+                              "Upload background check form"}
                           </p>
-                          <p className="text-12-regular text-dark-600">Signed authorization form - PDF, DOC, DOCX</p>
+                          <p className="text-12-regular text-dark-600">
+                            Signed authorization form - PDF, DOC, DOCX
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -823,8 +955,10 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
             {/* Consent & Security Agreement */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Security & Compliance Agreement</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Security & Compliance Agreement
+              </h2>
+
               <div className="space-y-6">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -836,7 +970,8 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I agree to comply with all security policies and procedures, including password requirements and system access protocols.
+                    I agree to comply with all security policies and procedures,
+                    including password requirements and system access protocols.
                   </span>
                 </label>
 
@@ -850,7 +985,8 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I consent to the collection and use of my personal and professional data for employment and system access purposes.
+                    I consent to the collection and use of my personal and
+                    professional data for employment and system access purposes.
                   </span>
                 </label>
 
@@ -864,7 +1000,9 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I acknowledge my responsibility to maintain strict confidentiality of all patient information and organizational data.
+                    I acknowledge my responsibility to maintain strict
+                    confidentiality of all patient information and
+                    organizational data.
                   </span>
                 </label>
 
@@ -878,7 +1016,8 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I agree to abide by the organization's code of conduct and ethical standards for healthcare administration.
+                    I agree to abide by the organization's code of conduct and
+                    ethical standards for healthcare administration.
                   </span>
                 </label>
               </div>
@@ -905,7 +1044,7 @@ const AdminOnboarding = ({ onBack, onComplete }) => {
 
           {/* Copyright */}
           <div className="mt-16">
-            <p className="copyright">©carepulse copyright</p>
+            <p className="copyright">©medicura copyright</p>
           </div>
         </div>
       </div>

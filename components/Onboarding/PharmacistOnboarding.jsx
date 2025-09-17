@@ -1,96 +1,113 @@
-import React, { useState } from 'react';
-import { Plus, User, Mail, Phone, Calendar, MapPin, Upload, ChevronDown, GraduationCap, Award, Pill, Clock, Building, Shield } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Plus,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Upload,
+  ChevronDown,
+  GraduationCap,
+  Award,
+  Pill,
+  Clock,
+  Building,
+  Shield,
+} from "lucide-react";
 
 const pharmacyTypes = [
-  'Community Pharmacy',
-  'Hospital Pharmacy',
-  'Clinical Pharmacy',
-  'Industrial Pharmacy',
-  'Compounding Pharmacy',
-  'Mail-Order Pharmacy',
-  'Specialty Pharmacy',
-  'Long-Term Care Pharmacy'
+  "Community Pharmacy",
+  "Hospital Pharmacy",
+  "Clinical Pharmacy",
+  "Industrial Pharmacy",
+  "Compounding Pharmacy",
+  "Mail-Order Pharmacy",
+  "Specialty Pharmacy",
+  "Long-Term Care Pharmacy",
 ];
 
 const certifications = [
-  'Board Certified Pharmacotherapy Specialist (BCPS)',
-  'Board Certified Ambulatory Care Pharmacist (BCACP)',
-  'Board Certified Geriatric Pharmacist (BCGP)',
-  'Board Certified Oncology Pharmacist (BCOP)',
-  'Board Certified Pediatric Pharmacy Specialist (BCPPS)',
-  'Board Certified Psychiatric Pharmacist (BCPP)',
-  'Certified Diabetes Care and Education Specialist (CDCES)',
-  'Immunization Certified'
+  "Board Certified Pharmacotherapy Specialist (BCPS)",
+  "Board Certified Ambulatory Care Pharmacist (BCACP)",
+  "Board Certified Geriatric Pharmacist (BCGP)",
+  "Board Certified Oncology Pharmacist (BCOP)",
+  "Board Certified Pediatric Pharmacy Specialist (BCPPS)",
+  "Board Certified Psychiatric Pharmacist (BCPP)",
+  "Certified Diabetes Care and Education Specialist (CDCES)",
+  "Immunization Certified",
 ];
 
 const PharmacistOnboarding = ({ onBack, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personal Information
-    fullName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    address: '',
-    emergencyContactName: '',
-    emergencyPhone: '',
-    
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    emergencyContactName: "",
+    emergencyPhone: "",
+
     // Professional Information
-    pharmacyLicenseNumber: '',
-    deaNumber: '',
-    npiNumber: '',
-    pharmacyType: '',
-    currentPharmacy: '',
-    yearsOfExperience: '',
-    specializations: '',
-    
+    pharmacyLicenseNumber: "",
+    deaNumber: "",
+    npiNumber: "",
+    pharmacyType: "",
+    currentPharmacy: "",
+    yearsOfExperience: "",
+    specializations: "",
+
     // Education & Certifications
-    pharmacySchool: '',
-    graduationYear: '',
-    residencyProgram: '',
-    certifications: '',
-    continuingEducation: '',
-    
+    pharmacySchool: "",
+    graduationYear: "",
+    residencyProgram: "",
+    certifications: "",
+    continuingEducation: "",
+
     // Practice Information
-    workSchedule: '',
-    languagesSpoken: '',
-    clinicalServices: '',
-    insuranceExperience: '',
-    
+    workSchedule: "",
+    languagesSpoken: "",
+    clinicalServices: "",
+    insuranceExperience: "",
+
     // Documents
     pharmacyLicense: null,
     deaLicense: null,
     cv: null,
     certificationDocs: null,
-    
+
     // Consent
     practiceConsent: true,
     dataConsent: true,
-    regulatoryConsent: true
+    regulatoryConsent: true,
   });
 
-  const [showPharmacyTypeDropdown, setShowPharmacyTypeDropdown] = useState(false);
-  const [showCertificationsDropdown, setShowCertificationsDropdown] = useState(false);
+  const [showPharmacyTypeDropdown, setShowPharmacyTypeDropdown] =
+    useState(false);
+  const [showCertificationsDropdown, setShowCertificationsDropdown] =
+    useState(false);
   const [selectedCertifications, setSelectedCertifications] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState({
     pharmacyLicense: null,
     deaLicense: null,
     cv: null,
-    certificationDocs: null
+    certificationDocs: null,
   });
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      const checked = (e.target).checked;
-      setFormData(prev => ({
+    if (type === "checkbox") {
+      const checked = e.target.checked;
+      setFormData((prev) => ({
         ...prev,
-        [name]: checked
+        [name]: checked,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -98,40 +115,40 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
   const handleFileUpload = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFiles(prev => ({
+      setUploadedFiles((prev) => ({
         ...prev,
-        [fieldName]: file.name
+        [fieldName]: file.name,
       }));
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [fieldName]: file
+        [fieldName]: file,
       }));
     }
   };
 
   const handlePharmacyTypeSelect = (type) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      pharmacyType: type
+      pharmacyType: type,
     }));
     setShowPharmacyTypeDropdown(false);
   };
 
   const handleCertificationToggle = (certification) => {
     const updatedCertifications = selectedCertifications.includes(certification)
-      ? selectedCertifications.filter(c => c !== certification)
+      ? selectedCertifications.filter((c) => c !== certification)
       : [...selectedCertifications, certification];
-    
+
     setSelectedCertifications(updatedCertifications);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      certifications: updatedCertifications.join(', ')
+      certifications: updatedCertifications.join(", "),
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Pharmacist onboarding form submitted:', formData);
+    console.log("Pharmacist onboarding form submitted:", formData);
     onComplete();
   };
 
@@ -143,7 +160,7 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Plus className="w-5 h-5 text-white" />
           </div>
-          <span className="text-24-bold text-white">CarePulse</span>
+          <span className="text-24-bold text-white">MediCura</span>
         </div>
       </div>
 
@@ -154,9 +171,13 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <Pill className="w-8 h-8 text-blue-500" />
-              <span className="text-18-bold text-blue-500">Pharmacist Registration</span>
+              <span className="text-18-bold text-blue-500">
+                Pharmacist Registration
+              </span>
             </div>
-            <h1 className="text-36-bold text-white mb-2">Welcome, Pharmacist 💊</h1>
+            <h1 className="text-36-bold text-white mb-2">
+              Welcome, Pharmacist 💊
+            </h1>
             <p className="text-16-regular text-dark-700">
               Join our healthcare network and provide expert pharmaceutical care
             </p>
@@ -165,12 +186,16 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Personal Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Personal Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Personal Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Full name</label>
+                  <label className="shad-input-label block mb-2">
+                    Full name
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User className="w-5 h-5 text-dark-600" />
@@ -189,7 +214,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Email */}
                 <div>
-                  <label className="shad-input-label block mb-2">Email address</label>
+                  <label className="shad-input-label block mb-2">
+                    Email address
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="w-5 h-5 text-dark-600" />
@@ -208,7 +235,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Phone */}
                 <div>
-                  <label className="shad-input-label block mb-2">Phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -227,7 +256,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Date of Birth */}
                 <div>
-                  <label className="shad-input-label block mb-2">Date of birth</label>
+                  <label className="shad-input-label block mb-2">
+                    Date of birth
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="w-5 h-5 text-dark-600" />
@@ -252,7 +283,7 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Male"
-                        checked={formData.gender === 'Male'}
+                        checked={formData.gender === "Male"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-blue-500 bg-dark-400 border-dark-500 focus:ring-blue-500"
                       />
@@ -263,7 +294,7 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                         type="radio"
                         name="gender"
                         value="Female"
-                        checked={formData.gender === 'Female'}
+                        checked={formData.gender === "Female"}
                         onChange={handleInputChange}
                         className="w-4 h-4 text-blue-500 bg-dark-400 border-dark-500 focus:ring-blue-500"
                       />
@@ -293,7 +324,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Emergency Contact */}
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency contact name</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency contact name
+                  </label>
                   <input
                     type="text"
                     name="emergencyContactName"
@@ -306,7 +339,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                 </div>
 
                 <div>
-                  <label className="shad-input-label block mb-2">Emergency phone number</label>
+                  <label className="shad-input-label block mb-2">
+                    Emergency phone number
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="w-5 h-5 text-dark-600" />
@@ -327,12 +362,16 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
             {/* Professional Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Professional Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Professional Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pharmacy License Number */}
                 <div>
-                  <label className="shad-input-label block mb-2">Pharmacy license number</label>
+                  <label className="shad-input-label block mb-2">
+                    Pharmacy license number
+                  </label>
                   <input
                     type="text"
                     name="pharmacyLicenseNumber"
@@ -346,7 +385,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* DEA Number */}
                 <div>
-                  <label className="shad-input-label block mb-2">DEA number</label>
+                  <label className="shad-input-label block mb-2">
+                    DEA number
+                  </label>
                   <input
                     type="text"
                     name="deaNumber"
@@ -360,7 +401,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* NPI Number */}
                 <div>
-                  <label className="shad-input-label block mb-2">NPI number</label>
+                  <label className="shad-input-label block mb-2">
+                    NPI number
+                  </label>
                   <input
                     type="text"
                     name="npiNumber"
@@ -374,7 +417,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Years of Experience */}
                 <div>
-                  <label className="shad-input-label block mb-2">Years of experience</label>
+                  <label className="shad-input-label block mb-2">
+                    Years of experience
+                  </label>
                   <input
                     type="number"
                     name="yearsOfExperience"
@@ -388,24 +433,36 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Pharmacy Type */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Primary pharmacy type</label>
+                  <label className="shad-input-label block mb-2">
+                    Primary pharmacy type
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowPharmacyTypeDropdown(!showPharmacyTypeDropdown)}
+                      onClick={() =>
+                        setShowPharmacyTypeDropdown(!showPharmacyTypeDropdown)
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-blue-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Building className="w-5 h-5 text-dark-600" />
-                        <span className="text-white">{formData.pharmacyType || 'Select pharmacy type'}</span>
+                        <span className="text-white">
+                          {formData.pharmacyType || "Select pharmacy type"}
+                        </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showPharmacyTypeDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showPharmacyTypeDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showPharmacyTypeDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Pharmacy Types</span>
+                          <span className="text-14-medium text-dark-700">
+                            Pharmacy Types
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {pharmacyTypes.map((type) => (
@@ -416,7 +473,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                               className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
                             >
                               <Building className="w-5 h-5 text-dark-600" />
-                              <span className="text-16-medium text-white">{type}</span>
+                              <span className="text-16-medium text-white">
+                                {type}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -427,7 +486,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Current Pharmacy */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Current pharmacy/employer</label>
+                  <label className="shad-input-label block mb-2">
+                    Current pharmacy/employer
+                  </label>
                   <input
                     type="text"
                     name="currentPharmacy"
@@ -441,7 +502,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Specializations */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Areas of specialization</label>
+                  <label className="shad-input-label block mb-2">
+                    Areas of specialization
+                  </label>
                   <textarea
                     name="specializations"
                     value={formData.specializations}
@@ -456,12 +519,16 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
             {/* Education & Certifications */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Education & Certifications</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Education & Certifications
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pharmacy School */}
                 <div>
-                  <label className="shad-input-label block mb-2">Pharmacy school</label>
+                  <label className="shad-input-label block mb-2">
+                    Pharmacy school
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <GraduationCap className="w-5 h-5 text-dark-600" />
@@ -480,7 +547,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Graduation Year */}
                 <div>
-                  <label className="shad-input-label block mb-2">Graduation year</label>
+                  <label className="shad-input-label block mb-2">
+                    Graduation year
+                  </label>
                   <input
                     type="number"
                     name="graduationYear"
@@ -494,7 +563,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Residency Program */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Residency program (if any)</label>
+                  <label className="shad-input-label block mb-2">
+                    Residency program (if any)
+                  </label>
                   <input
                     type="text"
                     name="residencyProgram"
@@ -507,29 +578,40 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Certifications */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Professional certifications</label>
+                  <label className="shad-input-label block mb-2">
+                    Professional certifications
+                  </label>
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowCertificationsDropdown(!showCertificationsDropdown)}
+                      onClick={() =>
+                        setShowCertificationsDropdown(
+                          !showCertificationsDropdown
+                        )
+                      }
                       className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-blue-500 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Award className="w-5 h-5 text-dark-600" />
                         <span className="text-white">
-                          {selectedCertifications.length > 0 
+                          {selectedCertifications.length > 0
                             ? `${selectedCertifications.length} certification(s) selected`
-                            : 'Select certifications'
-                          }
+                            : "Select certifications"}
                         </span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-dark-600 transition-transform ${showCertificationsDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showCertificationsDropdown ? "rotate-180" : ""
+                        }`}
+                      />
                     </button>
 
                     {showCertificationsDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="p-3 border-b border-dark-500">
-                          <span className="text-14-medium text-dark-700">Professional Certifications</span>
+                          <span className="text-14-medium text-dark-700">
+                            Professional Certifications
+                          </span>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
                           {certifications.map((certification) => (
@@ -539,11 +621,17 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                             >
                               <input
                                 type="checkbox"
-                                checked={selectedCertifications.includes(certification)}
-                                onChange={() => handleCertificationToggle(certification)}
+                                checked={selectedCertifications.includes(
+                                  certification
+                                )}
+                                onChange={() =>
+                                  handleCertificationToggle(certification)
+                                }
                                 className="w-4 h-4 text-blue-500 bg-dark-400 border-dark-500 rounded focus:ring-blue-500"
                               />
-                              <span className="text-14-regular text-white">{certification}</span>
+                              <span className="text-14-regular text-white">
+                                {certification}
+                              </span>
                             </label>
                           ))}
                         </div>
@@ -554,7 +642,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Continuing Education */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Recent continuing education</label>
+                  <label className="shad-input-label block mb-2">
+                    Recent continuing education
+                  </label>
                   <textarea
                     name="continuingEducation"
                     value={formData.continuingEducation}
@@ -569,12 +659,16 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
             {/* Practice Information */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Practice Information</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Practice Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Work Schedule */}
                 <div>
-                  <label className="shad-input-label block mb-2">Work schedule</label>
+                  <label className="shad-input-label block mb-2">
+                    Work schedule
+                  </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Clock className="w-5 h-5 text-dark-600" />
@@ -593,7 +687,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Languages Spoken */}
                 <div>
-                  <label className="shad-input-label block mb-2">Languages spoken</label>
+                  <label className="shad-input-label block mb-2">
+                    Languages spoken
+                  </label>
                   <input
                     type="text"
                     name="languagesSpoken"
@@ -607,7 +703,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Clinical Services */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Clinical services provided</label>
+                  <label className="shad-input-label block mb-2">
+                    Clinical services provided
+                  </label>
                   <textarea
                     name="clinicalServices"
                     value={formData.clinicalServices}
@@ -620,7 +718,9 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Insurance Experience */}
                 <div className="md:col-span-2">
-                  <label className="shad-input-label block mb-2">Insurance and billing experience</label>
+                  <label className="shad-input-label block mb-2">
+                    Insurance and billing experience
+                  </label>
                   <textarea
                     name="insuranceExperience"
                     value={formData.insuranceExperience}
@@ -636,17 +736,19 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
             {/* Document Upload */}
             <section>
               <h2 className="text-24-bold text-white mb-8">Document Upload</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pharmacy License */}
                 <div>
-                  <label className="shad-input-label block mb-2">Pharmacy license document</label>
+                  <label className="shad-input-label block mb-2">
+                    Pharmacy license document
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="pharmacyLicense"
                       name="pharmacyLicense"
-                      onChange={(e) => handleFileUpload(e, 'pharmacyLicense')}
+                      onChange={(e) => handleFileUpload(e, "pharmacyLicense")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       className="hidden"
                     />
@@ -657,9 +759,12 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-blue-500">
-                            {uploadedFiles.pharmacyLicense || 'Upload pharmacy license'}
+                            {uploadedFiles.pharmacyLicense ||
+                              "Upload pharmacy license"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, JPG, PNG (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, JPG, PNG (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -668,13 +773,15 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* DEA License */}
                 <div>
-                  <label className="shad-input-label block mb-2">DEA license document</label>
+                  <label className="shad-input-label block mb-2">
+                    DEA license document
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="deaLicense"
                       name="deaLicense"
-                      onChange={(e) => handleFileUpload(e, 'deaLicense')}
+                      onChange={(e) => handleFileUpload(e, "deaLicense")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       className="hidden"
                     />
@@ -685,9 +792,11 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-red-500">
-                            {uploadedFiles.deaLicense || 'Upload DEA license'}
+                            {uploadedFiles.deaLicense || "Upload DEA license"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, JPG, PNG (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, JPG, PNG (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -696,13 +805,15 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* CV/Resume */}
                 <div>
-                  <label className="shad-input-label block mb-2">CV/Resume</label>
+                  <label className="shad-input-label block mb-2">
+                    CV/Resume
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="cv"
                       name="cv"
-                      onChange={(e) => handleFileUpload(e, 'cv')}
+                      onChange={(e) => handleFileUpload(e, "cv")}
                       accept=".pdf,.doc,.docx"
                       className="hidden"
                     />
@@ -713,9 +824,11 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-green-500">
-                            {uploadedFiles.cv || 'Upload CV/Resume'}
+                            {uploadedFiles.cv || "Upload CV/Resume"}
                           </p>
-                          <p className="text-12-regular text-dark-600">PDF, DOC, DOCX (max 5MB)</p>
+                          <p className="text-12-regular text-dark-600">
+                            PDF, DOC, DOCX (max 5MB)
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -724,27 +837,35 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
                 {/* Certification Documents */}
                 <div>
-                  <label className="shad-input-label block mb-2">Certification documents</label>
+                  <label className="shad-input-label block mb-2">
+                    Certification documents
+                  </label>
                   <div className="file-upload">
                     <input
                       type="file"
                       id="certificationDocs"
                       name="certificationDocs"
-                      onChange={(e) => handleFileUpload(e, 'certificationDocs')}
+                      onChange={(e) => handleFileUpload(e, "certificationDocs")}
                       accept=".pdf,.jpg,.jpeg,.png"
                       multiple
                       className="hidden"
                     />
-                    <label htmlFor="certificationDocs" className="cursor-pointer">
+                    <label
+                      htmlFor="certificationDocs"
+                      className="cursor-pointer"
+                    >
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
                           <Award className="w-6 h-6 text-white" />
                         </div>
                         <div className="file-upload_label">
                           <p className="text-14-regular text-purple-500">
-                            {uploadedFiles.certificationDocs || 'Upload certifications'}
+                            {uploadedFiles.certificationDocs ||
+                              "Upload certifications"}
                           </p>
-                          <p className="text-12-regular text-dark-600">Multiple files allowed - PDF, JPG, PNG</p>
+                          <p className="text-12-regular text-dark-600">
+                            Multiple files allowed - PDF, JPG, PNG
+                          </p>
                         </div>
                       </div>
                     </label>
@@ -755,8 +876,10 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
             {/* Consent and Agreement */}
             <section>
-              <h2 className="text-24-bold text-white mb-8">Professional Agreement</h2>
-              
+              <h2 className="text-24-bold text-white mb-8">
+                Professional Agreement
+              </h2>
+
               <div className="space-y-6">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -768,7 +891,8 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I agree to practice pharmacy in accordance with professional standards and regulatory requirements.
+                    I agree to practice pharmacy in accordance with professional
+                    standards and regulatory requirements.
                   </span>
                 </label>
 
@@ -782,7 +906,8 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I consent to the collection and use of my professional data for credentialing and practice management.
+                    I consent to the collection and use of my professional data
+                    for credentialing and practice management.
                   </span>
                 </label>
 
@@ -796,7 +921,8 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
                     required
                   />
                   <span className="text-14-regular text-white">
-                    I acknowledge compliance with all federal and state pharmacy regulations and controlled substance laws.
+                    I acknowledge compliance with all federal and state pharmacy
+                    regulations and controlled substance laws.
                   </span>
                 </label>
               </div>
@@ -823,7 +949,7 @@ const PharmacistOnboarding = ({ onBack, onComplete }) => {
 
           {/* Copyright */}
           <div className="mt-16">
-            <p className="copyright">©carepulse copyright</p>
+            <p className="copyright">©medicura copyright</p>
           </div>
         </div>
       </div>

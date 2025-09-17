@@ -22,28 +22,28 @@ const physicians = [
     name: "Dr. Adam Smith",
     avatar:
       "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    specialty: "General Medicine",
+    speciality: "General Medicine",
   },
   {
     id: "2",
     name: "Dr. Sarah Johnson",
     avatar:
       "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    specialty: "Internal Medicine",
+    speciality: "Internal Medicine",
   },
   {
     id: "3",
     name: "Dr. Michael Brown",
     avatar:
       "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    specialty: "Family Medicine",
+    speciality: "Family Medicine",
   },
   {
     id: "4",
     name: "Dr. Emily Davis",
     avatar:
       "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    specialty: "Cardiology",
+    speciality: "Cardiology",
   },
 ];
 
@@ -384,7 +384,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Plus className="w-5 h-5 text-white" />
           </div>
-          <span className="text-24-bold text-white">CarePulse</span>
+          <span className="text-24-bold text-white">MediCura</span>
         </div>
       </div>
 
@@ -784,9 +784,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                               <div className="text-16-medium text-white">
                                 {physician.name}
                               </div>
-                              {physician.specialty && (
+                              {physician.speciality && (
                                 <div className="text-12-regular text-dark-600">
-                                  {physician.specialty}
+                                  {physician.speciality}
                                 </div>
                               )}
                             </div>

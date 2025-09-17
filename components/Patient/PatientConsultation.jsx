@@ -236,7 +236,7 @@ const PatientConsultation = ({ onBack }) => {
             "Take with food in the morning. Monitor blood pressure daily.",
           sideEffects: ["Dizziness", "Dry cough", "Fatigue"],
           cost: 25.99,
-          pharmacy: "CarePulse Pharmacy",
+          pharmacy: "MediCura Pharmacy",
           consultationId: "cons-001",
           appointmentDate: "2024-01-15",
           reason: "High blood pressure management",
@@ -258,7 +258,7 @@ const PatientConsultation = ({ onBack }) => {
             "Take only when experiencing anxiety. Do not exceed 2 tablets per day.",
           sideEffects: ["Drowsiness", "Dizziness", "Memory problems"],
           cost: 18.5,
-          pharmacy: "CarePulse Pharmacy",
+          pharmacy: "MediCura Pharmacy",
           consultationId: "cons-001",
           appointmentDate: "2024-01-15",
           reason: "Anxiety management",
@@ -292,7 +292,7 @@ const PatientConsultation = ({ onBack }) => {
             "Take with meals. Do not stop suddenly without consulting doctor.",
           sideEffects: ["Fatigue", "Cold hands/feet", "Dizziness"],
           cost: 32.75,
-          pharmacy: "CarePulse Pharmacy",
+          pharmacy: "MediCura Pharmacy",
           consultationId: "cons-002",
           appointmentDate: "2024-01-08",
           reason: "Cardiac monitoring and management",
@@ -326,7 +326,7 @@ const PatientConsultation = ({ onBack }) => {
             "Take with food. Complete entire course even if feeling better.",
           sideEffects: ["Nausea", "Diarrhea", "Stomach upset"],
           cost: 15.25,
-          pharmacy: "CarePulse Pharmacy",
+          pharmacy: "MediCura Pharmacy",
           consultationId: "cons-003",
           appointmentDate: "2023-12-20",
           reason: "Bacterial infection treatment",
@@ -394,7 +394,7 @@ const PatientConsultation = ({ onBack }) => {
     // Header
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text("CarePulse Medical Center", 20, 30);
+    doc.text("MediCura Medical Center", 20, 30);
 
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);

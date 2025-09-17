@@ -157,7 +157,7 @@ const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Plus className="w-4 h-4 text-white" />
               </div>
-              <span className="text-18-bold text-white">CarePulse</span>
+              <span className="text-18-bold text-white">MediCura</span>
             </div>
             <div className="w-10"></div> {/* Spacer for centering */}
           </div>

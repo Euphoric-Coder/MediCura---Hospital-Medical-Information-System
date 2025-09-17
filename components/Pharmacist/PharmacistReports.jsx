@@ -48,12 +48,12 @@ const PharmacistReports = ({ onBack }) => {
     // Header
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text("CarePulse Pharmacy", 20, 30);
+    doc.text("MediCura Pharmacy", 20, 30);
 
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
     doc.text("123 Healthcare Drive, Medical City, MC 12345", 20, 40);
-    doc.text("Phone: (555) 123-4567 | Email: pharmacy@carepulse.com", 20, 50);
+    doc.text("Phone: (555) 123-4567 | Email: pharmacy@medicura.com", 20, 50);
 
     // Title
     doc.setFontSize(16);
@@ -100,14 +100,9 @@ const PharmacistReports = ({ onBack }) => {
     );
   };
 
-  const getMaxValue = (data) =>
-    Math.max(...data.map((d) => d.value));
+  const getMaxValue = (data) => Math.max(...data.map((d) => d.value));
 
-  const BarChart = ({
-    data,
-    title,
-    unit = "",
-  }) => {
+  const BarChart = ({ data, title, unit = "" }) => {
     const maxValue = getMaxValue(data);
 
     return (
@@ -159,13 +154,7 @@ const PharmacistReports = ({ onBack }) => {
     );
   };
 
-  const StatCard = ({
-    title,
-    value,
-    change,
-    icon: Icon,
-    color,
-  }) => (
+  const StatCard = ({ title, value, change, icon: Icon, color }) => (
     <div
       className={`bg-gradient-to-br ${color} backdrop-blur-sm border border-opacity-20 rounded-2xl p-4 lg:p-6`}
     >

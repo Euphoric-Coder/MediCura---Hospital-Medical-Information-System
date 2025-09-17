@@ -113,7 +113,7 @@ const UpdatePassword = ({ onBack }) => {
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Plus className="w-5 h-5 text-white" />
           </div>
-          <span className="text-24-bold text-white">CarePulse</span>
+          <span className="text-24-bold text-white">MediCura</span>
         </div>
       </div>
 
