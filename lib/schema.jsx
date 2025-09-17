@@ -7,6 +7,7 @@ import {
   date,
   integer,
   boolean,
+  numeric,
 } from "drizzle-orm/pg-core";
 
 // Users Table
@@ -59,11 +60,11 @@ export const Doctors = pgTable("doctors", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
+  name: varchar("name"),
+  phone: varchar("phone"),
   medicalLicenseNumber: varchar("medicalLicenseNumber"),
   speciality: varchar("speciality"),
-  subSpecialty: varchar("subSpecialty"),
   yearsOfExperience: integer("yearsOfExperience"),
-  currentHospital: varchar("currentHospital"),
   previousHospitals: text("previousHospitals"),
 
   medicalSchool: varchar("medicalSchool"),
@@ -74,14 +75,15 @@ export const Doctors = pgTable("doctors", {
   continuingEducation: text("continuingEducation"),
 
   consultationFee: varchar("consultationFee"),
+  rating: numeric("rating").default(0),
   availableDays: varchar("availableDays"),
   availableHours: varchar("availableHours"),
   languagesSpoken: text("languagesSpoken"),
   insuranceAccepted: text("insuranceAccepted"),
 
-  practiceConsent: boolean("practiceConsent").default(true),
-  dataConsent: boolean("dataConsent").default(true),
-  ethicsConsent: boolean("ethicsConsent").default(true),
+  practiceConsent: boolean("practiceConsent").default(false),
+  dataConsent: boolean("dataConsent").default(false),
+  ethicsConsent: boolean("ethicsConsent").default(false),
 
   hasOnboarded: boolean("hasOnboarded").default(false),
 });

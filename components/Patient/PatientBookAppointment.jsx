@@ -303,8 +303,7 @@ const doctors = [
     avatar:
       "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
     rating: 4.9,
-    experience: "12 years",
-    location: "Main Building, Floor 2",
+    yearsOfExperience: "12 years",
     phone: "+1 (555) 123-4567",
     consultationFee: 150,
     nextAvailable: "Today 2:00 PM",
@@ -316,8 +315,7 @@ const doctors = [
     avatar:
       "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
     rating: 4.8,
-    experience: "15 years",
-    location: "Cardiology Wing, Floor 3",
+    yearsOfExperience: "15 years",
     phone: "+1 (555) 234-5678",
     consultationFee: 200,
     nextAvailable: "Tomorrow 10:00 AM",
@@ -329,8 +327,7 @@ const doctors = [
     avatar:
       "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
     rating: 4.7,
-    experience: "10 years",
-    location: "Pediatric Wing, Floor 1",
+    yearsOfExperience: "10 years",
     phone: "+1 (555) 345-6789",
     consultationFee: 175,
     nextAvailable: "Jan 25 9:00 AM",
@@ -342,8 +339,7 @@ const doctors = [
     avatar:
       "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
     rating: 4.9,
-    experience: "8 years",
-    location: "Dermatology Clinic, Floor 2",
+    yearsOfExperience: "8 years",
     phone: "+1 (555) 456-7890",
     consultationFee: 180,
     nextAvailable: "Jan 26 11:30 AM",
@@ -850,20 +846,11 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                                 {doctor.rating}
                               </span>
                               <span className="text-12-regular text-dark-600">
-                                ({doctor.experience} experience)
+                                ({doctor.yearsOfExperience} yearsOfExperience)
                               </span>
                             </div>
 
                             <div className="space-y-2 text-12-regular lg:text-14-regular text-dark-700">
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-green-400" />
-                                <span className="hidden sm:inline">
-                                  {doctor.location}
-                                </span>
-                                <span className="sm:hidden">
-                                  {doctor.location.split(",")[0]}
-                                </span>
-                              </div>
                               <div className="items-center gap-2 hidden sm:flex">
                                 <Phone className="w-4 h-4 text-blue-400" />
                                 <span>{doctor.phone}</span>
