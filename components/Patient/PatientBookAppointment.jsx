@@ -348,9 +348,51 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
   const [existingAppointments, setExistingAppointments] = useState([
     {
       id: "1",
-      date: "Jan 25, 2024",
+      date: "2025-09-17",
       time: "10:00 AM",
-      doctor: doctors[0],
+      doctor: {
+        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
+        name: "Dr. Arjun Mehta",
+        phone: "+91 9876543210",
+        avatar: "/avatars/dr-arjun.png",
+        dateOfBirth: null,
+        gender: null,
+        address: null,
+        emergencyContactName: null,
+        emergencyPhone: null,
+        medicalLicenseNumber: "MCI/DEL/12345",
+        speciality: "Cardiology",
+        subSpecialty: "Interventional Cardiology",
+        yearsOfExperience: 15,
+        previousHospitals:
+          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
+        medicalSchool: "AIIMS New Delhi",
+        graduationYear: "2008",
+        residencyProgram: "Internal Medicine – AIIMS",
+        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
+        boardCertifications:
+          "Medical Council of India (MCI), Indian Society of Cardiology",
+        continuingEducation:
+          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
+        consultationFee: "1200",
+        rating: "0",
+        availableDays: ["Monday", "Wednesday", "Friday"],
+        availableHours: {
+          end: "14:00",
+          start: "10:00",
+        },
+        languagesSpoken: ["English", "Hindi"],
+        cv: null,
+        cvId: null,
+        medicalLicenseDocument: null,
+        medicalLicenseDocumentId: null,
+        medicalCertificateDocument: null,
+        medicalCertificateDocumentId: null,
+        practiceConsent: true,
+        dataConsent: true,
+        ethicsConsent: true,
+        hasOnboarded: true,
+      },
       reason: "Annual check-up",
       status: "upcoming",
       type: "Consultation",
@@ -358,9 +400,51 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
     },
     {
       id: "2",
-      date: "Feb 2, 2024",
-      time: "2:30 PM",
-      doctor: doctors[1],
+      date: "2025-09-17",
+      time: "01:30 PM",
+      doctor: {
+        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
+        name: "Dr. Arjun Mehta",
+        phone: "+91 9876543210",
+        avatar: "/avatars/dr-arjun.png",
+        dateOfBirth: null,
+        gender: null,
+        address: null,
+        emergencyContactName: null,
+        emergencyPhone: null,
+        medicalLicenseNumber: "MCI/DEL/12345",
+        speciality: "Cardiology",
+        subSpecialty: "Interventional Cardiology",
+        yearsOfExperience: 15,
+        previousHospitals:
+          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
+        medicalSchool: "AIIMS New Delhi",
+        graduationYear: "2008",
+        residencyProgram: "Internal Medicine – AIIMS",
+        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
+        boardCertifications:
+          "Medical Council of India (MCI), Indian Society of Cardiology",
+        continuingEducation:
+          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
+        consultationFee: "1200",
+        rating: "0",
+        availableDays: ["Monday", "Wednesday", "Friday"],
+        availableHours: {
+          end: "14:00",
+          start: "10:00",
+        },
+        languagesSpoken: ["English", "Hindi"],
+        cv: null,
+        cvId: null,
+        medicalLicenseDocument: null,
+        medicalLicenseDocumentId: null,
+        medicalCertificateDocument: null,
+        medicalCertificateDocumentId: null,
+        practiceConsent: true,
+        dataConsent: true,
+        ethicsConsent: true,
+        hasOnboarded: true,
+      },
       reason: "Heart consultation",
       status: "upcoming",
       type: "Follow-up",
@@ -368,18 +452,67 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
     },
     {
       id: "3",
-      date: "Jan 10, 2024",
+      date: "2025-09-20",
       time: "9:00 AM",
-      doctor: doctors[2],
+      doctor: {
+        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
+        name: "Dr. Arjun Mehta",
+        phone: "+91 9876543210",
+        avatar: "/avatars/dr-arjun.png",
+        dateOfBirth: null,
+        gender: null,
+        address: null,
+        emergencyContactName: null,
+        emergencyPhone: null,
+        medicalLicenseNumber: "MCI/DEL/12345",
+        speciality: "Cardiology",
+        subSpecialty: "Interventional Cardiology",
+        yearsOfExperience: 15,
+        previousHospitals:
+          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
+        medicalSchool: "AIIMS New Delhi",
+        graduationYear: "2008",
+        residencyProgram: "Internal Medicine – AIIMS",
+        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
+        boardCertifications:
+          "Medical Council of India (MCI), Indian Society of Cardiology",
+        continuingEducation:
+          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
+        consultationFee: "1200",
+        rating: "0",
+        availableDays: ["Monday", "Wednesday", "Friday"],
+        availableHours: {
+          end: "14:00",
+          start: "10:00",
+        },
+        languagesSpoken: ["English", "Hindi"],
+        cv: null,
+        cvId: null,
+        medicalLicenseDocument: null,
+        medicalLicenseDocumentId: null,
+        medicalCertificateDocument: null,
+        medicalCertificateDocumentId: null,
+        practiceConsent: true,
+        dataConsent: true,
+        ethicsConsent: true,
+        hasOnboarded: true,
+      },
       reason: "Routine examination",
       status: "completed",
       type: "Check-up",
     },
   ]);
 
+  const formatTime12Hour = (date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   // Generate week schedule for selected doctor
   const generateWeekSchedule = (doctor, weekOffset = 0) => {
-    console.log(doctor);
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() + weekOffset * 7);
@@ -399,17 +532,13 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
 
       let slots = [];
 
-      // Check if doctor is available on this day
       if (doctor.availableDays?.includes(dayName) && doctor.availableHours) {
         const startStr = doctor.availableHours.start;
         const endStr = doctor.availableHours.end;
+        if (!startStr || !endStr) return schedule;
 
-        if (!startStr || !endStr) return schedule; // skip if invalid
-
-        const startHour = parseInt(startStr.split(":")[0], 10);
-        const startMinute = parseInt(startStr.split(":")[1], 10);
-        const endHour = parseInt(endStr.split(":")[0], 10);
-        const endMinute = parseInt(endStr.split(":")[1], 10);
+        const [startHour, startMinute] = startStr.split(":").map(Number);
+        const [endHour, endMinute] = endStr.split(":").map(Number);
 
         const startTime = new Date(date);
         startTime.setHours(startHour, startMinute, 0, 0);
@@ -417,24 +546,38 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
         const endTime = new Date(date);
         endTime.setHours(endHour, endMinute, 0, 0);
 
-        const tempSlots = [];
         let currentTime = new Date(startTime);
 
         while (currentTime <= endTime) {
-          const timeStr = currentTime.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
+          const timeStr = formatTime12Hour(currentTime);
+
+          // Match booked appointments with strict format
+          const isBooked = existingAppointments.some(
+            (apt) =>
+              apt.date === fullDate &&
+              apt.time === timeStr &&
+              apt.status === "upcoming"
+          );
+
+          console.log(timeStr);
+
+          console.log(existingAppointments[1].time);
+
+          console.log(isBooked);
+
+          slots.push({
+            time: timeStr,
+            available: !isBooked,
           });
 
-          tempSlots.push({ time: timeStr, available: true });
           currentTime.setMinutes(currentTime.getMinutes() + 30);
         }
-
-        slots = tempSlots;
       }
 
       schedule.push({ date: dateStr, dayName, fullDate, slots });
     }
+
+    console.log(schedule);
 
     return schedule;
   };
@@ -473,11 +616,11 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
     setWeekSchedule(generateWeekSchedule(doctor, newWeek));
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = (doctorId) => {
     const appointmentData = {
       patientId: "P123",
 
-      doctorId: doctors[0].id,
+      doctorId: doctorId,
 
       date: selectedDate,
       time: selectedTime,
@@ -935,8 +1078,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                           ? "This Week"
                           : `${currentWeek} Week${
                               currentWeek > 1 ? "s" : ""
-                            } Ahead`
-                        }
+                            } Ahead`}
                       </span>
                       <button
                         onClick={() => handleWeekChange("next", selectedDoctor)}
@@ -971,13 +1113,19 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                                 onClick={() =>
                                   handleTimeSelect(day.fullDate, slot.time)
                                 }
-                                className="w-full p-2 rounded bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
+                                disabled={!slot.available}
+                                className={`w-full p-2 rounded border transition-colors
+    ${
+      slot.available
+        ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
+        : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
+    }`}
                               >
                                 {slot.time}
                               </button>
                             ))
                           ) : (
-                            <p className="text-center text-dark-600 text-sm">
+                            <p className="text-center text-red-400 text-sm">
                               Not Available
                             </p>
                           )}
@@ -1203,7 +1351,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                   </button>
 
                   <button
-                    onClick={handleConfirmBooking}
+                    onClick={handleConfirmBooking(selectedDoctor.userId)}
                     disabled={!appointmentReason.trim()}
                     className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
                   >
@@ -1237,7 +1385,9 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                     <div className="flex items-center gap-4 lg:gap-6">
                       <div className="relative">
                         <img
-                          src={appointment.doctor.avatar}
+                          src={
+                            appointment?.doctor?.avatar || "/doctor-avatar.jpg"
+                          }
                           alt={appointment.doctor.name}
                           className="w-12 h-12 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-dark-500/50"
                         />
