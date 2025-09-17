@@ -306,7 +306,7 @@ const appointmentTypes = [
   "Surgery",
 ];
 
-const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
+const PatientBookAppointment = ({ onBack, patientData }) => {
   const [doctors, setDoctors] = useState([]); // store doctors here
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
@@ -559,12 +559,6 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
               apt.status === "upcoming"
           );
 
-          console.log(timeStr);
-
-          console.log(existingAppointments[1].time);
-
-          console.log(isBooked);
-
           slots.push({
             time: timeStr,
             available: !isBooked,
@@ -576,8 +570,6 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
 
       schedule.push({ date: dateStr, dayName, fullDate, slots });
     }
-
-    console.log(schedule);
 
     return schedule;
   };
@@ -636,23 +628,7 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
 
     console.log("Booking appointment:", appointmentData);
 
-    // Add to existing appointments
-    const newAppointment = {
-      id: (existingAppointments.length + 1).toString(),
-      date: new Date(selectedDate).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      time: selectedTime,
-      doctor: selectedDoctor,
-      reason: appointmentReason,
-      status: "upcoming",
-      type: "Consultation",
-      notes: additionalNotes,
-    };
-
-    setExistingAppointments((prev) => [...prev, newAppointment]);
+    // setExistingAppointments((prev) => [...prev, newAppointment]);
     setMessage("Appointment booked successfully!");
     setMessageType("success");
 
@@ -669,8 +645,6 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
       setMessage("");
       setMessageType("");
     }, 3000);
-
-    onSuccess(appointmentData);
   };
 
   const handleCancelAppointment = (reason) => {
@@ -1238,7 +1212,7 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
                             Consultation Fee: ${selectedDoctor.consultationFee}
                           </div>
                           <div className="text-12-regular text-green-300">
-                            Payment due at time of service
+                            Payment due after service
                           </div>
                         </div>
                       </div>
@@ -1265,7 +1239,12 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
                               !showAppointmentTypeDropdown
                             )
                           }
-                          onBlur={() => setShowAppointmentTypeDropdown(false)}
+                          onBlur={
+                            () =>
+                              setTimeout(() => {
+                                setShowAppointmentTypeDropdown(false);
+                              }, 150) // delay in ms (100–200ms usually works well)
+                          }
                           className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
                         >
                           <span className="text-white">{appointmentType}</span>
@@ -1290,6 +1269,7 @@ const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
                                   type="button"
                                   onClick={() => {
                                     setAppointmentType(type);
+                                    console.log(type);
                                     setShowAppointmentTypeDropdown(false);
                                   }}
                                   className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"

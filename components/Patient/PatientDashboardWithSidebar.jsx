@@ -44,10 +44,6 @@ const PatientDashboardWithSidebar = ({ onBookAppointment, patientData }) => {
         return (
           <PatientBookAppointment
             onBack={() => setCurrentPage("dashboard")}
-            onSuccess={(appointmentData) => {
-              console.log("Appointment booked:", appointmentData);
-              setCurrentPage("dashboard");
-            }}
             patientData={patientData}
           />
         );
