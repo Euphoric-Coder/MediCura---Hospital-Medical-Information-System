@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PatientDashboard from "@/components/Patient/PatientDashboard";
-import OnboardingRedirect from "@/components/Onboarding/OnboardingRedirect";
 import PatientDashboardWithSidebar from "@/components/Patient/PatientDashboardWithSidebar";
-import { useSession, signOut } from "next-auth/react";
+import OnboardingRedirect from "@/components/Onboarding/OnboardingRedirect";
+import { useSession } from "next-auth/react";
 import { db } from "@/lib/dbConfig";
 import { Patients, Users } from "@/lib/schema";
 import { eq } from "drizzle-orm";
@@ -18,42 +17,57 @@ export default function PatientPage() {
   const userEmail = session?.user?.email;
 
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState([]);
   const [role, setRole] = useState(null);
+  const [patientData, setPatientData] = useState([]);
+  const [onboardingStatus, setOnboardingStatus] = useState(null);
 
   useEffect(() => {
-    const CheckOnboardingStatus = async () => {
-      if (!userId) return;
-      console.log("user id:", userId);
-      const data = await db
-        .select()
-        .from(Users)
-        .where(eq(Users.email, userEmail));
-      console.log(data[0].role);
+    const checkOnboardingStatus = async () => {
+      if (!userId || !userEmail) return;
 
-      if (data.length > 0) {
-        const patient = await db
+      try {
+        const data = await db
           .select()
-          .from(Patients)
-          .where(eq(Patients.userId, userId));
+          .from(Users)
+          .where(eq(Users.email, userEmail));
 
-        console.log(patient);
+        if (data.length > 0) {
+          setRole(data[0].role);
+
+          const patient = await db
+            .select()
+            .from(Patients)
+            .where(eq(Patients.userId, userId));
+
+          if (patient.length > 0) {
+            setPatientData(patient);
+            setOnboardingStatus(patient[0].hasOnboarded);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    CheckOnboardingStatus();
-    // Simulate loading delay
-    // setTimeout(() => {
-    //   setLoading(false);
-    // }, 1000);
-  }, [userId]);
+
+    checkOnboardingStatus();
+  }, [userId, userEmail]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading your account...
+      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white text-lg">Loading Patient Dashboard...</p>
+        </div>
       </div>
-      // <OnboardingRedirect userType="patient" name={"Sagnik Dey"} />
     );
   }
+
+  if (onboardingStatus === false) {
+    return <OnboardingRedirect userType={role} name={userName} />;
+  }
+
   return <PatientDashboardWithSidebar />;
 }
