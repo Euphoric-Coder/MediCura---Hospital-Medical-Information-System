@@ -131,7 +131,7 @@ const PrescriptionDetailsModal = ({
   );
 };
 
-const PatientPrescriptions = ({ onBack }) => {
+const PatientMedication = ({ onBack }) => {
   const [prescriptions] = useState([
     {
       id: '1',
@@ -380,7 +380,7 @@ const PatientPrescriptions = ({ onBack }) => {
                 <Pill className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
               <div>
-                <span className="text-20-bold lg:text-24-bold text-white">My Prescriptions</span>
+                <span className="text-20-bold lg:text-24-bold text-white">My Medicines</span>
                 <p className="text-12-regular lg:text-14-regular text-dark-700">Manage your medications</p>
               </div>
             </div>
@@ -612,4 +612,4 @@ const PatientPrescriptions = ({ onBack }) => {
   );
 };
 
-export default PatientPrescriptions;
+export default PatientMedication;

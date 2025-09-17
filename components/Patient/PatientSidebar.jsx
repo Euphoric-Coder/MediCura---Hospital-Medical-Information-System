@@ -13,7 +13,8 @@ import {
   TestTube,
   Phone,
   Menu,
-  X
+  X,
+  NotebookTabs
 } from 'lucide-react';
 
 const PatientSidebar = ({ 
@@ -39,8 +40,14 @@ const PatientSidebar = ({
     {
       id: 'prescriptions',
       label: 'Prescriptions',
+      icon: NotebookTabs,
+      description: 'Consultation Details'
+    },
+    {
+      id: 'medication',
+      label: 'Medications',
       icon: Pill,
-      description: 'Active Medications'
+      description: 'Prescribed Medications'
     },
     {
       id: 'lab-results',
