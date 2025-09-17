@@ -8,6 +8,7 @@ import {
   integer,
   boolean,
   numeric,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // Users Table
@@ -60,28 +61,45 @@ export const Doctors = pgTable("doctors", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
+  // Profile
   name: varchar("name"),
   phone: varchar("phone"),
   avatar: varchar("avatar"),
+  dateOfBirth: date("dateOfBirth"),
+  gender: varchar("gender"),
+  address: varchar("address"),
+  emergencyContactName: varchar("emergencyContactName"),
+  emergencyPhone: varchar("emergencyPhone"),
   medicalLicenseNumber: varchar("medicalLicenseNumber"),
   speciality: varchar("speciality"),
+  subSpecialty: varchar("subSpecialty").default("NA"),
   yearsOfExperience: integer("yearsOfExperience"),
-  previousHospitals: text("previousHospitals"),
+  previousHospitals: varchar("previousHospitals"),
 
+  // Education
   medicalSchool: varchar("medicalSchool"),
   graduationYear: varchar("graduationYear"),
   residencyProgram: varchar("residencyProgram"),
   fellowshipProgram: varchar("fellowshipProgram"),
-  boardCertifications: text("boardCertifications"),
-  continuingEducation: text("continuingEducation"),
+  boardCertifications: varchar("boardCertifications"),
+  continuingEducation: varchar("continuingEducation"),
 
+  // Services
   consultationFee: varchar("consultationFee"),
   rating: numeric("rating").default(0),
-  availableDays: varchar("availableDays"),
+  availableDays: jsonb("availableDays"),
   availableHours: varchar("availableHours"),
-  languagesSpoken: text("languagesSpoken"),
-  insuranceAccepted: text("insuranceAccepted"),
+  languagesSpoken: jsonb("languagesSpoken"),
 
+  // Documents
+  cv: varchar("cv"),
+  cvId: varchar("cvId"),
+  medicalLicenseDocument: varchar("medicalLicenseDocument"),
+  medicalLicenseDocumentId: varchar("medicalLicenseDocumentId"),
+  medicalCertificateDocument: varchar("medicalCertificateDocument"),
+  medicalCertificateDocumentId: varchar("medicalCertificateDocumentId"),
+
+  // Consents
   practiceConsent: boolean("practiceConsent").default(false),
   dataConsent: boolean("dataConsent").default(false),
   ethicsConsent: boolean("ethicsConsent").default(false),
