@@ -19,7 +19,8 @@ import {
   X,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
-import { Doctors } from "@/lib/schema";
+import { Appointments, Doctors } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -91,13 +92,24 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   );
 };
 
-const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
+const RescheduleModal = ({
+  isOpen,
+  onClose,
+  onReschedule,
+  appointment,
+  existingAppointments,
+}) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [currentWeek, setCurrentWeek] = useState(0);
   const [weekSchedule, setWeekSchedule] = useState([]);
 
+  // ✅ Generate slots from doctor's availability
   const generateWeekSchedule = (weekOffset) => {
+    if (!appointment?.doctor) return [];
+
+    const { availableDays, availableHours } = appointment.doctor;
+
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() + weekOffset * 7);
@@ -108,7 +120,8 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
 
-      const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+      const shortDay = date.toLocaleDateString("en-US", { weekday: "short" });
       const dateStr = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -116,27 +129,56 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
       const fullDate = date.toISOString().split("T")[0];
 
       const slots = [];
-      for (let hour = 9; hour < 17; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const time = `${hour.toString().padStart(2, "0")}:${minute
-            .toString()
-            .padStart(2, "0")}`;
-          const available = Math.random() > 0.4;
-          slots.push({ time, available });
+      if (availableDays.includes(dayName)) {
+        const [startHour, startMinute] = availableHours.start
+          .split(":")
+          .map(Number);
+        const [endHour, endMinute] = availableHours.end.split(":").map(Number);
+
+        let current = new Date(date);
+        current.setHours(startHour, startMinute, 0, 0);
+
+        const end = new Date(date);
+        end.setHours(endHour, endMinute, 0, 0);
+
+        while (current <= end) {
+          const timeString = current.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
+
+          // Match booked appointments with strict format
+          const isBooked = existingAppointments.some(
+            (apt) =>
+              apt.doctorId === appointment.doctor.userId &&
+              apt.date === fullDate &&
+              apt.time.toLowerCase() === timeString &&
+              apt.status === "upcoming"
+          );
+
+          slots.push({
+            time: timeString,
+            available: !isBooked,
+          });
+
+          current.setMinutes(current.getMinutes() + 30);
         }
       }
 
-      schedule.push({ date: dateStr, dayName, fullDate, slots });
+      schedule.push({ date: dateStr, dayName: shortDay, fullDate, slots });
     }
+
+    console.log(schedule);
 
     return schedule;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       setWeekSchedule(generateWeekSchedule(0));
     }
-  }, [isOpen]);
+  }, [isOpen, appointment]);
 
   const handleWeekChange = (direction) => {
     const newWeek = direction === "next" ? currentWeek + 1 : currentWeek - 1;
@@ -160,6 +202,7 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-6 lg:p-8">
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-20-bold lg:text-24-bold text-white">
               Reschedule Appointment
@@ -244,34 +287,41 @@ const RescheduleModal = ({ isOpen, onClose, onReschedule, appointment }) => {
                   </div>
 
                   <div className="space-y-1 max-h-32 lg:max-h-48 overflow-y-auto">
-                    {day.slots.slice(0, 6).map((slot, slotIndex) => (
-                      <button
-                        key={slotIndex}
-                        onClick={() => {
-                          if (slot.available) {
-                            setSelectedDate(day.fullDate);
-                            setSelectedTime(slot.time);
-                          }
-                        }}
-                        disabled={!slot.available}
-                        className={`w-full p-1 rounded text-8-medium lg:text-10-medium transition-all duration-200 ${
-                          selectedDate === day.fullDate &&
-                          selectedTime === slot.time
-                            ? "bg-blue-500 text-white border border-blue-400"
-                            : slot.available
-                            ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
-                            : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
-                        }`}
-                      >
-                        {slot.time}
-                      </button>
-                    ))}
+                    {day.slots.length > 0 ? (
+                      day.slots.map((slot, slotIndex) => (
+                        <button
+                          key={slotIndex}
+                          onClick={() => {
+                            if (slot.available) {
+                              setSelectedDate(day.fullDate);
+                              setSelectedTime(slot.time);
+                            }
+                          }}
+                          disabled={!slot.available}
+                          className={`w-full p-1 rounded text-8-medium lg:text-10-medium transition-all duration-200 ${
+                            selectedDate === day.fullDate &&
+                            selectedTime === slot.time
+                              ? "bg-blue-500 text-white border border-blue-400"
+                              : slot.available
+                              ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
+                              : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
+                          }`}
+                        >
+                          {slot.time}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-8-regular lg:text-10-regular text-red-400 text-center">
+                        Not Available
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Actions */}
           <form
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-4"
@@ -307,13 +357,14 @@ const appointmentTypes = [
 ];
 
 const PatientBookAppointment = ({ onBack, patientData }) => {
-  const [doctors, setDoctors] = useState([]); // store doctors here
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
   const [step, setStep] = useState("select-doctor");
   const [appointmentType, setAppointmentType] = useState("Consultation");
   const [showAppointmentTypeDropdown, setShowAppointmentTypeDropdown] =
     useState(false);
+  const [existingAppointments, setExistingAppointments] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -332,7 +383,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     const fetchDoctors = async () => {
       try {
         const data = await db.select().from(Doctors);
-        console.log(data);
         setDoctors(data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
@@ -342,166 +392,26 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     };
 
     fetchDoctors();
+    fetchAppointments();
   }, []);
 
-  // Mock existing appointments
-  const [existingAppointments, setExistingAppointments] = useState([
-    {
-      id: "1",
-      date: "2025-09-17",
-      time: "10:00 AM",
-      doctor: {
-        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
-        name: "Dr. Arjun Mehta",
-        phone: "+91 9876543210",
-        avatar: "/avatars/dr-arjun.png",
-        dateOfBirth: null,
-        gender: null,
-        address: null,
-        emergencyContactName: null,
-        emergencyPhone: null,
-        medicalLicenseNumber: "MCI/DEL/12345",
-        speciality: "Cardiology",
-        subSpecialty: "Interventional Cardiology",
-        yearsOfExperience: 15,
-        previousHospitals:
-          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
-        medicalSchool: "AIIMS New Delhi",
-        graduationYear: "2008",
-        residencyProgram: "Internal Medicine – AIIMS",
-        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
-        boardCertifications:
-          "Medical Council of India (MCI), Indian Society of Cardiology",
-        continuingEducation:
-          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
-        consultationFee: "1200",
-        rating: "0",
-        availableDays: ["Monday", "Wednesday", "Friday"],
-        availableHours: {
-          end: "14:00",
-          start: "10:00",
-        },
-        languagesSpoken: ["English", "Hindi"],
-        cv: null,
-        cvId: null,
-        medicalLicenseDocument: null,
-        medicalLicenseDocumentId: null,
-        medicalCertificateDocument: null,
-        medicalCertificateDocumentId: null,
-        practiceConsent: true,
-        dataConsent: true,
-        ethicsConsent: true,
-        hasOnboarded: true,
-      },
-      reason: "Annual check-up",
-      status: "upcoming",
-      type: "Consultation",
-      notes: "Regular health screening",
-    },
-    {
-      id: "2",
-      date: "2025-09-17",
-      time: "01:30 PM",
-      doctor: {
-        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
-        name: "Dr. Arjun Mehta",
-        phone: "+91 9876543210",
-        avatar: "/avatars/dr-arjun.png",
-        dateOfBirth: null,
-        gender: null,
-        address: null,
-        emergencyContactName: null,
-        emergencyPhone: null,
-        medicalLicenseNumber: "MCI/DEL/12345",
-        speciality: "Cardiology",
-        subSpecialty: "Interventional Cardiology",
-        yearsOfExperience: 15,
-        previousHospitals:
-          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
-        medicalSchool: "AIIMS New Delhi",
-        graduationYear: "2008",
-        residencyProgram: "Internal Medicine – AIIMS",
-        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
-        boardCertifications:
-          "Medical Council of India (MCI), Indian Society of Cardiology",
-        continuingEducation:
-          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
-        consultationFee: "1200",
-        rating: "0",
-        availableDays: ["Monday", "Wednesday", "Friday"],
-        availableHours: {
-          end: "14:00",
-          start: "10:00",
-        },
-        languagesSpoken: ["English", "Hindi"],
-        cv: null,
-        cvId: null,
-        medicalLicenseDocument: null,
-        medicalLicenseDocumentId: null,
-        medicalCertificateDocument: null,
-        medicalCertificateDocumentId: null,
-        practiceConsent: true,
-        dataConsent: true,
-        ethicsConsent: true,
-        hasOnboarded: true,
-      },
-      reason: "Heart consultation",
-      status: "upcoming",
-      type: "Follow-up",
-      notes: "Follow-up for previous cardiac evaluation",
-    },
-    {
-      id: "3",
-      date: "2025-09-20",
-      time: "9:00 AM",
-      doctor: {
-        userId: "9ec3a0ae-d7e6-4a67-b7d9-5adb29dc0fea",
-        name: "Dr. Arjun Mehta",
-        phone: "+91 9876543210",
-        avatar: "/avatars/dr-arjun.png",
-        dateOfBirth: null,
-        gender: null,
-        address: null,
-        emergencyContactName: null,
-        emergencyPhone: null,
-        medicalLicenseNumber: "MCI/DEL/12345",
-        speciality: "Cardiology",
-        subSpecialty: "Interventional Cardiology",
-        yearsOfExperience: 15,
-        previousHospitals:
-          "AIIMS New Delhi (2008–2015), Fortis Escorts Heart Institute (2015–2023)",
-        medicalSchool: "AIIMS New Delhi",
-        graduationYear: "2008",
-        residencyProgram: "Internal Medicine – AIIMS",
-        fellowshipProgram: "Cardiology Fellowship – Fortis Escorts",
-        boardCertifications:
-          "Medical Council of India (MCI), Indian Society of Cardiology",
-        continuingEducation:
-          "Cardio Update 2022 (Mumbai), Asia-Pacific Cardiology Conference 2023",
-        consultationFee: "1200",
-        rating: "0",
-        availableDays: ["Monday", "Wednesday", "Friday"],
-        availableHours: {
-          end: "14:00",
-          start: "10:00",
-        },
-        languagesSpoken: ["English", "Hindi"],
-        cv: null,
-        cvId: null,
-        medicalLicenseDocument: null,
-        medicalLicenseDocumentId: null,
-        medicalCertificateDocument: null,
-        medicalCertificateDocumentId: null,
-        practiceConsent: true,
-        dataConsent: true,
-        ethicsConsent: true,
-        hasOnboarded: true,
-      },
-      reason: "Routine examination",
-      status: "completed",
-      type: "Check-up",
-    },
-  ]);
+  const fetchAppointments = async () => {
+    try {
+      const data = await db
+        .select()
+        .from(Appointments)
+        .where(eq(Appointments.patientId, patientData.userId));
+      console.log(data);
+      setExistingAppointments(data);
+      // setExistingAppointments(data);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
+
+  const refreshAppointment = async () => {
+    await fetchAppointments();
+  };
 
   const formatTime12Hour = (date) => {
     return date.toLocaleTimeString("en-US", {
@@ -554,6 +464,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
           // Match booked appointments with strict format
           const isBooked = existingAppointments.some(
             (apt) =>
+              apt.doctorId === doctor.userId &&
               apt.date === fullDate &&
               apt.time === timeStr &&
               apt.status === "upcoming"
@@ -608,26 +519,34 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     setWeekSchedule(generateWeekSchedule(doctor, newWeek));
   };
 
-  const handleConfirmBooking = (doctorId) => {
+  const handleConfirmBooking = async (doctorId) => {
     const appointmentData = {
       patientId: patientData.userId,
 
-      doctorId: doctorId,
+      doctorId: selectedDoctor.userId,
+
+      patient: patientData,
+      doctor: selectedDoctor,
 
       date: selectedDate,
       time: selectedTime,
       reason: appointmentReason,
       notes: additionalNotes,
 
-      status: "Upcoming",
+      status: "upcoming",
 
       type: appointmentType,
-
-      bookingDate: new Date().toISOString(),
     };
+
+    const bookAppointment = await db
+      .insert(Appointments)
+      .values(appointmentData);
+
+    refreshAppointment();
 
     console.log("Booking appointment:", appointmentData);
 
+    // Refresh existing appointments data
     // setExistingAppointments((prev) => [...prev, newAppointment]);
     setMessage("Appointment booked successfully!");
     setMessageType("success");
@@ -677,13 +596,14 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         year: "numeric",
       });
 
-      setExistingAppointments((prev) =>
-        prev.map((apt) =>
-          apt.id === selectedAppointment.id
-            ? { ...apt, date: formattedDate, time: newTime }
-            : apt
-        )
-      );
+      console.log(formattedDate, newTime);
+      // setExistingAppointments((prev) =>
+      //   prev.map((apt) =>
+      //     apt.id === selectedAppointment.id
+      //       ? { ...apt, date: formattedDate, time: newTime }
+      //       : apt
+      //   )
+      // );
 
       setMessage(
         `Appointment with ${selectedAppointment.doctor.name} rescheduled successfully`
@@ -1269,7 +1189,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   type="button"
                                   onClick={() => {
                                     setAppointmentType(type);
-                                    console.log(type);
                                     setShowAppointmentTypeDropdown(false);
                                   }}
                                   className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
@@ -1495,6 +1414,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         onClose={() => setShowRescheduleModal(false)}
         onReschedule={handleRescheduleAppointment}
         appointment={selectedAppointment}
+        existingAppointments={existingAppointments}
       />
     </div>
   );
