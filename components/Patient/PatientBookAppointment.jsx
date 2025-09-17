@@ -306,7 +306,7 @@ const appointmentTypes = [
   "Surgery",
 ];
 
-const PatientBookAppointment = ({ onBack, onSuccess }) => {
+const PatientBookAppointment = ({ onBack, onSuccess, patientData }) => {
   const [doctors, setDoctors] = useState([]); // store doctors here
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
@@ -618,7 +618,7 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
 
   const handleConfirmBooking = (doctorId) => {
     const appointmentData = {
-      patientId: "P123",
+      patientId: patientData.userId,
 
       doctorId: doctorId,
 
@@ -1351,7 +1351,10 @@ const PatientBookAppointment = ({ onBack, onSuccess }) => {
                   </button>
 
                   <button
-                    onClick={handleConfirmBooking(selectedDoctor.userId)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleConfirmBooking(selectedDoctor.userId);
+                    }}
                     disabled={!appointmentReason.trim()}
                     className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
                   >

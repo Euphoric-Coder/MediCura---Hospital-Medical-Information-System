@@ -11,11 +11,9 @@ import PatientMedicalRecords from "./PatientMedicalRecords";
 import PatientConsultation from "./PatientConsultation";
 import PatientMedication from "./PatientMedication";
 
-const PatientDashboardWithSidebar = ({ onLogout, onBookAppointment }) => {
+const PatientDashboardWithSidebar = ({ onBookAppointment, patientData }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [doctors, setDoctors] = useState([]); // store doctors here
-  const [loading, setLoading] = useState(true);
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
@@ -29,31 +27,11 @@ const PatientDashboardWithSidebar = ({ onLogout, onBookAppointment }) => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // 🔹 Fetch doctors from API
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const res = await fetch("/api/fetch/doctors");
-        const data = await res.json();
-        if (data.success) {
-          setDoctors(data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDoctors();
-  }, []);
-
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "dashboard":
         return (
           <PatientDashboard
-            onLogout={onLogout}
             onBookAppointment={onBookAppointment}
             onGoToProfile={handleGoToProfile}
           />
@@ -70,6 +48,7 @@ const PatientDashboardWithSidebar = ({ onLogout, onBookAppointment }) => {
               console.log("Appointment booked:", appointmentData);
               setCurrentPage("dashboard");
             }}
+            patientData={patientData}
           />
         );
       case "prescriptions":
@@ -84,7 +63,6 @@ const PatientDashboardWithSidebar = ({ onLogout, onBookAppointment }) => {
       default:
         return (
           <PatientDashboard
-            onLogout={onLogout}
             onBookAppointment={onBookAppointment}
             onGoToProfile={handleGoToProfile}
           />
@@ -98,7 +76,6 @@ const PatientDashboardWithSidebar = ({ onLogout, onBookAppointment }) => {
       <PatientSidebar
         currentPage={currentPage}
         onNavigate={handleNavigate}
-        onLogout={onLogout}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
       />

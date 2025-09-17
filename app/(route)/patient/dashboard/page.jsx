@@ -15,8 +15,6 @@ export default function PatientPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  console.log(status);
-
   // Extract user details from session
   const userName = session?.user?.name;
   const userId = session?.user?.id;
@@ -38,7 +36,6 @@ export default function PatientPage() {
           .where(eq(Users.email, userEmail));
 
         if (data.length > 0) {
-          console.log(data[0].role);
           setRole(data[0].role);
 
           const patient = await db
@@ -47,7 +44,7 @@ export default function PatientPage() {
             .where(eq(Patients.userId, userId));
 
           if (patient.length > 0) {
-            setPatientData(patient);
+            setPatientData(patient[0]);
             setOnboardingStatus(patient[0].hasOnboarded);
           }
         }
@@ -62,7 +59,6 @@ export default function PatientPage() {
 
     // Timeout fallback → after 4s stop loading if unauthenticated
     const timer = setTimeout(() => {
-      console.log("timeout");
       if (status === "unauthenticated") {
         setLoading(false);
       }
@@ -116,5 +112,5 @@ export default function PatientPage() {
     );
   }
 
-  return <PatientDashboardWithSidebar />;
+  return <PatientDashboardWithSidebar patientData={patientData} />;
 }
