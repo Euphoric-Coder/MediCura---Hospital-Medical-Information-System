@@ -39,7 +39,10 @@ const DoctorDashboardWithSidebar = ({ doctorData }) => {
         return <DoctorPatients onBack={() => setCurrentPage("dashboard")} />;
       case "consultations":
         return (
-          <DoctorConsultations onBack={() => setCurrentPage("dashboard")} />
+          <DoctorConsultations
+            onBack={() => setCurrentPage("dashboard")}
+            doctorData={doctorData}
+          />
         );
       case "prescriptions":
         return (

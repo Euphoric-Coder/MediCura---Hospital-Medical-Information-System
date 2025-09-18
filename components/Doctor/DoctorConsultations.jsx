@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   FileText,
@@ -15,23 +15,14 @@ import {
   Search,
   CheckCircle,
   AlertTriangle,
+  X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
-import { Appointments, Patients } from "@/lib/schema";
+import { Appointments, Consultations, LabTests, Patients, Prescriptions } from "@/lib/schema";
 import { eq } from "drizzle-orm";
-
-const labTests = [
-  { id: "1", name: "Complete Blood Count (CBC)", category: "Hematology" },
-  { id: "2", name: "Basic Metabolic Panel", category: "Chemistry" },
-  { id: "3", name: "Lipid Profile", category: "Chemistry" },
-  { id: "4", name: "Thyroid Function Tests", category: "Endocrinology" },
-  { id: "5", name: "Urinalysis", category: "Urology" },
-  { id: "6", name: "Chest X-Ray", category: "Radiology" },
-  { id: "7", name: "ECG", category: "Cardiology" },
-  { id: "8", name: "Echocardiogram", category: "Cardiology" },
-  { id: "9", name: "CT Scan - Head", category: "Radiology" },
-  { id: "10", name: "MRI - Brain", category: "Radiology" },
-];
+import { Button } from "../ui/button";
 
 const admissionTypes = [
   "General Ward",
@@ -44,21 +35,477 @@ const admissionTypes = [
   "Psychiatric Unit",
 ];
 
-const DoctorConsultations = ({ onBack }) => {
+const DynamicListSection = ({
+  field,
+  label,
+  placeholder,
+  consultationData,
+  handleInputChange,
+  color = "blue",
+}) => {
+  const [newItem, setNewItem] = useState("");
+
+  const addItem = () => {
+    if (newItem.trim()) {
+      handleInputChange(field, [
+        ...(consultationData[field] || []),
+        newItem.trim(),
+      ]);
+      setNewItem("");
+    }
+  };
+
+  const removeItem = (index) => {
+    const updated = consultationData[field].filter((_, i) => i !== index);
+    handleInputChange(field, updated);
+  };
+
+  // Map of colors → Tailwind classes
+  const colorMap = {
+    blue: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    green: "bg-green-500/10 border-green-500/20 text-green-400",
+    yellow: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
+    purple: "bg-purple-500/10 border-purple-500/20 text-purple-400",
+    red: "bg-red-500/10 border-red-500/20 text-red-400",
+    teal: "bg-teal-500/10 border-teal-500/20 text-teal-400",
+    orange: "bg-orange-500/10 border-orange-500/20 text-orange-400",
+  };
+
+  const appliedClasses = colorMap[color] || colorMap.blue;
+
+  return (
+    <div className="mt-8">
+      <label className="shad-input-label block mb-2">{label}</label>
+      <div className="space-y-3">
+        {/* Existing Items */}
+        {consultationData[field]?.length > 0 && (
+          <div className="space-y-2">
+            {consultationData[field].map((item, index) => (
+              <div
+                key={index}
+                className={`flex items-center justify-between rounded-lg p-3 ${appliedClasses}`}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${appliedClasses
+                      .split(" ")[0]
+                      .replace("/10", "")}`}
+                  ></div>
+                  <span className="text-14-regular text-white">{item}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="text-red-400 hover:text-red-300 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add New Item */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addItem();
+              }
+            }}
+            placeholder={placeholder}
+            className="shad-input flex-1 text-white"
+          />
+          <button
+            type="button"
+            onClick={addItem}
+            className={`px-4 py-2 rounded-lg text-14-medium transition-colors ${
+              color === "blue"
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : color === "green"
+                ? "bg-green-500 hover:bg-green-600 text-white"
+                : color === "yellow"
+                ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                : color === "purple"
+                ? "bg-purple-500 hover:bg-purple-600 text-white"
+                : color === "red"
+                ? "bg-red-500 hover:bg-red-600 text-white"
+                : color === "teal"
+                ? "bg-teal-500 hover:bg-teal-600 text-white"
+                : "bg-orange-500 hover:bg-orange-600 text-white"
+            }`}
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [search, setSearch] = useState("");
+  const [medicines, setMedicines] = useState([
+    "Paracetamol 500mg",
+    "Ibuprofen 400mg",
+    "Amoxicillin 500mg",
+    "Azithromycin 250mg",
+    "Multivitamin Tablet",
+  ]);
+
+  // Filter medicines by search input
+  const filteredMedicines = medicines.filter((med) =>
+    med.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSelect = (medicine) => {
+    setSelectedMedicine(medicine);
+    setShowDropdown(false);
+    setSearch("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && search.trim() !== "") {
+      e.preventDefault();
+      if (!medicines.includes(search)) {
+        setMedicines([...medicines, search]);
+      }
+      setSelectedMedicine(search);
+      setShowDropdown(false);
+      setSearch("");
+    }
+  };
+
+  return (
+    <div className="relative w-full">
+      <label className="shad-input-label block mb-2">Medicine Name</label>
+      <button
+        type="button"
+        onClick={() => setShowDropdown(!showDropdown)}
+        className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-purple-500 transition-colors"
+      >
+        <span className="text-white">
+          {selectedMedicine || "Select or search medicine"}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-dark-600 transition-transform ${
+            showDropdown ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {showDropdown && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden">
+          {/* Search Input */}
+          <div className="p-3 border-b border-dark-500">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search or type to add..."
+              className="w-full bg-dark-300 border border-dark-500 rounded-lg px-3 py-2 text-white placeholder-dark-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
+            />
+          </div>
+
+          {/* Medicine Options */}
+          <div className="max-h-60 overflow-y-auto">
+            {filteredMedicines.length > 0 ? (
+              filteredMedicines.map((medicine) => (
+                <button
+                  key={medicine}
+                  type="button"
+                  onClick={() => handleSelect(medicine)}
+                  className="w-full p-3 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                >
+                  <span className="text-16-medium text-white">{medicine}</span>
+                  {selectedMedicine === medicine && (
+                    <Check className="w-5 h-5 text-purple-500" />
+                  )}
+                </button>
+              ))
+            ) : (
+              <div className="p-3 text-14-regular text-dark-600">
+                Press <span className="text-white font-medium">Enter</span> to
+                add “{search}”
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const LabTestsSection = ({ consultationData, setConsultationData }) => {
+  const [labTests, setLabTests] = useState([
+    // Hematology
+    { id: "1", name: "CBC", category: "Hematology" },
+    { id: "2", name: "Hemoglobin", category: "Hematology" },
+    { id: "3", name: "Hematocrit (PCV)", category: "Hematology" },
+    { id: "4", name: "Platelet Count", category: "Hematology" },
+    { id: "5", name: "Peripheral Smear", category: "Hematology" },
+
+    // Chemistry
+    { id: "6", name: "Blood Sugar (Fasting)", category: "Chemistry" },
+    { id: "7", name: "Blood Sugar (PP)", category: "Chemistry" },
+    { id: "8", name: "Blood Sugar (Random)", category: "Chemistry" },
+    { id: "9", name: "HbA1c", category: "Chemistry" },
+    { id: "10", name: "Lipid Profile", category: "Chemistry" },
+    { id: "11", name: "Liver Function Test (LFT)", category: "Chemistry" },
+    { id: "12", name: "Kidney Function Test (KFT)", category: "Chemistry" },
+    { id: "13", name: "Uric Acid", category: "Chemistry" },
+    { id: "14", name: "Serum Calcium", category: "Chemistry" },
+    { id: "15", name: "Serum Electrolytes (Na, K, Cl)", category: "Chemistry" },
+
+    // Radiology
+    { id: "16", name: "X-Ray Chest", category: "Radiology" },
+    { id: "17", name: "X-Ray Abdomen", category: "Radiology" },
+    { id: "18", name: "X-Ray Spine", category: "Radiology" },
+    { id: "19", name: "Ultrasound Abdomen", category: "Radiology" },
+    { id: "20", name: "Ultrasound Pelvis", category: "Radiology" },
+    { id: "21", name: "CT Brain", category: "Radiology" },
+    { id: "22", name: "MRI Brain", category: "Radiology" },
+    { id: "23", name: "Mammography", category: "Radiology" },
+    { id: "24", name: "Echocardiography", category: "Radiology" },
+
+    // Cardiology
+    { id: "25", name: "ECG", category: "Cardiology" },
+    { id: "26", name: "TMT (Stress Test)", category: "Cardiology" },
+    { id: "27", name: "Holter Monitoring", category: "Cardiology" },
+    {
+      id: "28",
+      name: "Cardiac Enzymes (CK-MB, Troponin)",
+      category: "Cardiology",
+    },
+
+    // Microbiology
+    { id: "29", name: "Urine Routine & Microscopy", category: "Microbiology" },
+    { id: "30", name: "Urine Culture & Sensitivity", category: "Microbiology" },
+    { id: "31", name: "Blood Culture & Sensitivity", category: "Microbiology" },
+    {
+      id: "32",
+      name: "Sputum Culture & Sensitivity",
+      category: "Microbiology",
+    },
+    { id: "33", name: "Stool Routine & Culture", category: "Microbiology" },
+
+    // Immunology & Serology
+    { id: "34", name: "HIV Test", category: "Immunology" },
+    {
+      id: "35",
+      name: "Hepatitis B Surface Antigen (HBsAg)",
+      category: "Immunology",
+    },
+    { id: "36", name: "Hepatitis C Antibody", category: "Immunology" },
+    { id: "37", name: "Widal Test (Typhoid)", category: "Immunology" },
+    { id: "38", name: "Dengue NS1 Antigen", category: "Immunology" },
+    { id: "39", name: "Dengue IgM/IgG", category: "Immunology" },
+    { id: "40", name: "Malaria Antigen Test", category: "Immunology" },
+
+    // Endocrinology & Hormones
+    {
+      id: "41",
+      name: "Thyroid Profile (T3, T4, TSH)",
+      category: "Endocrinology",
+    },
+    { id: "42", name: "Prolactin", category: "Endocrinology" },
+    { id: "43", name: "Cortisol", category: "Endocrinology" },
+    {
+      id: "44",
+      name: "FSH (Follicle Stimulating Hormone)",
+      category: "Endocrinology",
+    },
+    { id: "45", name: "LH (Luteinizing Hormone)", category: "Endocrinology" },
+    { id: "46", name: "Testosterone", category: "Endocrinology" },
+    { id: "47", name: "Estrogen", category: "Endocrinology" },
+    { id: "48", name: "Progesterone", category: "Endocrinology" },
+
+    // Miscellaneous
+    { id: "49", name: "Vitamin D", category: "General" },
+    { id: "50", name: "Vitamin B12", category: "General" },
+  ]);
+
+  const [newTestName, setNewTestName] = useState("");
+  const [newTestCategory, setNewTestCategory] = useState("General");
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
+  const categories = [
+    "Hematology",
+    "Chemistry",
+    "Radiology",
+    "Cardiology",
+    "General",
+  ];
+
+  // ✅ Toggle test selection (store full object, not just id)
+  const handleLabTestToggle = (test) => {
+    setConsultationData((prev) => {
+      const exists = prev.labTests.find((t) => t.id === test.id);
+      return {
+        ...prev,
+        labTests: exists
+          ? prev.labTests.filter((t) => t.id !== test.id)
+          : [...prev.labTests, test],
+      };
+    });
+  };
+
+  // ✅ Add a new test
+  const handleAddLabTest = () => {
+    if (!newTestName.trim()) return;
+    const newTest = {
+      id: Date.now().toString(),
+      name: newTestName.trim(),
+      category: newTestCategory,
+    };
+    setLabTests((prev) => [...prev, newTest]); // add to available list
+    setConsultationData((prev) => ({
+      ...prev,
+      labTests: [...prev.labTests, newTest], // store full object
+    }));
+    setNewTestName("");
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
+      <div className="flex items-center gap-3 mb-4 lg:mb-6">
+        <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+          <TestTube className="w-4 h-4 text-white" />
+        </div>
+        <h3 className="text-16-bold lg:text-18-bold text-white">
+          Order Lab Tests
+        </h3>
+      </div>
+
+      {/* Search + Add Test */}
+      <div className="flex items-center justify-center flex-col gap-2 mb-3">
+        <input
+          type="text"
+          value={newTestName}
+          onChange={(e) => setNewTestName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddLabTest();
+            }
+          }}
+          placeholder="Search or add new test..."
+          className="shad-input p-3 rounded-xl flex-1 text-white"
+        />
+        {/* Category Dropdown */}
+        <div className="relative w-40">
+          <button
+            type="button"
+            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+            className="w-full bg-dark-400 border border-dark-500 rounded-lg px-3 py-2 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+          >
+            <span>{newTestCategory}</span>
+            <ChevronDown
+              className={`w-4 h-4 text-dark-600 transition-transform ${
+                showCategoryDropdown ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {showCategoryDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setNewTestCategory(cat);
+                    setShowCategoryDropdown(false);
+                  }}
+                  className="w-full px-3 py-2 flex items-center justify-between hover:bg-dark-500 text-white"
+                >
+                  <span>{cat}</span>
+                  {newTestCategory === cat && (
+                    <Check className="w-4 h-4 text-green-500" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={handleAddLabTest}
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          Add
+        </button>
+      </div>
+
+      {/* List of Available Lab Tests */}
+      <div className="space-y-2 max-h-64 overflow-y-auto">
+        {labTests.map((test) => {
+          const isSelected = consultationData.labTests.some(
+            (t) => t.id === test.id
+          );
+          return (
+            <label
+              key={test.id}
+              className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-green-500/10 transition-colors"
+            >
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => handleLabTestToggle(test)}
+                className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="text-12-medium lg:text-14-medium text-white">
+                  {test.name}
+                </div>
+                <div className="text-10-regular lg:text-12-regular text-green-400">
+                  {test.category}
+                </div>
+              </div>
+            </label>
+          );
+        })}
+      </div>
+
+      {/* Selected Tests */}
+      {consultationData.labTests.length > 0 && (
+        <div className="mt-4 p-3 bg-green-500/20 rounded-lg">
+          <div className="text-10-medium lg:text-12-medium text-green-400">
+            Selected Tests:
+          </div>
+          <ul className="list-disc list-inside text-12-regular text-white mt-2">
+            {consultationData.labTests.map((t) => (
+              <li key={t.id}>
+                {t.name} <span className="text-green-400">({t.category})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DoctorConsultations = ({ onBack, doctorData }) => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [consultationData, setConsultationData] = useState({
     patientId: "",
-    chiefComplaint: "",
-    historyOfPresentIllness: "",
-    physicalExamination: "",
-    assessment: "",
-    plan: "",
+    chiefComplaint: [],
+    historyOfPresentIllness: [],
+    physicalExamination: [],
+    assessment: [],
+    plan: [],
     prescriptions: [],
     labTests: [],
     admissionRequired: false,
     admissionType: "",
     admissionReason: "",
-    followUpInstructions: "",
+    followUpInstructions: [],
     nextAppointment: "",
   });
 
@@ -72,10 +519,15 @@ const DoctorConsultations = ({ onBack }) => {
 
   const [isRecording, setIsRecording] = useState(false);
   const [activeField, setActiveField] = useState("");
+  const [showMedicationDropdown, setShowMedicationDropdown] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-  const [patient, setPatient] = useState([]);
+  const [patients, setPatients] = useState([]);
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
 
   // Mock patients for today's consultations
   const todayPatients = [
@@ -112,50 +564,75 @@ const DoctorConsultations = ({ onBack }) => {
   ];
 
   const fetchPatients = async () => {
-      try {
-        const data = await db
-          .select({
-            id: Appointments.id,
-            date: Appointments.date,
-            time: Appointments.time,
-            reason: Appointments.reason,
-            status: Appointments.status,
-            workflow: Appointments.workflow,
-            type: Appointments.type,
-            bookingDate: Appointments.bookingDate,
-            updatedAt: Appointments.updatedAt,
-  
-            // patient data
-            patient: {
-              userId: Patients.userId,
-              avatar: Patients.avatar,
-              name: Patients.name,
-              email: Patients.email,
-              phone: Patients.phone,
-              gender: Patients.gender,
-              address: Patients.address,
-              dateOfBirth: Patients.dateOfBirth,
-              emergencyContactName: Patients.emergencyContactName,
-              emergencyPhone: Patients.emergencyPhone,
-              allergies: Patients.allergies,
-              currentMedications: Patients.currentMedications,
-              familyMedicalHistory: Patients.familyMedicalHistory,
-              pastMedicalHistory: Patients.pastMedicalHistory,
-            },
-          })
-          .from(Appointments)
-          .innerJoin(Patients, eq(Appointments.patientId, Patients.userId))
-          .where(eq(Appointments.doctorId, doctorData.userId));
-  
-        console.log("Appointments with patient data:", data);
-        // setAllAppointments(data);
-  
-        return data;
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-        return [];
-      }
-    };
+    try {
+      const todayStr = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
+
+      const data = await db
+        .select({
+          id: Appointments.id,
+          date: Appointments.date,
+          time: Appointments.time,
+          reason: Appointments.reason,
+          status: Appointments.status,
+          workflow: Appointments.workflow,
+          type: Appointments.type,
+          bookingDate: Appointments.bookingDate,
+          updatedAt: Appointments.updatedAt,
+
+          // patient data
+          patient: {
+            userId: Patients.userId,
+            avatar: Patients.avatar,
+            name: Patients.name,
+            email: Patients.email,
+            phone: Patients.phone,
+            gender: Patients.gender,
+            address: Patients.address,
+            dateOfBirth: Patients.dateOfBirth,
+            emergencyContactName: Patients.emergencyContactName,
+            emergencyPhone: Patients.emergencyPhone,
+            allergies: Patients.allergies,
+            currentMedications: Patients.currentMedications,
+            familyMedicalHistory: Patients.familyMedicalHistory,
+            pastMedicalHistory: Patients.pastMedicalHistory,
+          },
+        })
+        .from(Appointments)
+        .innerJoin(Patients, eq(Appointments.patientId, Patients.userId))
+        .where(eq(Appointments.doctorId, doctorData.userId))
+        .where(eq(Appointments.date, todayStr));
+
+      // Map into simplified array for UI
+      const mappedPatients = data.map((apt) => {
+        let age = "";
+        if (apt.patient.dateOfBirth) {
+          const dob = new Date(apt.patient.dateOfBirth);
+          const diff = Date.now() - dob.getTime();
+          age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+        }
+
+        return {
+          id: apt.patient.userId,
+          name: apt.patient.name,
+          age,
+          gender: apt.patient.gender,
+          avatar: apt.patient.avatar,
+          reason: apt.reason,
+          appointmentTime: apt.time,
+          appointmentId: apt.id,
+        };
+      });
+
+      console.log("Mapped patients for UI:", mappedPatients);
+      setPatients(mappedPatients);
+      return mappedPatients;
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      return [];
+    }
+  };
 
   const handlePatientSelect = (patient) => {
     setSelectedPatient(patient);
@@ -170,20 +647,6 @@ const DoctorConsultations = ({ onBack }) => {
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleVoiceToText = (field) => {
-    if (isRecording && activeField === field) {
-      setIsRecording(false);
-      setActiveField("");
-      // Simulate voice-to-text result
-      const mockText =
-        "Patient reports feeling better since last visit. No significant changes in symptoms.";
-      handleInputChange(field, consultationData[field] + " " + mockText);
-    } else {
-      setIsRecording(true);
-      setActiveField(field);
-    }
   };
 
   const handleAddPrescription = () => {
@@ -209,18 +672,102 @@ const DoctorConsultations = ({ onBack }) => {
     }));
   };
 
-  const handleLabTestToggle = (testId) => {
-    setConsultationData((prev) => ({
-      ...prev,
-      labTests: prev.labTests.includes(testId)
-        ? prev.labTests.filter((id) => id !== testId)
-        : [...prev.labTests, testId],
-    }));
-  };
-
   const handleSaveConsultation = async () => {
     setIsSaving(true);
     try {
+
+      const consultation = await db
+        .insert(Consultations)
+        .values({
+          doctorId: doctorData.userId,
+          patientId: consultationData.patientId,
+          appointmentId: selectedPatient.appointmentId || null,
+
+          chiefComplaint: consultationData.chiefComplaint,
+          historyOfPresentIllness: consultationData.historyOfPresentIllness,
+          physicalExamination: consultationData.physicalExamination,
+          assessment: consultationData.assessment,
+          plan: consultationData.plan,
+
+          admissionRequired: consultationData.admissionRequired,
+          admissionType: consultationData.admissionType,
+          admissionReason: consultationData.admissionReason,
+
+          followUpInstructions: consultationData.followUpInstructions,
+          nextAppointment: consultationData.nextAppointment || null,
+        })
+        .returning({ id: Consultations.id });
+
+      const consultationId = consultation[0].id;
+
+      if (consultationData.prescriptions.length > 0) {
+        await db.insert(Prescriptions).values(
+          consultationData.prescriptions.map((pres) => ({
+            consultationId,
+            medication: pres.medication,
+            dosage: pres.dosage,
+            frequency: pres.frequency,
+            duration: pres.duration,
+            instructions: pres.instructions,
+          }))
+        );
+      }
+
+      if (consultationData.labTests.length > 0) {
+        await db.insert(LabTests).values(
+          consultationData.labTests.map((test) => ({
+            consultationId,
+            testName: test.name,
+            category: test.category,
+          }))
+        );
+      }
+
+      const appointment = await db
+        .update(Appointments)
+        .set({
+          status: "completed",
+          workflow: "completed",
+          updatedAt: new Date(),
+        })
+        .where(eq(Appointments.id, selectedPatient.appointmentId));
+
+      // console.log({
+      //   doctorId: doctorData.userId,
+      //   patientId: consultationData.patientId,
+      //   appointmentId: selectedPatient.appointmentId || null,
+
+      //   chiefComplaint: consultationData.chiefComplaint,
+      //   historyOfPresentIllness: consultationData.historyOfPresentIllness,
+      //   physicalExamination: consultationData.physicalExamination,
+      //   assessment: consultationData.assessment,
+      //   plan: consultationData.plan,
+
+      //   admissionRequired: consultationData.admissionRequired,
+      //   admissionType: consultationData.admissionType,
+      //   admissionReason: consultationData.admissionReason,
+
+      //   followUpInstructions: consultationData.followUpInstructions,
+      //   nextAppointment: consultationData.nextAppointment || null,
+      // });
+      // console.log(
+      //   consultationData.prescriptions.map((pres) => ({
+      //     consultationId: "consultationId",
+      //     medication: pres.medication,
+      //     dosage: pres.dosage,
+      //     frequency: pres.frequency,
+      //     duration: pres.duration,
+      //     instructions: pres.instructions,
+      //   }))
+      // );
+      // console.log(
+      //   consultationData.labTests.map((test) => ({
+      //     consultationId: "consultationId",
+      //     testName: test.name,
+      //     category: test.category,
+      //   }))
+      // );
+      // console.log(consultationData);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setMessage("Consultation saved successfully");
       setMessageType("success");
@@ -301,7 +848,7 @@ const DoctorConsultations = ({ onBack }) => {
               </h2>
 
               <div className="space-y-3">
-                {todayPatients.map((patient) => (
+                {patients.map((patient) => (
                   <button
                     key={patient.id}
                     onClick={() => handlePatientSelect(patient)}
@@ -362,7 +909,7 @@ const DoctorConsultations = ({ onBack }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
                   {/* Main Consultation Form */}
                   <div className="lg:col-span-2 space-y-6 lg:space-y-8">
                     {/* Clinical Notes */}
@@ -378,203 +925,64 @@ const DoctorConsultations = ({ onBack }) => {
 
                       <div className="space-y-6">
                         {/* Chief Complaint */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="shad-input-label">
-                              Chief Complaint
-                            </label>
-                            <button
-                              onClick={() =>
-                                handleVoiceToText("chiefComplaint")
-                              }
-                              className={`p-2 rounded-lg transition-all duration-300 ${
-                                isRecording && activeField === "chiefComplaint"
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-dark-400 text-dark-600 hover:text-white"
-                              }`}
-                            >
-                              {isRecording &&
-                              activeField === "chiefComplaint" ? (
-                                <MicOff className="w-4 h-4" />
-                              ) : (
-                                <Mic className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                          <textarea
-                            value={consultationData.chiefComplaint}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "chiefComplaint",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Patient's primary concern or reason for visit..."
-                            className="shad-textArea w-full text-white min-h-[80px] resize-none"
-                            rows={3}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="chiefComplaint"
+                          label="Chief Complaint"
+                          placeholder="ex: Severe headache since morning"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="blue"
+                        />
 
                         {/* History of Present Illness */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="shad-input-label">
-                              History of Present Illness
-                            </label>
-                            <button
-                              onClick={() =>
-                                handleVoiceToText("historyOfPresentIllness")
-                              }
-                              className={`p-2 rounded-lg transition-all duration-300 ${
-                                isRecording &&
-                                activeField === "historyOfPresentIllness"
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-dark-400 text-dark-600 hover:text-white"
-                              }`}
-                            >
-                              {isRecording &&
-                              activeField === "historyOfPresentIllness" ? (
-                                <MicOff className="w-4 h-4" />
-                              ) : (
-                                <Mic className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                          <textarea
-                            value={consultationData.historyOfPresentIllness}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "historyOfPresentIllness",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Detailed history of the current illness..."
-                            className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                            rows={4}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="historyOfPresentIllness"
+                          label="History of Present Illness"
+                          placeholder="ex: Symptoms started 2 weeks ago"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="green"
+                        />
 
                         {/* Physical Examination */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="shad-input-label">
-                              Physical Examination
-                            </label>
-                            <button
-                              onClick={() =>
-                                handleVoiceToText("physicalExamination")
-                              }
-                              className={`p-2 rounded-lg transition-all duration-300 ${
-                                isRecording &&
-                                activeField === "physicalExamination"
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-dark-400 text-dark-600 hover:text-white"
-                              }`}
-                            >
-                              {isRecording &&
-                              activeField === "physicalExamination" ? (
-                                <MicOff className="w-4 h-4" />
-                              ) : (
-                                <Mic className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                          <textarea
-                            value={consultationData.physicalExamination}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "physicalExamination",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Physical examination findings..."
-                            className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                            rows={4}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="physicalExamination"
+                          label="Physical Examination"
+                          placeholder="ex: Elevated heart rate observed"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="yellow"
+                        />
 
                         {/* Assessment */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="shad-input-label">
-                              Assessment & Diagnosis
-                            </label>
-                            <button
-                              onClick={() => handleVoiceToText("assessment")}
-                              className={`p-2 rounded-lg transition-all duration-300 ${
-                                isRecording && activeField === "assessment"
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-dark-400 text-dark-600 hover:text-white"
-                              }`}
-                            >
-                              {isRecording && activeField === "assessment" ? (
-                                <MicOff className="w-4 h-4" />
-                              ) : (
-                                <Mic className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                          <textarea
-                            value={consultationData.assessment}
-                            onChange={(e) =>
-                              handleInputChange("assessment", e.target.value)
-                            }
-                            placeholder="Clinical assessment and diagnosis..."
-                            className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                            rows={4}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="assessment"
+                          label="Assessment & Diagnosis"
+                          placeholder="ex: Hypertension"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="purple"
+                        />
 
                         {/* Treatment Plan */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="shad-input-label">
-                              Treatment Plan
-                            </label>
-                            <button
-                              onClick={() => handleVoiceToText("plan")}
-                              className={`p-2 rounded-lg transition-all duration-300 ${
-                                isRecording && activeField === "plan"
-                                  ? "bg-red-500 text-white animate-pulse"
-                                  : "bg-dark-400 text-dark-600 hover:text-white"
-                              }`}
-                            >
-                              {isRecording && activeField === "plan" ? (
-                                <MicOff className="w-4 h-4" />
-                              ) : (
-                                <Mic className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                          <textarea
-                            value={consultationData.plan}
-                            onChange={(e) =>
-                              handleInputChange("plan", e.target.value)
-                            }
-                            placeholder="Treatment plan and recommendations..."
-                            className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                            rows={4}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="plan"
+                          label="Treatment Plan"
+                          placeholder="ex: Start antihypertensive medication"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="teal"
+                        />
 
                         {/* Follow-up Instructions */}
-                        <div>
-                          <label className="shad-input-label block mb-2">
-                            Follow-up Instructions
-                          </label>
-                          <textarea
-                            value={consultationData.followUpInstructions}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "followUpInstructions",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Follow-up instructions for the patient..."
-                            className="shad-textArea w-full text-white min-h-[80px] resize-none"
-                            rows={3}
-                          />
-                        </div>
+                        <DynamicListSection
+                          field="followUpInstructions"
+                          label="Follow-up Instructions"
+                          placeholder="ex: Monitor BP daily, reduce salt, follow up in 2 weeks"
+                          consultationData={consultationData}
+                          handleInputChange={handleInputChange}
+                          color="orange"
+                        />
 
                         {/* Next Appointment */}
                         <div>
@@ -582,7 +990,7 @@ const DoctorConsultations = ({ onBack }) => {
                             Next Appointment
                           </label>
                           <input
-                            type="datetime-local"
+                            type="date"
                             value={consultationData.nextAppointment}
                             onChange={(e) =>
                               handleInputChange(
@@ -612,68 +1020,94 @@ const DoctorConsultations = ({ onBack }) => {
 
                       {/* Add New Prescription */}
                       <div className="space-y-3 mb-4">
-                        <input
-                          type="text"
-                          value={newPrescription.medication}
-                          onChange={(e) =>
+                        {/* Medication Dropdown */}
+                        <MedicineDropdown
+                          selectedMedicine={newPrescription.medication}
+                          setSelectedMedicine={(value) =>
                             setNewPrescription((prev) => ({
                               ...prev,
-                              medication: e.target.value,
+                              medication: value,
                             }))
                           }
-                          placeholder="Medication name"
-                          className="shad-input w-full text-white text-12-regular lg:text-14-regular"
                         />
+
+                        {/* Dosage & Frequency */}
                         <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="shad-input-label block mb-1">
+                              Dosage
+                            </label>
+                            <input
+                              type="text"
+                              value={newPrescription.dosage}
+                              onChange={(e) =>
+                                setNewPrescription((prev) => ({
+                                  ...prev,
+                                  dosage: e.target.value,
+                                }))
+                              }
+                              placeholder="Ex: 500mg"
+                              className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                            />
+                          </div>
+                          <div>
+                            <label className="shad-input-label block mb-1">
+                              Frequency
+                            </label>
+                            <input
+                              type="text"
+                              value={newPrescription.frequency}
+                              onChange={(e) =>
+                                setNewPrescription((prev) => ({
+                                  ...prev,
+                                  frequency: e.target.value,
+                                }))
+                              }
+                              placeholder="Ex: 2 times a day"
+                              className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Duration */}
+                        <div>
+                          <label className="shad-input-label block mb-1">
+                            Duration
+                          </label>
                           <input
                             type="text"
-                            value={newPrescription.dosage}
+                            value={newPrescription.duration}
                             onChange={(e) =>
                               setNewPrescription((prev) => ({
                                 ...prev,
-                                dosage: e.target.value,
+                                duration: e.target.value,
                               }))
                             }
-                            placeholder="Dosage"
-                            className="shad-input w-full text-white text-10-regular lg:text-12-regular"
-                          />
-                          <input
-                            type="text"
-                            value={newPrescription.frequency}
-                            onChange={(e) =>
-                              setNewPrescription((prev) => ({
-                                ...prev,
-                                frequency: e.target.value,
-                              }))
-                            }
-                            placeholder="Frequency"
-                            className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                            placeholder="Ex: 5 days"
+                            className="shad-input w-full text-white text-12-regular lg:text-14-regular"
                           />
                         </div>
-                        <input
-                          type="text"
-                          value={newPrescription.duration}
-                          onChange={(e) =>
-                            setNewPrescription((prev) => ({
-                              ...prev,
-                              duration: e.target.value,
-                            }))
-                          }
-                          placeholder="Duration"
-                          className="shad-input w-full text-white text-12-regular lg:text-14-regular"
-                        />
-                        <textarea
-                          value={newPrescription.instructions}
-                          onChange={(e) =>
-                            setNewPrescription((prev) => ({
-                              ...prev,
-                              instructions: e.target.value,
-                            }))
-                          }
-                          placeholder="Special instructions"
-                          className="shad-textArea w-full text-white min-h-[60px] resize-none text-10-regular lg:text-12-regular"
-                          rows={2}
-                        />
+
+                        {/* Instructions */}
+                        <div>
+                          <label className="shad-input-label block mb-1">
+                            Special Instructions
+                          </label>
+                          <textarea
+                            value={newPrescription.instructions}
+                            onChange={(e) =>
+                              setNewPrescription((prev) => ({
+                                ...prev,
+                                instructions: e.target.value,
+                              }))
+                            }
+                            placeholder="Ex: Take after meals"
+                            className="shad-textArea w-full text-white min-h-[60px] resize-none text-10-regular lg:text-12-regular"
+                            rows={2}
+                          />
+                        </div>
+
+                        {/* Add Button */}
                         <button
                           onClick={handleAddPrescription}
                           className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg text-12-medium lg:text-14-medium transition-colors"
@@ -721,55 +1155,14 @@ const DoctorConsultations = ({ onBack }) => {
                     </div>
 
                     {/* Lab Tests */}
-                    <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
-                      <div className="flex items-center gap-3 mb-4 lg:mb-6">
-                        <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                          <TestTube className="w-4 h-4 text-white" />
-                        </div>
-                        <h3 className="text-16-bold lg:text-18-bold text-white">
-                          Order Lab Tests
-                        </h3>
-                      </div>
+                    <LabTestsSection
+                      consultationData={consultationData}
+                      setConsultationData={setConsultationData}
+                    />
 
-                      <div className="space-y-3 max-h-64 overflow-y-auto">
-                        {labTests.map((test) => (
-                          <label
-                            key={test.id}
-                            className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-green-500/10 transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={consultationData.labTests.includes(
-                                test.id
-                              )}
-                              onChange={() => handleLabTestToggle(test.id)}
-                              className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <div className="text-12-medium lg:text-14-medium text-white">
-                                {test.name}
-                              </div>
-                              <div className="text-10-regular lg:text-12-regular text-green-400">
-                                {test.category}
-                              </div>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-
-                      {consultationData.labTests.length > 0 && (
-                        <div className="mt-4 p-3 bg-green-500/20 rounded-lg">
-                          <div className="text-10-medium lg:text-12-medium text-green-400">
-                            {consultationData.labTests.length} test
-                            {consultationData.labTests.length > 1 ? "s" : ""}{" "}
-                            selected
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
+                    {/* TODO: Later on  */}
                     {/* Hospital Admission */}
-                    <div className="bg-gradient-to-r from-red-500/10 to-red-600/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-4 lg:p-6">
+                    {/* <div className="bg-gradient-to-r from-red-500/10 to-red-600/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-4 lg:p-6">
                       <div className="flex items-center gap-3 mb-4 lg:mb-6">
                         <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
                           <Bed className="w-4 h-4 text-white" />
@@ -831,7 +1224,7 @@ const DoctorConsultations = ({ onBack }) => {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

@@ -18,6 +18,7 @@ import React from "react";
 // import BillingHistory from "@/components/Patient/BillingHistory";
 import DoctorConsultations from "./_components/DoctorConsulations";
 import DoctorPrescriptions from "./_components/DoctorPrescriptions";
+import { DateRangePicker } from "@/components/DateRangePicker";
 
 const page = () => {
   return (
@@ -37,7 +38,13 @@ const page = () => {
       {/* <PatientDashboard /> */}
       {/* <BillingHistory /> */}
       {/* <DoctorConsultations /> */}
-      <DoctorPrescriptions />
+      {/* <DoctorPrescriptions /> */}
+      <DateRangePicker
+        label="Billing Cycle"
+        buttonWidth="w-72"
+        dateFormat="dd/MM/yyyy"
+        onChange={(range) => console.log("Billing range:", range)}
+      />
     </div>
   );
 };

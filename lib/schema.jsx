@@ -194,7 +194,7 @@ export const Prescriptions = pgTable("prescriptions", {
   duration: varchar("duration"),
   instructions: varchar("instructions"),
 
-  status: varchar("status").default("ordered"), // ordered, completed, pending
+  status: varchar("status").default("recommended"), // ordered, completed, pending
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
@@ -211,7 +211,7 @@ export const LabTests = pgTable("lab_tests", {
 
   // optional results/remarks
   result: jsonb("result"),
-  status: varchar("status").default("ordered"), // ordered, completed, pending
+  status: varchar("status").default("recommended"), // recommended, ordered, completed, pending
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
