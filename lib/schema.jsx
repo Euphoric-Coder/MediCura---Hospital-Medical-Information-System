@@ -29,6 +29,7 @@ export const Patients = pgTable("patients", {
 
   // Profile
   name: varchar("name"),
+  avatar: varchar("avatar"),
   email: varchar("email"),
   phone: varchar("phone"),
   dateOfBirth: date("dateOfBirth"),
@@ -135,7 +136,7 @@ export const Appointments = pgTable("appointments", {
 
   status: varchar("status").default("upcoming"), // upcoming, completed, cancelled
 
-  workflow: varchar("workflow").default("not-arrived"), // arrived, checked-in, in-consultation, completed
+  workflow: varchar("workflow").default("scheduled"), // arrived, checked-in, in-consultation, completed
 
   type: varchar("type").default("Consultation"), // Consultation, Follow-up, etc.
 

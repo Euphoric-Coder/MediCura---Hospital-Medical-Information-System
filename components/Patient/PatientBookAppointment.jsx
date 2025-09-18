@@ -575,7 +575,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     if (selectedAppointment) {
       const cancel = await db
         .update(Appointments)
-        .set({ status: "cancelled", reason: reason })
+        .set({ status: "cancelled", reason: reason, workflow: "cancelled" })
         .where(eq(Appointments.id, selectedAppointment.id));
 
       refreshAppointment();
