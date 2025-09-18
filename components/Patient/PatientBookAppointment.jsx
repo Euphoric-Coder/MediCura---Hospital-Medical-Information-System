@@ -158,9 +158,15 @@ const RescheduleModal = ({
               apt.status === "upcoming"
           );
 
+          // Check if slot has already passed
+          const timePassed =
+            fullDate < today.toISOString().split("T")[0] || // any past day
+            (fullDate === today.toISOString().split("T")[0] &&
+              current < today); // same day but earlier time
+
           slots.push({
             time: timeString,
-            available: !isBooked,
+            available: !isBooked && !timePassed,
           });
 
           current.setMinutes(current.getMinutes() + 30);
@@ -405,8 +411,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         .where(eq(Appointments.patientId, patientData.userId));
 
       const all = await db.select().from(Appointments);
-
-      console.log(all);
       setExistingAppointments(data);
       setAllAppointments(all);
     } catch (error) {
@@ -466,18 +470,28 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         while (currentTime <= endTime) {
           const timeStr = formatTime12Hour(currentTime);
 
-          // Match booked appointments with strict format
+          console.log(timeStr);
+          // strict match for booked appointment
           const isBooked = allAppointments.some(
             (apt) =>
               apt.doctorId === doctor.userId &&
               apt.date === fullDate &&
-              apt.time === timeStr &&
+              apt.time.toLowerCase() === timeStr.toLowerCase() &&
               apt.status === "upcoming"
           );
 
+          // console.log("checking booking status");
+          console.log(isBooked && `Book on ${fullDate} at ${timeStr}`);
+
+          // Check if slot has already passed
+          const timePassed =
+            fullDate < today.toISOString().split("T")[0] || // any past day
+            (fullDate === today.toISOString().split("T")[0] &&
+              currentTime < today); // same day but earlier time
+
           slots.push({
             time: timeStr,
-            available: !isBooked,
+            available: !isBooked && !timePassed,
           });
 
           currentTime.setMinutes(currentTime.getMinutes() + 30);
@@ -486,6 +500,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
       schedule.push({ date: dateStr, dayName, fullDate, slots });
     }
+
+    console.log(schedule);
 
     return schedule;
   };

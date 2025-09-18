@@ -16,10 +16,13 @@ import {
   Save,
   X,
   Users,
+  Copy,
 } from "lucide-react";
 import { Appointments, Patients } from "@/lib/schema";
 import { db } from "@/lib/dbConfig";
 import { eq } from "drizzle-orm";
+import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
 
 const AvailabilityModal = ({
   isOpen,
@@ -116,7 +119,93 @@ const AvailabilityModal = ({
   );
 };
 
+const PatientContactModal = ({ type, value, isOpen, onClose }) => {
+  const [copied, setCopied] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-dark-400/90 to-dark-300/90 border border-dark-500/50 rounded-3xl p-6 w-full max-w-sm shadow-lg relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-dark-600 hover:text-white transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Icon */}
+        <div className="flex justify-center mb-6">
+          <div
+            className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+              type === "phone"
+                ? "bg-gradient-to-r from-blue-500 to-blue-600"
+                : "bg-gradient-to-r from-green-500 to-green-600"
+            }`}
+          >
+            {type === "phone" ? (
+              <Phone className="w-8 h-8 text-white" />
+            ) : (
+              <Mail className="w-8 h-8 text-white" />
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <h2 className="text-20-bold text-center text-white mb-4">
+          {type === "phone" ? "Patient Phone" : "Patient Email"}
+        </h2>
+
+        <p className="text-center text-dark-600 text-lg mb-6 break-words">
+          {value}
+        </p>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          {type === "phone" ? (
+            <button
+              onClick={handleCopy}
+              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4" /> Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" /> Copy Number
+                </>
+              )}
+            </button>
+          ) : (
+            <a
+              href={`mailto:${value}`}
+              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+            >
+              <Mail className="w-4 h-4" /> Send Mail
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DoctorAppointments = ({ onBack, doctorData }) => {
+  const [modalType, setModalType] = useState(null);
+  const [contactModal, setContactModal] = useState({
+    isOpen: false,
+    type: null,
+    value: "",
+  });
+
   const [currentWeek, setCurrentWeek] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
@@ -129,6 +218,16 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  // Open modal for a specific appointment
+  const openContactModal = (type, value) => {
+    setContactModal({ isOpen: true, type, value });
+  };
+
+  // Close modal
+  const closeContactModal = () => {
+    setContactModal({ isOpen: false, type: null, value: "" });
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -176,7 +275,14 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
     }
   };
 
-  // Generate week schedule with appointments
+  const formatTime = (hour, minute) => {
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+    const hourStr = hour12.toString().padStart(2, "0"); // <-- ensures 09, 01, etc.
+    const minuteStr = minute.toString().padStart(2, "0");
+    return `${hourStr}:${minuteStr} ${ampm}`;
+  };
+
   const generateWeekSchedule = (weekOffset) => {
     const today = new Date();
     const startOfWeek = new Date(today);
@@ -193,63 +299,36 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         month: "short",
         day: "numeric",
       });
+      const fullDate = date.toISOString().split("T")[0]; // yyyy-mm-dd
 
-      // Generate time slots with appointments
+      console.log(fullDate);
+
       const slots = [];
-      for (let hour = 9; hour < 17; hour++) {
+      for (let hour = 9; hour < 22; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
-          const time = `${hour.toString().padStart(2, "0")}:${minute
-            .toString()
-            .padStart(2, "0")}`;
-          const hasAppointment = Math.random() > 0.7 && i < 5; // Weekdays only
+          const slotTime = formatTime(hour, minute); // e.g. "10:30 AM"
 
-          if (hasAppointment) {
-            const appointment = {
-              id: `${i}-${hour}-${minute}`,
-              patient: {
-                id: `P${Math.floor(Math.random() * 999) + 1}`,
-                name: [
-                  "John Smith",
-                  "Emily Johnson",
-                  "Michael Brown",
-                  "Sarah Davis",
-                  "David Wilson",
-                ][Math.floor(Math.random() * 5)],
-                age: Math.floor(Math.random() * 60) + 20,
-                phone: "+1 (555) 123-4567",
-                email: "patient@email.com",
-                avatar: `https://images.pexels.com/photos/${
-                  [1222271, 1239291, 1681010, 1130626, 1043471][
-                    Math.floor(Math.random() * 5)
-                  ]
-                }/pexels-photo-${
-                  [1222271, 1239291, 1681010, 1130626, 1043471][
-                    Math.floor(Math.random() * 5)
-                  ]
-                }.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop`,
-              },
-              date: dateStr,
-              time,
-              duration: 30,
-              type: ["Consultation", "Follow-up", "Check-up", "Emergency"][
-                Math.floor(Math.random() * 4)
-              ],
-              status: ["scheduled", "completed", "in-progress"][
-                Math.floor(Math.random() * 3)
-              ],
-              reason: [
-                "Annual check-up",
-                "Follow-up visit",
-                "Chest pain",
-                "Routine examination",
-              ][Math.floor(Math.random() * 4)],
-              isUrgent: Math.random() > 0.9,
-              consultationFee: 150,
-            };
+          console.log(slotTime.toLowerCase());
 
-            slots.push({ time, available: false, appointment });
+          // Look up matching appointment
+          const appointment = allAppointments.find(
+            (apt) =>
+              apt.date === fullDate && apt.time === slotTime.toLowerCase()
+          );
+
+          console.log(appointment);
+
+          if (appointment) {
+            slots.push({
+              time: slotTime,
+              available: false,
+              appointment,
+            });
           } else {
-            slots.push({ time, available: true });
+            slots.push({
+              time: slotTime,
+              available: true,
+            });
           }
         }
       }
@@ -257,13 +336,20 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
       schedule.push({
         date: dateStr,
         dayName,
-        fullDate: date,
+        fullDate,
         slots,
       });
     }
 
+    console.log(schedule);
+
     return schedule;
   };
+
+  // Update weekSchedule whenever appointments/currentWeek change
+  useEffect(() => {
+    setWeekSchedule(generateWeekSchedule(currentWeek));
+  }, [allAppointments, currentWeek]);
 
   const [weekSchedule, setWeekSchedule] = useState(generateWeekSchedule(0));
 
@@ -390,11 +476,6 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
     }
   };
 
-
-  // const allAppointments = weekSchedule.flatMap((day) =>
-  //   day.slots.filter((slot) => slot.appointment).map((slot) => slot.appointment)
-  // );
-
   const filteredAppointments = allAppointments.filter((appointment) => {
     const matchesSearch =
       appointment.patient.name
@@ -403,7 +484,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
       appointment.reason.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
-      statusFilter === "all" || appointment.status === statusFilter;
+      statusFilter === "all" || appointment.workflow === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -694,7 +775,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div className="flex items-center gap-2">
                             <Calendar className="w-3 h-3 lg:w-4 lg:h-4 text-blue-400" />
-                            <span>{appointment.date}</span>
+                            <span>{format(appointment.date, "PPP")}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-purple-400" />
@@ -709,15 +790,12 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                           <div>
                             <span className="text-white">Age:</span>{" "}
-                            {appointment.patient.age}
-                          </div>
-                          <div>
-                            <span className="text-white">Fee:</span> $
-                            {appointment.consultationFee}
+                            {calculateAge(appointment.patient.dateOfBirth)}{" "}
+                            Years
                           </div>
                           <div className="hidden sm:block">
                             <span className="text-white">ID:</span>{" "}
-                            {appointment.patient.id}
+                            {appointment.patient.userId}
                           </div>
                         </div>
 
@@ -732,14 +810,24 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
 
                     <div className="flex flex-row lg:flex-col items-start lg:items-end gap-2 lg:gap-4 flex-shrink-0">
                       <div className="flex gap-2">
-                        <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
+                        {/* Phone Button */}
+                        <button
+                          onClick={() =>
+                            openContactModal("phone", appointment.patient.phone)
+                          }
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                        >
                           <Phone className="w-4 h-4" />
                         </button>
-                        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
+
+                        {/* Email Button */}
+                        <button
+                          onClick={() =>
+                            openContactModal("email", appointment.patient.email)
+                          }
+                          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                        >
                           <Mail className="w-4 h-4" />
-                        </button>
-                        <button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-purple-500/25">
-                          <Edit className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -780,6 +868,12 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         onClose={() => setShowAvailabilityModal(false)}
         selectedDate={selectedDate || ""}
         onSaveAvailability={handleSaveAvailability}
+      />
+      <PatientContactModal
+        type={contactModal.type}
+        value={contactModal.value}
+        isOpen={contactModal.isOpen}
+        onClose={closeContactModal}
       />
     </>
   );
