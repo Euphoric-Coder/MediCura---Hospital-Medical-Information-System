@@ -65,18 +65,18 @@ const DoctorSidebar = ({
       icon: TestTube,
       description: "Order & Review Tests",
     },
-    {
-      id: "admissions",
-      label: "Admissions",
-      icon: Bed,
-      description: "Hospital Admissions",
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: BarChart3,
-      description: "Patient Reports & Analytics",
-    },
+    // {
+    //   id: "admissions",
+    //   label: "Admissions",
+    //   icon: Bed,
+    //   description: "Hospital Admissions",
+    // },
+    // {
+    //   id: "reports",
+    //   label: "Reports",
+    //   icon: BarChart3,
+    //   description: "Patient Reports & Analytics",
+    // },
   ];
 
   const quickActions = [
@@ -232,8 +232,9 @@ const DoctorSidebar = ({
             ))}
           </div>
 
+            {/* TODO: Add Quick Actions */}
           {/* Quick Actions */}
-          <div className="mt-8 space-y-2">
+          {/* <div className="mt-8 space-y-2">
             <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">
               Quick Actions
             </div>
@@ -259,7 +260,7 @@ const DoctorSidebar = ({
                 </div>
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Footer Actions */}
