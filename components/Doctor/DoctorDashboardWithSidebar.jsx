@@ -12,7 +12,7 @@ import DoctorAvailability from "./DoctorAvailability";
 import DoctorConsultationFee from "./DoctorConsultationFee";
 import { Plus, Menu } from "lucide-react";
 
-const DoctorDashboardWithSidebar = () => {
+const DoctorDashboardWithSidebar = ({ doctorData }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -103,6 +103,7 @@ const DoctorDashboardWithSidebar = () => {
         onNavigate={handleNavigate}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
+        doctorData={doctorData}
       />
 
       {/* Main Content */}

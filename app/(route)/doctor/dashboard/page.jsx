@@ -22,7 +22,7 @@ export default function PatientPage() {
 
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
-  const [patientData, setPatientData] = useState([]);
+  const [doctorData, setDoctorData] = useState([]);
   const [onboardingStatus, setOnboardingStatus] = useState(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function PatientPage() {
             .where(eq(Doctors.userId, userId));
 
           if (doctor.length > 0) {
-            setPatientData(doctor[0]);
+            setDoctorData(doctor[0]);
             setOnboardingStatus(doctor[0].hasOnboarded);
           }
         }
@@ -112,5 +112,5 @@ export default function PatientPage() {
     );
   }
 
-  return <DoctorDashboardWithSidebar />;
+  return <DoctorDashboardWithSidebar doctorData={doctorData} />;
 }
