@@ -98,6 +98,7 @@ const RescheduleModal = ({
   onReschedule,
   appointment,
   existingAppointments,
+  allAppointments,
 }) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -149,7 +150,7 @@ const RescheduleModal = ({
           });
 
           // Match booked appointments with strict format
-          const isBooked = existingAppointments.some(
+          const isBooked = allAppointments.some(
             (apt) =>
               apt.doctorId === appointment.doctor.userId &&
               apt.date === fullDate &&
@@ -365,6 +366,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const [showAppointmentTypeDropdown, setShowAppointmentTypeDropdown] =
     useState(false);
   const [existingAppointments, setExistingAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -401,9 +403,12 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         .select()
         .from(Appointments)
         .where(eq(Appointments.patientId, patientData.userId));
-      console.log(data);
+
+      const all = await db.select().from(Appointments);
+
+      console.log(all);
       setExistingAppointments(data);
-      // setExistingAppointments(data);
+      setAllAppointments(all);
     } catch (error) {
       console.error("Error fetching appointments:", error);
     }
@@ -462,7 +467,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
           const timeStr = formatTime12Hour(currentTime);
 
           // Match booked appointments with strict format
-          const isBooked = existingAppointments.some(
+          const isBooked = allAppointments.some(
             (apt) =>
               apt.doctorId === doctor.userId &&
               apt.date === fullDate &&
@@ -1432,6 +1437,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         onReschedule={handleRescheduleAppointment}
         appointment={selectedAppointment}
         existingAppointments={existingAppointments}
+        allAppointments={allAppointments}
       />
     </div>
   );
