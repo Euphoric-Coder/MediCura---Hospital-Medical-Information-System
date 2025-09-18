@@ -105,7 +105,7 @@ const RescheduleModal = ({
   const [currentWeek, setCurrentWeek] = useState(0);
   const [weekSchedule, setWeekSchedule] = useState([]);
 
-  // ✅ Generate slots from doctor's availability
+  // Generate slots from doctor's availability
   const generateWeekSchedule = (weekOffset) => {
     if (!appointment?.doctor) return [];
 
@@ -127,7 +127,12 @@ const RescheduleModal = ({
         month: "short",
         day: "numeric",
       });
-      const fullDate = date.toISOString().split("T")[0];
+
+      // Use IST local date (yyyy-mm-dd) instead of toISOString()
+      // Fixes 1-day shift issue caused by UTC conversion
+      const fullDate = date.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
 
       const slots = [];
       if (availableDays.includes(dayName)) {
@@ -161,8 +166,7 @@ const RescheduleModal = ({
           // Check if slot has already passed
           const timePassed =
             fullDate < today.toISOString().split("T")[0] || // any past day
-            (fullDate === today.toISOString().split("T")[0] &&
-              current < today); // same day but earlier time
+            (fullDate === today.toISOString().split("T")[0] && current < today); // same day but earlier time
 
           slots.push({
             time: timeString,

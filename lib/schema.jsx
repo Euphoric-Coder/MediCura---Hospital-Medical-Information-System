@@ -146,6 +146,74 @@ export const Appointments = pgTable("appointments", {
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
+export const Consultations = pgTable("consultations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => Doctors.userId, { onDelete: "cascade" }),
+
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => Patients.userId, { onDelete: "cascade" }),
+
+  appointmentId: uuid("appointment_id").references(() => Appointments.id, {
+    onDelete: "set null",
+  }),
+
+  // Clinical notes
+  chiefComplaint: jsonb("chief_complaint"),
+  historyOfPresentIllness: jsonb("history_of_present_illness"),
+  physicalExamination: jsonb("physical_examination"),
+  assessment: jsonb("assessment"),
+  plan: jsonb("plan"),
+
+  // Admission info
+  admissionRequired: boolean("admission_required").default(false),
+  admissionType: varchar("admission_type", { length: 100 }),
+  admissionReason: text("admission_reason"),
+
+  // Follow-up
+  followUpInstructions: text("follow_up_instructions"),
+  nextAppointment: timestamp("next_appointment"),
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const Prescriptions = pgTable("prescriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  consultationId: uuid("consultation_id")
+    .notNull()
+    .references(() => Consultations.id, { onDelete: "cascade" }),
+
+  medication: varchar("medication", { length: 255 }).notNull(),
+  dosage: varchar("dosage", { length: 100 }),
+  frequency: varchar("frequency", { length: 100 }),
+  duration: varchar("duration", { length: 100 }),
+  instructions: text("instructions"),
+
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const LabTests = pgTable("lab_tests", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  consultationId: uuid("consultation_id")
+    .notNull()
+    .references(() => Consultations.id, { onDelete: "cascade" }),
+
+  testName: varchar("test_name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }),
+
+  // optional results/remarks
+  result: text("result"),
+  status: varchar("status", { length: 50 }).default("ordered"), // ordered, completed, pending
+
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Pharmacist Table
 export const Pharmacists = pgTable("pharmacists", {
   userId: uuid("userId")

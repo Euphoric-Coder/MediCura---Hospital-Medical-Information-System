@@ -125,32 +125,32 @@ const AvailabilityModal = ({
 };
 
 // Function to Weekly Schedule Color
-  const getSlotClasses = (status, isUrgent) => {
-    if (isUrgent) {
-      return "bg-red-500/20 border border-red-500/40 hover:bg-red-500/30";
-    }
+const getSlotClasses = (status, isUrgent) => {
+  if (isUrgent) {
+    return "bg-red-500/20 border border-red-500/40 hover:bg-red-500/30";
+  }
 
-    switch (status) {
-      case "scheduled":
-        return "bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30";
-      case "waiting":
-        return "bg-orange-500/20 border border-orange-500/30 hover:bg-orange-500/30";
-      case "arrived":
-        return "bg-yellow-500/20 border border-yellow-500/30 hover:bg-yellow-500/30";
-      case "checked-in":
-        return "bg-teal-500/20 border border-teal-500/30 hover:bg-teal-500/30";
-      case "in-consultation":
-        return "bg-green-500/20 border border-green-500/30 hover:bg-green-500/30";
-      case "completed":
-        return "bg-gray-500/20 border border-gray-500/30 hover:bg-gray-500/30";
-      case "cancelled":
-        return "bg-red-500/20 border border-red-500/30 hover:bg-red-500/30";
-      case "no-show":
-        return "bg-pink-500/20 border border-pink-500/30 hover:bg-pink-500/30";
-      default:
-        return "bg-purple-500/20 border border-purple-500/30 hover:bg-purple-500/30";
-    }
-  };
+  switch (status) {
+    case "scheduled":
+      return "bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30";
+    case "waiting":
+      return "bg-orange-500/20 border border-orange-500/30 hover:bg-orange-500/30";
+    case "arrived":
+      return "bg-yellow-500/20 border border-yellow-500/30 hover:bg-yellow-500/30";
+    case "checked-in":
+      return "bg-teal-500/20 border border-teal-500/30 hover:bg-teal-500/30";
+    case "in-consultation":
+      return "bg-green-500/20 border border-green-500/30 hover:bg-green-500/30";
+    case "completed":
+      return "bg-gray-500/20 border border-gray-500/30 hover:bg-gray-500/30";
+    case "cancelled":
+      return "bg-red-500/20 border border-red-500/30 hover:bg-red-500/30";
+    case "no-show":
+      return "bg-pink-500/20 border border-pink-500/30 hover:bg-pink-500/30";
+    default:
+      return "bg-purple-500/20 border border-purple-500/30 hover:bg-purple-500/30";
+  }
+};
 
 const PatientContactModal = ({ type, value, isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
@@ -238,7 +238,7 @@ const AppointmentGrid = ({ day }) => {
         day.slots
           .filter((slot) => slot.appointment)
           .map((slot, slotIndex) => (
-            <HoverCard key={slotIndex} >
+            <HoverCard key={slotIndex}>
               <HoverCardTrigger asChild>
                 <div
                   className={`p-2 lg:p-3 rounded-lg border transition-all duration-200 cursor-pointer ${getSlotClasses(
@@ -260,7 +260,10 @@ const AppointmentGrid = ({ day }) => {
                 </div>
               </HoverCardTrigger>
 
-              <HoverCardContent className="w-80 bg-dark-400 border border-dark-500 rounded-xl shadow-lg" side="top">
+              <HoverCardContent
+                className="w-80 bg-dark-400 border border-dark-500 rounded-xl shadow-lg"
+                side="top"
+              >
                 <div className="flex gap-4">
                   <img
                     src={slot.appointment?.patient.avatar || "/placeholder.png"}
@@ -312,7 +315,7 @@ const AppointmentGrid = ({ day }) => {
       )}
     </div>
   );
-}
+};
 
 const DoctorAppointments = ({ onBack, doctorData }) => {
   const [modalType, setModalType] = useState(null);
@@ -381,7 +384,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         .innerJoin(Patients, eq(Appointments.patientId, Patients.userId))
         .where(eq(Appointments.doctorId, doctorData.userId));
 
-      console.log("Appointments with patient data:", data);
+      // console.log("Appointments with patient data:", data);
       setAllAppointments(data);
 
       return data;
@@ -415,24 +418,24 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         month: "short",
         day: "numeric",
       });
-      const fullDate = date.toISOString().split("T")[0]; // yyyy-mm-dd
 
-      console.log(fullDate);
+      // Use IST local date (yyyy-mm-dd) instead of toISOString()
+      // Fixes 1-day shift issue caused by UTC conversion
+      const fullDate = date.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
 
       const slots = [];
       for (let hour = 9; hour < 22; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
           const slotTime = formatTime(hour, minute); // e.g. "10:30 AM"
 
-          console.log(slotTime.toLowerCase());
-
           // Look up matching appointment
           const appointment = allAppointments.find(
             (apt) =>
-              apt.date === fullDate && apt.time === slotTime.toLowerCase()
+              apt.date === fullDate &&
+              apt.time.toLowerCase() === slotTime.toLowerCase()
           );
-
-          console.log(appointment);
 
           if (appointment) {
             slots.push({
@@ -456,8 +459,6 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         slots,
       });
     }
-
-    console.log(schedule);
 
     return schedule;
   };
@@ -492,7 +493,6 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
 
   // Function to get status badge
   const getStatusBadge = (status, isUrgent) => {
-    console.log(status);
     const baseClasses =
       "flex items-center gap-1 px-2 py-1 rounded-full text-10-medium sm:text-12-medium";
 
