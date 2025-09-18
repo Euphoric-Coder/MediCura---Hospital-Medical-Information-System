@@ -589,11 +589,14 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const handleRescheduleAppointment = async (newDate, newTime) => {
     if (selectedAppointment) {
-      const reschedule = await db.update(Appointments).set({
-        date: newDate,
-        time: newTime,
-        updatedAt: new Date(),
-      });
+      const reschedule = await db
+        .update(Appointments)
+        .set({
+          date: newDate,
+          time: newTime,
+          updatedAt: new Date(),
+        })
+        .where(eq(Appointments.id, selectedAppointment.id));
       refreshAppointment();
 
       setMessage(
@@ -1331,7 +1334,9 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   : "text-white"
                               }
                             >
-                              { appointment.status === "cancelled" && "Cancellation"} Reason:
+                              {appointment.status === "cancelled" &&
+                                "Cancellation"}{" "}
+                              Reason:
                             </span>{" "}
                             {appointment.reason}
                           </p>
