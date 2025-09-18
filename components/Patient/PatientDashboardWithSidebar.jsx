@@ -48,7 +48,12 @@ const PatientDashboardWithSidebar = ({ onBookAppointment, patientData }) => {
           />
         );
       case "prescriptions":
-        return <PatientConsultation />;
+        return (
+          <PatientConsultation
+            patientData={patientData}
+            onBack={() => setCurrentPage("dashboard")}
+          />
+        );
       case "medication":
         return <PatientMedication />;
       case "lab-results":

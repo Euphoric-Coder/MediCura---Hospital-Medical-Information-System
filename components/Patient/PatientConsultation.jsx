@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Pill,
@@ -15,6 +15,15 @@ import {
   Stethoscope,
 } from "lucide-react";
 import jsPDF from "jspdf";
+import {
+  Appointments,
+  Consultations,
+  Doctors,
+  Prescriptions,
+} from "@/lib/schema";
+import { eq, inArray } from "drizzle-orm";
+import { db } from "@/lib/dbConfig";
+import { set } from "date-fns";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -200,140 +209,305 @@ const PrescriptionDetailsModal = ({
   );
 };
 
-const PatientConsultation = ({ onBack }) => {
+const PatientConsultation = ({ onBack, patientData }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [consultationPrescriptions, setConsultationPrescriptions] = useState(
+    []
+  );
+
+  useEffect(() => {
+    fetchConsultationsWithPrescriptions(patientData.userId);
+  }, [patientData]);
+
+  const fetchConsultationsWithPrescriptions = async (patientId) => {
+    try {
+      // Fetch consultations + doctor + appointment
+      const consultations = await db
+        .select({
+          id: Consultations.id,
+          consultationDate: Consultations.createdAt,
+          chiefComplaint: Consultations.chiefComplaint,
+          historyOfPresentIllness: Consultations.historyOfPresentIllness,
+          physicalExamination: Consultations.physicalExamination,
+          followUpInstructions: Consultations.followUpInstructions,
+          consultationNotes: Consultations.plan,
+          diagnosis: Consultations.assessment,
+          followUpDate: Consultations.nextAppointment,
+
+          doctor: Doctors.name,
+          doctorSpecialty: Doctors.speciality,
+
+          appointmentType: Appointments.type,
+          appointmentDate: Appointments.date,
+          reason: Appointments.reason,
+        })
+        .from(Consultations)
+        .innerJoin(Doctors, eq(Consultations.doctorId, Doctors.userId))
+        .leftJoin(
+          Appointments,
+          eq(Consultations.appointmentId, Appointments.id)
+        )
+        .where(eq(Consultations.patientId, patientId));
+
+      if (!consultations.length) return [];
+
+      // Collect consultation IDs
+      const consultationIds = consultations.map((c) => c.id);
+
+      // Fetch prescriptions for these consultations
+      const prescriptions = await db
+        .select()
+        .from(Prescriptions)
+        .where(inArray(Prescriptions.consultationId, consultationIds));
+
+      // Group prescriptions by consultation
+      console.log(
+        consultations.map((c) => ({
+          id: c.id,
+          consultationDate: c.consultationDate,
+          doctor: c.doctor,
+          doctorSpecialty: c.doctorSpecialty,
+          appointmentType: c.appointmentType,
+          diagnosis: Array.isArray(c.diagnosis)
+            ? c.diagnosis.join(", ")
+            : c.diagnosis,
+          consultationNotes: Array.isArray(c.consultationNotes)
+            ? c.consultationNotes.join(", ")
+            : c.consultationNotes,
+          followUpDate: c.followUpDate,
+          prescriptions: prescriptions
+            .filter((p) => p.consultationId === c.id)
+            .map((p) => ({
+              id: p.id,
+              medication: p.medication,
+              dosage: p.dosage,
+              frequency: p.frequency,
+              duration: p.duration,
+              prescribedBy: c.doctor,
+              prescribedDate: c.consultationDate,
+              startDate: p.startDate || c.consultationDate,
+              endDate: p.endDate || null,
+              status: p.status,
+              refillsLeft: p.refillsLeft ?? 0,
+              totalRefills: p.totalRefills ?? 0,
+              instructions: p.instructions,
+              sideEffects: p.sideEffects ?? [],
+              cost: p.cost ?? 0,
+              pharmacy: p.pharmacy ?? "",
+              consultationId: p.consultationId,
+              appointmentDate: c.appointmentDate,
+              reason: c.reason,
+            })),
+        }))
+      );
+
+      const data = consultations.map((c) => ({
+        id: c.id,
+        consultationDate: c.consultationDate
+          ? new Date(c.consultationDate).toLocaleDateString()
+          : null,
+        doctor: c.doctor,
+        doctorSpecialty: c.doctorSpecialty,
+        appointmentType: c.appointmentType,
+        diagnosis: Array.isArray(c.diagnosis)
+          ? c.diagnosis.join(", ")
+          : c.diagnosis,
+          chiefComplaint: Array.isArray(c.chiefComplaint)
+          ? c.chiefComplaint.join(", ")
+          : c.chiefComplaint,
+          historyOfPresentIllness: Array.isArray(c.historyOfPresentIllness)
+          ? c.historyOfPresentIllness.join(", ")
+          : c.historyOfPresentIllness,
+          physicalExamination: Array.isArray(c.physicalExamination)
+          ? c.physicalExamination.join(", ")
+          : c.physicalExamination,
+          followUpInstructions: Array.isArray(c.followUpInstructions)
+          ? c.followUpInstructions.join(", ")
+          : c.followUpInstructions,
+        consultationNotes: Array.isArray(c.consultationNotes)
+          ? c.consultationNotes.join(", ")
+          : c.consultationNotes,
+        followUpDate: c.followUpDate
+          ? new Date(c.followUpDate).toLocaleDateString()
+          : null,
+        prescriptions: prescriptions
+          .filter((p) => p.consultationId === c.id)
+          .map((p) => ({
+            id: p.id,
+            medication: p.medication,
+            dosage: p.dosage,
+            frequency: p.frequency,
+            duration: p.duration,
+            prescribedBy: c.doctor,
+            prescribedDate: c.consultationDate
+              ? new Date(c.consultationDate).toLocaleDateString()
+              : null,
+            startDate: p.startDate
+              ? new Date(p.startDate).toLocaleDateString()
+              : c.consultationDate
+              ? new Date(c.consultationDate).toLocaleDateString()
+              : null,
+            endDate: p.endDate
+              ? new Date(p.endDate).toLocaleDateString()
+              : null,
+            status: p.status,
+            refillsLeft: p.refillsLeft ?? 0,
+            totalRefills: p.totalRefills ?? 0,
+            instructions: p.instructions,
+            sideEffects: p.sideEffects ?? [],
+            cost: p.cost ?? 0,
+            pharmacy: p.pharmacy ?? "",
+            consultationId: p.consultationId,
+            appointmentDate: c.appointmentDate
+              ? new Date(c.appointmentDate).toLocaleDateString()
+              : null,
+            reason: c.reason,
+          })),
+      }));
+
+
+      console.log(data);
+
+      setConsultationPrescriptions(data);
+
+      // setConsultationPrescriptions(data);
+    } catch (error) {
+      console.error("Error fetching consultations:", error);
+      return [];
+    }
+  };
 
   // Mock consultation prescriptions data
-  const consultationPrescriptions = [
-    {
-      id: "cons-001",
-      consultationDate: "2024-01-15",
-      doctor: "Dr. Sarah Safari",
-      doctorSpecialty: "General Medicine",
-      appointmentType: "Regular Consultation",
-      diagnosis: "Hypertension and mild anxiety",
-      consultationNotes:
-        "Patient presented with elevated blood pressure readings. Recommended lifestyle changes and medication management.",
-      followUpDate: "2024-02-15",
-      prescriptions: [
-        {
-          id: "rx-001",
-          medication: "Lisinopril",
-          dosage: "10mg",
-          frequency: "Once daily",
-          duration: "30 days",
-          prescribedBy: "Dr. Sarah Safari",
-          prescribedDate: "2024-01-15",
-          startDate: "2024-01-15",
-          endDate: "2024-02-14",
-          status: "active",
-          refillsLeft: 2,
-          totalRefills: 3,
-          instructions:
-            "Take with food in the morning. Monitor blood pressure daily.",
-          sideEffects: ["Dizziness", "Dry cough", "Fatigue"],
-          cost: 25.99,
-          pharmacy: "MediCura Pharmacy",
-          consultationId: "cons-001",
-          appointmentDate: "2024-01-15",
-          reason: "High blood pressure management",
-        },
-        {
-          id: "rx-002",
-          medication: "Alprazolam",
-          dosage: "0.25mg",
-          frequency: "As needed",
-          duration: "30 days",
-          prescribedBy: "Dr. Sarah Safari",
-          prescribedDate: "2024-01-15",
-          startDate: "2024-01-15",
-          endDate: "2024-02-14",
-          status: "active",
-          refillsLeft: 1,
-          totalRefills: 2,
-          instructions:
-            "Take only when experiencing anxiety. Do not exceed 2 tablets per day.",
-          sideEffects: ["Drowsiness", "Dizziness", "Memory problems"],
-          cost: 18.5,
-          pharmacy: "MediCura Pharmacy",
-          consultationId: "cons-001",
-          appointmentDate: "2024-01-15",
-          reason: "Anxiety management",
-        },
-      ],
-    },
-    {
-      id: "cons-002",
-      consultationDate: "2024-01-08",
-      doctor: "Dr. Michael Chen",
-      doctorSpecialty: "Cardiology",
-      appointmentType: "Follow-up",
-      diagnosis: "Post-cardiac event monitoring",
-      consultationNotes:
-        "Patient recovering well from recent cardiac event. Continue current medication regimen.",
-      prescriptions: [
-        {
-          id: "rx-003",
-          medication: "Metoprolol",
-          dosage: "50mg",
-          frequency: "Twice daily",
-          duration: "90 days",
-          prescribedBy: "Dr. Michael Chen",
-          prescribedDate: "2024-01-08",
-          startDate: "2024-01-08",
-          endDate: "2024-04-08",
-          status: "active",
-          refillsLeft: 3,
-          totalRefills: 5,
-          instructions:
-            "Take with meals. Do not stop suddenly without consulting doctor.",
-          sideEffects: ["Fatigue", "Cold hands/feet", "Dizziness"],
-          cost: 32.75,
-          pharmacy: "MediCura Pharmacy",
-          consultationId: "cons-002",
-          appointmentDate: "2024-01-08",
-          reason: "Cardiac monitoring and management",
-        },
-      ],
-    },
-    {
-      id: "cons-003",
-      consultationDate: "2023-12-20",
-      doctor: "Dr. Sarah Safari",
-      doctorSpecialty: "General Medicine",
-      appointmentType: "Sick Visit",
-      diagnosis: "Bacterial infection - completed treatment",
-      consultationNotes:
-        "Patient completed full course of antibiotics. Infection cleared successfully.",
-      prescriptions: [
-        {
-          id: "rx-004",
-          medication: "Amoxicillin",
-          dosage: "500mg",
-          frequency: "Three times daily",
-          duration: "10 days",
-          prescribedBy: "Dr. Sarah Safari",
-          prescribedDate: "2023-12-20",
-          startDate: "2023-12-20",
-          endDate: "2023-12-30",
-          status: "completed",
-          refillsLeft: 0,
-          totalRefills: 0,
-          instructions:
-            "Take with food. Complete entire course even if feeling better.",
-          sideEffects: ["Nausea", "Diarrhea", "Stomach upset"],
-          cost: 15.25,
-          pharmacy: "MediCura Pharmacy",
-          consultationId: "cons-003",
-          appointmentDate: "2023-12-20",
-          reason: "Bacterial infection treatment",
-        },
-      ],
-    },
-  ];
+  // const consultationPrescriptions = [
+  //   {
+  //     id: "cons-001",
+  //     consultationDate: "2024-01-15",
+  //     doctor: "Dr. Sarah Safari",
+  //     doctorSpecialty: "General Medicine",
+  //     appointmentType: "Regular Consultation",
+  //     diagnosis: "Hypertension and mild anxiety",
+  //     consultationNotes:
+  //       "Patient presented with elevated blood pressure readings. Recommended lifestyle changes and medication management.",
+  //     followUpDate: "2024-02-15",
+  //     prescriptions: [
+  //       {
+  //         id: "rx-001",
+  //         medication: "Lisinopril",
+  //         dosage: "10mg",
+  //         frequency: "Once daily",
+  //         duration: "30 days",
+  //         prescribedBy: "Dr. Sarah Safari",
+  //         prescribedDate: "2024-01-15",
+  //         startDate: "2024-01-15",
+  //         endDate: "2024-02-14",
+  //         status: "active",
+  //         refillsLeft: 2,
+  //         totalRefills: 3,
+  //         instructions:
+  //           "Take with food in the morning. Monitor blood pressure daily.",
+  //         sideEffects: ["Dizziness", "Dry cough", "Fatigue"],
+  //         cost: 25.99,
+  //         pharmacy: "MediCura Pharmacy",
+  //         consultationId: "cons-001",
+  //         appointmentDate: "2024-01-15",
+  //         reason: "High blood pressure management",
+  //       },
+  //       {
+  //         id: "rx-002",
+  //         medication: "Alprazolam",
+  //         dosage: "0.25mg",
+  //         frequency: "As needed",
+  //         duration: "30 days",
+  //         prescribedBy: "Dr. Sarah Safari",
+  //         prescribedDate: "2024-01-15",
+  //         startDate: "2024-01-15",
+  //         endDate: "2024-02-14",
+  //         status: "active",
+  //         refillsLeft: 1,
+  //         totalRefills: 2,
+  //         instructions:
+  //           "Take only when experiencing anxiety. Do not exceed 2 tablets per day.",
+  //         sideEffects: ["Drowsiness", "Dizziness", "Memory problems"],
+  //         cost: 18.5,
+  //         pharmacy: "MediCura Pharmacy",
+  //         consultationId: "cons-001",
+  //         appointmentDate: "2024-01-15",
+  //         reason: "Anxiety management",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "cons-002",
+  //     consultationDate: "2024-01-08",
+  //     doctor: "Dr. Michael Chen",
+  //     doctorSpecialty: "Cardiology",
+  //     appointmentType: "Follow-up",
+  //     diagnosis: "Post-cardiac event monitoring",
+  //     consultationNotes:
+  //       "Patient recovering well from recent cardiac event. Continue current medication regimen.",
+  //     prescriptions: [
+  //       {
+  //         id: "rx-003",
+  //         medication: "Metoprolol",
+  //         dosage: "50mg",
+  //         frequency: "Twice daily",
+  //         duration: "90 days",
+  //         prescribedBy: "Dr. Michael Chen",
+  //         prescribedDate: "2024-01-08",
+  //         startDate: "2024-01-08",
+  //         endDate: "2024-04-08",
+  //         status: "active",
+  //         refillsLeft: 3,
+  //         totalRefills: 5,
+  //         instructions:
+  //           "Take with meals. Do not stop suddenly without consulting doctor.",
+  //         sideEffects: ["Fatigue", "Cold hands/feet", "Dizziness"],
+  //         cost: 32.75,
+  //         pharmacy: "MediCura Pharmacy",
+  //         consultationId: "cons-002",
+  //         appointmentDate: "2024-01-08",
+  //         reason: "Cardiac monitoring and management",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "cons-003",
+  //     consultationDate: "2023-12-20",
+  //     doctor: "Dr. Sarah Safari",
+  //     doctorSpecialty: "General Medicine",
+  //     appointmentType: "Sick Visit",
+  //     diagnosis: "Bacterial infection - completed treatment",
+  //     consultationNotes:
+  //       "Patient completed full course of antibiotics. Infection cleared successfully.",
+  //     prescriptions: [
+  //       {
+  //         id: "rx-004",
+  //         medication: "Amoxicillin",
+  //         dosage: "500mg",
+  //         frequency: "Three times daily",
+  //         duration: "10 days",
+  //         prescribedBy: "Dr. Sarah Safari",
+  //         prescribedDate: "2023-12-20",
+  //         startDate: "2023-12-20",
+  //         endDate: "2023-12-30",
+  //         status: "completed",
+  //         refillsLeft: 0,
+  //         totalRefills: 0,
+  //         instructions:
+  //           "Take with food. Complete entire course even if feeling better.",
+  //         sideEffects: ["Nausea", "Diarrhea", "Stomach upset"],
+  //         cost: 15.25,
+  //         pharmacy: "MediCura Pharmacy",
+  //         consultationId: "cons-003",
+  //         appointmentDate: "2023-12-20",
+  //         reason: "Bacterial infection treatment",
+  //       },
+  //     ],
+  //   },
+  // ];
 
   // Flatten all prescriptions from consultations
   const allPrescriptions = consultationPrescriptions.flatMap(
