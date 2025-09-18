@@ -384,7 +384,7 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
       </div>
 
       {/* Search + Add Test */}
-      <div className="flex items-center justify-center flex-col gap-2 mb-3">
+      <div className="flex items-center justify-center flex-col gap-4 mb-3">
         <input
           type="text"
           value={newTestName}
@@ -396,10 +396,10 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
             }
           }}
           placeholder="Search or add new test..."
-          className="shad-input p-3 rounded-xl flex-1 text-white"
+          className="w-full shad-input p-3 rounded-xl flex-1 text-white"
         />
         {/* Category Dropdown */}
-        <div className="relative w-40">
+        <div className="relative w-full">
           <button
             type="button"
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
@@ -436,7 +436,7 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
         <button
           type="button"
           onClick={handleAddLabTest}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+          className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
         >
           Add
         </button>
