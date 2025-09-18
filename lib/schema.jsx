@@ -140,6 +140,8 @@ export const Appointments = pgTable("appointments", {
 
   type: varchar("type").default("Consultation"), // Consultation, Follow-up, etc.
 
+  isUrgent: boolean("isUrgent").default(false),
+
   bookingDate: timestamp("bookingDate").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });

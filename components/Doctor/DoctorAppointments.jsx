@@ -314,15 +314,47 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
             <span className="text-blue-400">Scheduled</span>
           </div>
         );
-      case "in-progress":
+
+      case "waiting":
+        return (
+          <div
+            className={`${baseClasses} bg-orange-500/20 border border-orange-500/30`}
+          >
+            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+            <span className="text-orange-400">Waiting</span>
+          </div>
+        );
+
+      case "arrived":
+        return (
+          <div
+            className={`${baseClasses} bg-yellow-500/20 border border-yellow-500/30`}
+          >
+            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+            <span className="text-yellow-400">Arrived</span>
+          </div>
+        );
+
+      case "checked-in":
+        return (
+          <div
+            className={`${baseClasses} bg-teal-500/20 border border-teal-500/30`}
+          >
+            <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
+            <span className="text-teal-400">Checked-In</span>
+          </div>
+        );
+
+      case "in-consultation":
         return (
           <div
             className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
           >
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400">In Progress</span>
+            <span className="text-green-400">In Consultation</span>
           </div>
         );
+
       case "completed":
         return (
           <div
@@ -332,6 +364,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
             <span className="text-gray-400">Completed</span>
           </div>
         );
+
       case "cancelled":
         return (
           <div
@@ -341,19 +374,22 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
             <span className="text-red-400">Cancelled</span>
           </div>
         );
+
       case "no-show":
         return (
           <div
-            className={`${baseClasses} bg-yellow-500/20 border border-yellow-500/30`}
+            className={`${baseClasses} bg-pink-500/20 border border-pink-500/30`}
           >
-            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            <span className="text-yellow-400">No Show</span>
+            <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+            <span className="text-pink-400">No Show</span>
           </div>
         );
+
       default:
         return null;
     }
   };
+
 
   // const allAppointments = weekSchedule.flatMap((day) =>
   //   day.slots.filter((slot) => slot.appointment).map((slot) => slot.appointment)
