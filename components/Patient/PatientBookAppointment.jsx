@@ -1310,21 +1310,42 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           </div>
                         </div>
 
-                        <div className="bg-dark-500/30 rounded-lg px-3 py-2 inline-block">
-                          <p className="text-10-regular lg:text-12-regular text-dark-600">
-                            <span className="text-white">Reason:</span>{" "}
+                        <div
+                          className={`rounded-lg px-3 py-2 inline-block ${
+                            appointment.status === "cancelled"
+                              ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                              : "bg-dark-500/30"
+                          }`}
+                        >
+                          <p
+                            className={`text-10-regular lg:text-12-regular ${
+                              appointment.status === "cancelled"
+                                ? "text-red-400"
+                                : "text-dark-600"
+                            }`}
+                          >
+                            <span
+                              className={
+                                appointment.status === "cancelled"
+                                  ? "text-red-300"
+                                  : "text-white"
+                              }
+                            >
+                              { appointment.status === "cancelled" && "Cancellation"} Reason:
+                            </span>{" "}
                             {appointment.reason}
                           </p>
                         </div>
 
-                        {appointment.notes && (
-                          <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block">
-                            <p className="text-10-regular lg:text-12-regular text-blue-400">
-                              <span className="text-white">Notes:</span>{" "}
-                              {appointment.notes}
-                            </p>
-                          </div>
-                        )}
+                        {appointment.notes &&
+                          appointment.status !== "cancelled" && (
+                            <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
+                              <p className="text-10-regular lg:text-12-regular text-blue-400">
+                                <span className="text-white">Notes:</span>{" "}
+                                {appointment.notes}
+                              </p>
+                            </div>
+                          )}
                       </div>
                     </div>
 
