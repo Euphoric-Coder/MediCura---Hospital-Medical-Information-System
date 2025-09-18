@@ -566,15 +566,14 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     }, 3000);
   };
 
-  const handleCancelAppointment = (reason) => {
+  const handleCancelAppointment = async (reason) => {
     if (selectedAppointment) {
-      setExistingAppointments((prev) =>
-        prev.map((apt) =>
-          apt.id === selectedAppointment.id
-            ? { ...apt, status: "cancelled" }
-            : apt
-        )
-      );
+      const cancel = await db
+        .update(Appointments)
+        .set({ status: "cancelled", reason: reason })
+        .where(eq(Appointments.id, selectedAppointment.id));
+
+      refreshAppointment();
 
       setMessage(
         `Appointment with ${selectedAppointment.doctor.name} cancelled successfully`
