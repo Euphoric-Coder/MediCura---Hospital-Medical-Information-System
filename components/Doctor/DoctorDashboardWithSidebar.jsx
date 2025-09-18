@@ -12,7 +12,7 @@ import DoctorAvailability from "./DoctorAvailability";
 import DoctorConsultationFee from "./DoctorConsultationFee";
 import { Plus, Menu } from "lucide-react";
 
-const DoctorDashboardWithSidebar = ({ onLogout }) => {
+const DoctorDashboardWithSidebar = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -27,7 +27,7 @@ const DoctorDashboardWithSidebar = ({ onLogout }) => {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "dashboard":
-        return <DoctorDashboard onLogout={onLogout} />;
+        return <DoctorDashboard />;
       case "appointments":
         return (
           <DoctorAppointments onBack={() => setCurrentPage("dashboard")} />
@@ -91,7 +91,7 @@ const DoctorDashboardWithSidebar = ({ onLogout }) => {
           </div>
         );
       default:
-        return <DoctorDashboard onLogout={onLogout} />;
+        return <DoctorDashboard />;
     }
   };
 
@@ -101,7 +101,6 @@ const DoctorDashboardWithSidebar = ({ onLogout }) => {
       <DoctorSidebar
         currentPage={currentPage}
         onNavigate={handleNavigate}
-        onLogout={onLogout}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
       />

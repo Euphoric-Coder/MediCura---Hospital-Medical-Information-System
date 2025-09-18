@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, Clock, Users, FileText, Pill, TestTube, Bed, TrendingUp, Bell, ChevronLeft, ChevronRight, User, Phone, Mail, Stethoscope, Activity } from 'lucide-react';
 
-const DoctorDashboard = ({ onLogout }) => {
+const DoctorDashboard = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
 
