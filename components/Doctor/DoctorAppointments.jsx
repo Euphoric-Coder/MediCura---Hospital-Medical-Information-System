@@ -18,6 +18,11 @@ import {
   Users,
   Copy,
 } from "lucide-react";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "@/components/ui/hover-card";
 import { Appointments, Patients } from "@/lib/schema";
 import { db } from "@/lib/dbConfig";
 import { eq } from "drizzle-orm";
@@ -119,6 +124,34 @@ const AvailabilityModal = ({
   );
 };
 
+// Function to Weekly Schedule Color
+  const getSlotClasses = (status, isUrgent) => {
+    if (isUrgent) {
+      return "bg-red-500/20 border border-red-500/40 hover:bg-red-500/30";
+    }
+
+    switch (status) {
+      case "scheduled":
+        return "bg-blue-500/20 border border-blue-500/30 hover:bg-blue-500/30";
+      case "waiting":
+        return "bg-orange-500/20 border border-orange-500/30 hover:bg-orange-500/30";
+      case "arrived":
+        return "bg-yellow-500/20 border border-yellow-500/30 hover:bg-yellow-500/30";
+      case "checked-in":
+        return "bg-teal-500/20 border border-teal-500/30 hover:bg-teal-500/30";
+      case "in-consultation":
+        return "bg-green-500/20 border border-green-500/30 hover:bg-green-500/30";
+      case "completed":
+        return "bg-gray-500/20 border border-gray-500/30 hover:bg-gray-500/30";
+      case "cancelled":
+        return "bg-red-500/20 border border-red-500/30 hover:bg-red-500/30";
+      case "no-show":
+        return "bg-pink-500/20 border border-pink-500/30 hover:bg-pink-500/30";
+      default:
+        return "bg-purple-500/20 border border-purple-500/30 hover:bg-purple-500/30";
+    }
+  };
+
 const PatientContactModal = ({ type, value, isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
 
@@ -197,6 +230,89 @@ const PatientContactModal = ({ type, value, isOpen, onClose }) => {
     </div>
   );
 };
+
+const AppointmentGrid = ({ day }) => {
+  return (
+    <div className="space-y-2 max-h-64 lg:max-h-96 overflow-y-auto">
+      {day.slots.filter((slot) => slot.appointment).length > 0 ? (
+        day.slots
+          .filter((slot) => slot.appointment)
+          .map((slot, slotIndex) => (
+            <HoverCard key={slotIndex} >
+              <HoverCardTrigger asChild>
+                <div
+                  className={`p-2 lg:p-3 rounded-lg border transition-all duration-200 cursor-pointer ${getSlotClasses(
+                    slot.appointment?.workflow,
+                    slot.appointment?.isUrgent
+                  )}`}
+                >
+                  <div className="text-center">
+                    <div className="text-12-medium lg:text-14-medium text-white">
+                      {slot.time}
+                    </div>
+                    <div className="text-10-regular lg:text-12-regular text-white/70 truncate mt-1">
+                      {slot.appointment?.patient.name}
+                    </div>
+                    <div className="text-10-regular text-white/50 truncate">
+                      {slot.appointment?.type}
+                    </div>
+                  </div>
+                </div>
+              </HoverCardTrigger>
+
+              <HoverCardContent className="w-80 bg-dark-400 border border-dark-500 rounded-xl shadow-lg" side="top">
+                <div className="flex gap-4">
+                  <img
+                    src={slot.appointment?.patient.avatar || "/placeholder.png"}
+                    alt={slot.appointment?.patient.name}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-white text-14-semibold">
+                      {slot.appointment?.patient.name}
+                    </h3>
+                    <p className="text-dark-600 text-12-regular">
+                      {slot.appointment?.patient.gender},{" "}
+                      {slot.appointment?.patient.dateOfBirth &&
+                        new Date().getFullYear() -
+                          new Date(
+                            slot.appointment?.patient.dateOfBirth
+                          ).getFullYear()}{" "}
+                      yrs
+                    </p>
+                    <p className="flex gap-1 items-center text-dark-600 text-12-regular">
+                      <Mail /> {slot.appointment?.patient.email}
+                    </p>
+                    <p className="flex gap-1 items-center text-dark-600 text-12-regular">
+                      <Phone /> {slot.appointment?.patient.phone}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3 border-t border-dark-600 pt-2 text-12-regular text-dark-700">
+                  <p>
+                    <span className="text-white">Reason:</span>{" "}
+                    {slot.appointment?.reason || "N/A"}
+                  </p>
+                  <p>
+                    <span className="text-white">Workflow:</span>{" "}
+                    {slot.appointment?.workflow}
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          ))
+      ) : (
+        <div className="text-center py-4 lg:py-8">
+          <Calendar className="w-8 h-8 lg:w-12 lg:h-12 text-dark-600 mx-auto mb-2" />
+          <p className="text-10-regular lg:text-12-regular text-dark-600">
+            No appointments
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const DoctorAppointments = ({ onBack, doctorData }) => {
   const [modalType, setModalType] = useState(null);
@@ -374,6 +490,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
     }, 3000);
   };
 
+  // Function to get status badge
   const getStatusBadge = (status, isUrgent) => {
     console.log(status);
     const baseClasses =
@@ -663,22 +780,17 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                     </button>
                   </div>
 
-                  <div className="space-y-2 max-h-64 lg:max-h-96 overflow-y-auto">
+                  {/* <div className="space-y-2 max-h-64 lg:max-h-96 overflow-y-auto">
                     {day.slots.filter((slot) => slot.appointment).length > 0 ? (
                       day.slots
                         .filter((slot) => slot.appointment)
                         .map((slot, slotIndex) => (
                           <div
                             key={slotIndex}
-                            className={`p-2 lg:p-3 rounded-lg border transition-all duration-200 cursor-pointer ${
+                            className={`p-2 lg:p-3 rounded-lg border transition-all duration-200 cursor-pointer ${getSlotClasses(
+                              slot.appointment?.workflow,
                               slot.appointment?.isUrgent
-                                ? "bg-red-500/20 border-red-500/40 hover:bg-red-500/30"
-                                : slot.appointment?.status === "completed"
-                                ? "bg-green-500/20 border-green-500/30 hover:bg-green-500/30"
-                                : slot.appointment?.status === "in-progress"
-                                ? "bg-blue-500/20 border-blue-500/30 hover:bg-blue-500/30"
-                                : "bg-purple-500/20 border-purple-500/30 hover:bg-purple-500/30"
-                            }`}
+                            )}`}
                           >
                             <div className="text-center">
                               <div className="text-12-medium lg:text-14-medium text-white">
@@ -701,7 +813,8 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                         </p>
                       </div>
                     )}
-                  </div>
+                  </div> */}
+                  <AppointmentGrid day={day} />
                 </div>
               ))}
             </div>
