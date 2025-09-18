@@ -112,6 +112,12 @@ const RescheduleModal = ({
     const { availableDays, availableHours } = appointment.doctor;
 
     const today = new Date();
+
+    // Always use IST local date for comparisons
+    const todayStr = today.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() + weekOffset * 7);
 
@@ -121,15 +127,21 @@ const RescheduleModal = ({
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
 
-      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
-      const shortDay = date.toLocaleDateString("en-US", { weekday: "short" });
+      const dayName = date.toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Kolkata",
+      });
+      const shortDay = date.toLocaleDateString("en-US", {
+        weekday: "short",
+        timeZone: "Asia/Kolkata",
+      });
       const dateStr = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
+        timeZone: "Asia/Kolkata",
       });
 
-      // Use IST local date (yyyy-mm-dd) instead of toISOString()
-      // Fixes 1-day shift issue caused by UTC conversion
+      // Use IST yyyy-mm-dd for database matching
       const fullDate = date.toLocaleDateString("en-CA", {
         timeZone: "Asia/Kolkata",
       });
@@ -148,10 +160,11 @@ const RescheduleModal = ({
         end.setHours(endHour, endMinute, 0, 0);
 
         while (current <= end) {
-          const timeString = current.toLocaleTimeString([], {
+          const timeString = current.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
             hour12: true,
+            timeZone: "Asia/Kolkata", // enforce IST
           });
 
           // Match booked appointments with strict format
@@ -159,14 +172,13 @@ const RescheduleModal = ({
             (apt) =>
               apt.doctorId === appointment.doctor.userId &&
               apt.date === fullDate &&
-              apt.time.toLowerCase() === timeString &&
+              apt.time.toLowerCase() === timeString.toLowerCase() &&
               apt.status === "upcoming"
           );
 
-          // Check if slot has already passed
+          // Compare with IST-safe today string
           const timePassed =
-            fullDate < today.toISOString().split("T")[0] || // any past day
-            (fullDate === today.toISOString().split("T")[0] && current < today); // same day but earlier time
+            fullDate < todayStr || (fullDate === todayStr && current < today);
 
           slots.push({
             time: timeString,
@@ -437,6 +449,12 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   // Generate week schedule for selected doctor
   const generateWeekSchedule = (doctor, weekOffset = 0) => {
     const today = new Date();
+
+    // Consistent IST date string for today
+    const todayStr = today.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() + weekOffset * 7);
 
@@ -446,12 +464,21 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
 
-      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+      const dayName = date.toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Kolkata",
+      });
+
       const dateStr = date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
+        timeZone: "Asia/Kolkata",
       });
-      const fullDate = date.toISOString().split("T")[0];
+
+      // Use IST yyyy-mm-dd instead of UTC ISO string
+      const fullDate = date.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
 
       let slots = [];
 
@@ -472,9 +499,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         let currentTime = new Date(startTime);
 
         while (currentTime <= endTime) {
-          const timeStr = formatTime12Hour(currentTime);
+          const timeStr = currentTime.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Kolkata",
+          });
 
-          console.log(timeStr);
           // strict match for booked appointment
           const isBooked = allAppointments.some(
             (apt) =>
@@ -484,14 +515,12 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
               apt.status === "upcoming"
           );
 
-          // console.log("checking booking status");
-          console.log(isBooked && `Book on ${fullDate} at ${timeStr}`);
+          console.log(isBooked && `Booked on ${fullDate} at ${timeStr}`);
 
-          // Check if slot has already passed
+          // Consistent IST-based time check
           const timePassed =
-            fullDate < today.toISOString().split("T")[0] || // any past day
-            (fullDate === today.toISOString().split("T")[0] &&
-              currentTime < today); // same day but earlier time
+            fullDate < todayStr || // past date
+            (fullDate === todayStr && currentTime < today);
 
           slots.push({
             time: timeStr,
@@ -509,6 +538,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
     return schedule;
   };
+
 
   const [weekSchedule, setWeekSchedule] = useState([]);
 
