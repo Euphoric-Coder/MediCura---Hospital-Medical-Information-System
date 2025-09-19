@@ -62,13 +62,17 @@ const PrescriptionDetailsModal = ({
               )} flex items-center gap-1`}
             >
               {getStatusIcon(prescription.status)}
-              {/* {prescription.status.charAt(0).toUpperCase() +
-                                  prescription.status.slice(1)} */}
             </span>
             <button
               // onClick={() => onDownloadPDF(prescription)}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
-              disabled={prescription.billGenerated}
+              disabled={!prescription.billGenerated}
+              className={`bg-gradient-to-r from-green-500 to-green-600 
+              hover:from-green-600 hover:to-green-700 
+              text-white py-3 px-4 rounded-3xl 
+              text-14-semibold lg:text-16-semibold 
+              transition-all duration-300 shadow-lg 
+              hover:shadow-green-500/25 flex items-center justify-center gap-2
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-green-500 disabled:hover:to-green-600`}
             >
               <Download className="w-5 h-5" />
               Download PDF
@@ -901,8 +905,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 )} flex items-center gap-1`}
                               >
                                 {getStatusIcon(prescription.status)}
-                                {/* {prescription.status.charAt(0).toUpperCase() +
-                                  prescription.status.slice(1)} */}
                               </span>
                             </div>
                           </div>
