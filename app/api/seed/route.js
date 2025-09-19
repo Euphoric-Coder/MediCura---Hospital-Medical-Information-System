@@ -1,5 +1,5 @@
 import { db } from "@/lib/dbConfig";
-import { Doctors, Patients } from "@/lib/schema";
+import { Doctors, Patients, Pharmacists } from "@/lib/schema";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -190,56 +190,104 @@ export async function GET() {
     //   },
     // ];
 
-    const patient = [
+    // const patient = [
+    //   {
+    //     userId: "f4e9e1a8-c823-422a-b8f3-103640a99943",
+    //     name: "Sagnik Dey",
+    //     email: "deydsagnik48@gmail.com",
+    //     phone: "+91-9876543210",
+    //     dateOfBirth: "1985-04-15",
+    //     gender: "Male",
+    //     address: "23 MG Road, Indiranagar, Bengaluru, Karnataka",
+    //     occupation: "Software Engineer",
+    //     emergencyContactName: "Rohit Sharma",
+    //     emergencyPhone: "+91-9123456789",
+
+    //     primaryPhysician: "Dr. Neha Verma",
+    //     insuranceProvider: "LIC Health Insurance",
+    //     insurancePolicyNumber: "LIC-HI-2025-45879",
+    //     insurancePolicyDocument: null,
+    //     insurancePolicyDocumentId: null,
+    //     allergies: ["Peanuts", "Dust"],
+    //     currentMedications: ["Metformin", "Atorvastatin"],
+    //     familyMedicalHistory: ["Diabetes", "Hypertension"],
+    //     pastMedicalHistory: ["Appendectomy (2010)"],
+
+    //     identificationType: "Aadhaar Card",
+    //     identificationNumber: "5678-1234-9012",
+    //     identificationDocument: null,
+    //     identificationDocumentId: null,
+
+    //     treatmentConsent: true,
+    //     disclosureConsent: true,
+    //     privacyConsent: true,
+    //   },
+    // ];
+
+    const pharmacist = [
       {
-        userId: "f4e9e1a8-c823-422a-b8f3-103640a99943",
-        name: "Sagnik Dey",
-        email: "deydsagnik48@gmail.com",
+        userId: "a0442548-e117-4244-b3c0-f6ed691d3cc0", // generate a new UUID or use an existing User's ID
+
+        // Profile Info
+        name: "Ritu Sharma",
         phone: "+91-9876543210",
-        dateOfBirth: "1985-04-15",
-        gender: "Male",
-        address: "23 MG Road, Indiranagar, Bengaluru, Karnataka",
-        occupation: "Software Engineer",
-        emergencyContactName: "Rohit Sharma",
-        emergencyPhone: "+91-9123456789",
+        avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+        dateOfBirth: new Date("1985-04-12"),
+        gender: "Female",
+        address: "C-124, South Extension II, New Delhi, India",
+        emergencyContactName: "Rajesh Sharma",
+        emergencyPhone: "+91-9812345678",
 
-        primaryPhysician: "Dr. Neha Verma",
-        insuranceProvider: "LIC Health Insurance",
-        insurancePolicyNumber: "LIC-HI-2025-45879",
-        insurancePolicyDocument: null,
-        insurancePolicyDocumentId: null,
-        allergies: ["Peanuts", "Dust"],
-        currentMedications: ["Metformin", "Atorvastatin"],
-        familyMedicalHistory: ["Diabetes", "Hypertension"],
-        pastMedicalHistory: ["Appendectomy (2010)"],
+        // Professional Info
+        pharmacyLicenseNumber: "DL-23456/2025",
+        pharmacyType: "Retail",
+        currentPharmacy: "Apollo Pharmacy, South Extension II, New Delhi",
+        yearsOfExperience: 12,
+        specializations: "Chronic Care, Geriatrics, Pediatrics",
 
-        identificationType: "Aadhaar Card",
-        identificationNumber: "5678-1234-9012",
-        identificationDocument: null,
-        identificationDocumentId: null,
+        // Education
+        pharmacySchool:
+          "Delhi Institute of Pharmaceutical Sciences and Research (DIPSAR)",
+        graduationYear: "2008",
+        residencyProgram: "Hospital Pharmacy Residency - AIIMS New Delhi",
+        certifications: "Drug Safety Certification, Clinical Pharmacology",
+        continuingEducation:
+          "Annual CME workshops in Clinical Pharmacy, Diabetes Care Training",
 
-        treatmentConsent: true,
-        disclosureConsent: true,
-        privacyConsent: true,
+        // Practice
+        workSchedule: "Mon-Sat, 9:00 AM - 7:00 PM",
+        languagesSpoken: "English, Hindi",
+        clinicalServices:
+          "Medication Therapy Management, Immunization Counseling, Chronic Disease Support",
+        insuranceExperience:
+          "Handled Mediclaim and cashless pharmacy insurance claims with Apollo Pharmacy",
+
+        // Consent
+        practiceConsent: true,
+        dataConsent: true,
+        regulatoryConsent: true,
+
+        // Onboarding
+        hasOnboarded: true,
       },
     ];
 
     // console.log(dummyDoctors);
 
     try {
-      await db.insert(Patients).values(patient);
+      await db.insert(Pharmacists).values(pharmacist);
     } catch (error) {
       console.log(error);
     }
 
     return NextResponse.json({
       // message: "6 dummy doctors seeded successfully (India-specific)!",
-      message: "1 dummy patient seeded successfully!",
+      message: "1 dummy pharmacist data seeded successfully!",
     });
   } catch (error) {
-    console.error("Error seeding doctors:", error);
+    console.error("Error seeding pharmacist:", error);
     return NextResponse.json(
-      { error: "Failed to seed doctors" },
+      { error: "Failed to seed pharmacists" },
       { status: 500 }
     );
   }

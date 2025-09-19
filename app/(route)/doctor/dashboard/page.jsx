@@ -98,7 +98,7 @@ export default function PatientPage() {
           <h2 className="text-24-bold text-white mb-4">Access Denied</h2>
           <p className="text-dark-600 text-16-regular mb-6">
             Hello <span className="text-white">{userName || "User"}</span>, you
-            don’t have access to the Patient Dashboard. Please proceed to your{" "}
+            don’t have access to the Doctor Dashboard. Please proceed to your{" "}
             <span className="text-green-400">{role}</span> dashboard.
           </p>
           <button

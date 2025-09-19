@@ -235,25 +235,37 @@ export const Pharmacists = pgTable("pharmacists", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
+  // Profile
+  name: varchar("name"),
+  phone: varchar("phone"),
+  avatar: varchar("avatar"),
+  dateOfBirth: date("dateOfBirth"),
+  gender: varchar("gender"),
+  address: varchar("address"),
+  emergencyContactName: varchar("emergencyContactName"),
+  emergencyPhone: varchar("emergencyPhone"),
+
+  // Professional
   pharmacyLicenseNumber: varchar("pharmacyLicenseNumber"),
-  deaNumber: varchar("deaNumber"),
-  npiNumber: varchar("npiNumber"),
   pharmacyType: varchar("pharmacyType"),
   currentPharmacy: varchar("currentPharmacy"),
   yearsOfExperience: integer("yearsOfExperience"),
   specializations: text("specializations"),
 
+  // Education
   pharmacySchool: varchar("pharmacySchool"),
   graduationYear: varchar("graduationYear", { length: 4 }),
   residencyProgram: varchar("residencyProgram"),
   certifications: text("certifications"),
   continuingEducation: text("continuingEducation"),
 
+  // Practice Details
   workSchedule: varchar("workSchedule"),
   languagesSpoken: text("languagesSpoken"),
   clinicalServices: text("clinicalServices"),
   insuranceExperience: text("insuranceExperience"),
 
+  // Consent
   practiceConsent: boolean("practiceConsent").default(true),
   dataConsent: boolean("dataConsent").default(true),
   regulatoryConsent: boolean("regulatoryConsent").default(true),
