@@ -30,7 +30,7 @@ The project is currently in **active development** with role-based authenticatio
   - Write consultation notes (clinical history, assessment, plan)
   - Recommend lab tests & prescribe medicines  
   - Discontinue medicines when required
-- 🔄 **More features** – *under development (advanced workflow, analytics, etc.)*
+- **More features** – *under development (advanced workflow, analytics, etc.)*
 
 ---
 
@@ -54,7 +54,7 @@ The project is currently in **active development** with role-based authenticatio
 
 ---
 
-## 🎨 UI/UX
+## UI/UX
 - **UI design completed** using modern components and a dark-themed gradient system  
 - Currently working on **connecting the UI with backend APIs & database**  
 
@@ -76,7 +76,7 @@ The project is currently in **active development** with role-based authenticatio
 
 ---
 
-## 📌 Roadmap
+## Roadmap
 - [i] Patient onboarding & appointment system  
 - [ii] Doctor consultation workflow  
 - [iii] Pharmacist & Receptionist workflow  
