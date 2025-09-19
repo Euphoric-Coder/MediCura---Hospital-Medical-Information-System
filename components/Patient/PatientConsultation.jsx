@@ -16,6 +16,8 @@ import {
   NotepadTextDashed,
   Check,
   AlarmClock,
+  CircleX,
+  AlertCircle,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import {
@@ -27,6 +29,7 @@ import {
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/dbConfig";
 import { format, set } from "date-fns";
+import { Button } from "../ui/button";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -172,12 +175,21 @@ const PatientConsultation = ({ onBack, patientData }) => {
   const [consultationPrescriptions, setConsultationPrescriptions] = useState(
     []
   );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchConsultationsWithPrescriptions(patientData.userId);
+    try {
+      fetchConsultationsWithPrescriptions(patientData.userId);
+    } catch (error) {
+      console.error("Error fetching consultations:", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
   }, [patientData]);
 
-  const updateMedicineStatus = async (id) => {
+  const orderMedicine = async (id) => {
     try {
       const updateStatus = await db
         .update(Prescriptions)
@@ -186,6 +198,24 @@ const PatientConsultation = ({ onBack, patientData }) => {
           updatedAt: new Date(),
         })
         .where(eq(Prescriptions.id, id));
+
+      refreshPrescriptions();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const requestCancellation = async (id) => {
+    try {
+      const updateStatus = await db
+        .update(Prescriptions)
+        .set({
+          status: "request-cancellation",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, id));
+
+      refreshPrescriptions();
     } catch (error) {
       console.log(error);
     }
@@ -207,6 +237,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
           followUpDate: Consultations.nextAppointment,
 
           doctor: Doctors.name,
+          doctorId: Doctors.userId,
           doctorSpecialty: Doctors.speciality,
 
           appointmentType: Appointments.type,
@@ -236,6 +267,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
         id: c.id,
         consultationDate: c.consultationDate.toString(),
         doctor: c.doctor,
+        doctorId: c.doctorId,
         doctorSpecialty: c.doctorSpecialty,
         appointmentType: c.appointmentType,
         diagnosis: c.diagnosis,
@@ -253,6 +285,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
             dosage: p.dosage,
             frequency: p.frequency,
             duration: p.duration,
+            doctorId: c.doctorId,
             prescribedBy: c.doctor,
             prescribedDate: c.consultationDate
               ? new Date(c.consultationDate).toLocaleDateString()
@@ -288,12 +321,17 @@ const PatientConsultation = ({ onBack, patientData }) => {
     }
   };
 
+  const refreshPrescriptions = () => {
+    fetchConsultationsWithPrescriptions(patientData.userId);
+  };
+
   // Flatten all prescriptions from consultations
   const allPrescriptions = consultationPrescriptions.flatMap(
     (consultation) => consultation.prescriptions
   );
 
   const filteredPrescriptions = allPrescriptions.filter((prescription) => {
+    console.log(prescription);
     const matchesSearch =
       prescription.medication
         .toLowerCase()
@@ -310,12 +348,25 @@ const PatientConsultation = ({ onBack, patientData }) => {
     switch (status) {
       case "active":
         return "bg-green-500/20 text-green-400 border-green-500/30";
+
       case "completed":
         return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+
       case "discontinued":
         return "bg-red-500/20 text-red-400 border-red-500/30";
+
       case "pending":
         return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+
+      case "ordered":
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+
+      case "recommended":
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+
+      case "request-cancellation":
+        return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
@@ -324,15 +375,61 @@ const PatientConsultation = ({ onBack, patientData }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case "active":
-        return <CheckCircle className="w-4 h-4" />;
+        return (
+          <p className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4" />
+            Active
+          </p>
+        );
+
       case "completed":
-        return <CheckCircle className="w-4 h-4" />;
+        return (
+          <p className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4" />
+            Course Completed
+          </p>
+        );
+
       case "discontinued":
-        return <X className="w-4 h-4" />;
+        return (
+          <p className="flex items-center gap-2">
+            <X className="w-4 h-4" />
+            Discontinued By Doctor
+          </p>
+        );
+
       case "pending":
-        return <Clock className="w-4 h-4" />;
+        return (
+          <p className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Pending Dispensing By Pharmacist
+          </p>
+        );
+
       case "ordered":
-        return <AlarmClock className="w-4 h-4" />;
+        return (
+          <p className="flex items-center gap-2">
+            <AlarmClock className="w-4 h-4" />
+            Ordered: Pending Approval
+          </p>
+        );
+
+      case "recommended":
+        return (
+          <p className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            Recommended By Doctor
+          </p>
+        );
+
+      case "request-cancellation":
+        return (
+          <p className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            Requested Cancellation To Doctor
+          </p>
+        );
+
       default:
         return <Clock className="w-4 h-4" />;
     }
@@ -397,6 +494,19 @@ const PatientConsultation = ({ onBack, patientData }) => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white text-lg font-bold">
+            Loading your prescriptions...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
       {/* Header */}
@@ -431,7 +541,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
                 placeholder="Search medicines or doctors..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
+                className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-3xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
               />
             </div>
             <select
@@ -446,6 +556,16 @@ const PatientConsultation = ({ onBack, patientData }) => {
               <option value="pending">Pending</option>
             </select>
           </div>
+        </div>
+
+        <div className="flex justify-end mb-4">
+          <Button
+            onClick={refreshPrescriptions(patientData.userId)}
+            className="btn2"
+          >
+            <RefreshCw />
+            Refresh Prescriptions
+          </Button>
         </div>
 
         {/* Consultation Prescriptions */}
@@ -645,23 +765,33 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 )} flex items-center gap-1`}
                               >
                                 {getStatusIcon(prescription.status)}
-                                {prescription.status.charAt(0).toUpperCase() +
-                                  prescription.status.slice(1)}
+                                {/* {prescription.status.charAt(0).toUpperCase() +
+                                  prescription.status.slice(1)} */}
                               </span>
                             </div>
                           </div>
                         </div>
 
                         {prescription.status === "recommended" && (
-                          <button
-                            onClick={() =>
-                              updateMedicineStatus(prescription.id)
-                            }
-                            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                          >
-                            <Check className="w-4 h-4 lg:w-5 lg:h-5" />
-                            Order
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              onClick={() => orderMedicine(prescription.id)}
+                              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
+                            >
+                              <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
+                              Order Medicine
+                            </Button>
+
+                            <Button
+                              onClick={() =>
+                                requestCancellation(prescription.id)
+                              }
+                              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
+                            >
+                              <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
+                              Cancel Medicine
+                            </Button>
+                          </div>
                         )}
 
                         {prescription.status === "active" && (
