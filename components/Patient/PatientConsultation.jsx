@@ -13,6 +13,7 @@ import {
   X,
   RefreshCw,
   Stethoscope,
+  NotepadTextDashed,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import {
@@ -116,43 +117,6 @@ const PrescriptionDetailsModal = ({
             </div>
           )}
 
-          {/* Refill Information */}
-          <div className="bg-dark-500/30 rounded-2xl p-6 mb-6">
-            <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
-              Refill Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-14-regular text-dark-700">
-              <div>
-                <span className="text-white">Refills Left:</span>{" "}
-                {prescription.refillsLeft}
-              </div>
-              <div>
-                <span className="text-white">Total Refills:</span>{" "}
-                {prescription.totalRefills}
-              </div>
-              <div>
-                <span className="text-white">Cost:</span> $
-                {prescription.cost.toFixed(2)}
-              </div>
-              {prescription.lastRefillDate && (
-                <div>
-                  <span className="text-white">Last Refill:</span>{" "}
-                  {prescription.lastRefillDate}
-                </div>
-              )}
-              {prescription.nextRefillDate && (
-                <div>
-                  <span className="text-white">Next Refill:</span>{" "}
-                  {prescription.nextRefillDate}
-                </div>
-              )}
-              <div>
-                <span className="text-white">Pharmacy:</span>{" "}
-                {prescription.pharmacy}
-              </div>
-            </div>
-          </div>
-
           {/* Instructions */}
           <div className="bg-blue-500/10 rounded-2xl p-6 mb-6">
             <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
@@ -191,17 +155,6 @@ const PrescriptionDetailsModal = ({
               <Download className="w-5 h-5" />
               Download PDF
             </button>
-
-            {prescription.status === "active" &&
-              prescription.refillsLeft > 0 && (
-                <button
-                  onClick={() => onRequestRefill(prescription.i)}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                  Request Refill
-                </button>
-              )}
           </div>
         </div>
       </div>
@@ -263,47 +216,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
         .from(Prescriptions)
         .where(inArray(Prescriptions.consultationId, consultationIds));
 
-      // Group prescriptions by consultation
-      console.log(
-        consultations.map((c) => ({
-          id: c.id,
-          consultationDate: c.consultationDate,
-          doctor: c.doctor,
-          doctorSpecialty: c.doctorSpecialty,
-          appointmentType: c.appointmentType,
-          diagnosis: Array.isArray(c.diagnosis)
-            ? c.diagnosis.join(", ")
-            : c.diagnosis,
-          consultationNotes: Array.isArray(c.consultationNotes)
-            ? c.consultationNotes.join(", ")
-            : c.consultationNotes,
-          followUpDate: c.followUpDate,
-          prescriptions: prescriptions
-            .filter((p) => p.consultationId === c.id)
-            .map((p) => ({
-              id: p.id,
-              medication: p.medication,
-              dosage: p.dosage,
-              frequency: p.frequency,
-              duration: p.duration,
-              prescribedBy: c.doctor,
-              prescribedDate: c.consultationDate,
-              startDate: p.startDate || c.consultationDate,
-              endDate: p.endDate || null,
-              status: p.status,
-              refillsLeft: p.refillsLeft ?? 0,
-              totalRefills: p.totalRefills ?? 0,
-              instructions: p.instructions,
-              sideEffects: p.sideEffects ?? [],
-              cost: p.cost ?? 0,
-              pharmacy: p.pharmacy ?? "",
-              consultationId: p.consultationId,
-              appointmentDate: c.appointmentDate,
-              reason: c.reason,
-            })),
-        }))
-      );
-
       const data = consultations.map((c) => ({
         id: c.id,
         consultationDate: c.consultationDate
@@ -312,24 +224,12 @@ const PatientConsultation = ({ onBack, patientData }) => {
         doctor: c.doctor,
         doctorSpecialty: c.doctorSpecialty,
         appointmentType: c.appointmentType,
-        diagnosis: Array.isArray(c.diagnosis)
-          ? c.diagnosis.join(", ")
-          : c.diagnosis,
-          chiefComplaint: Array.isArray(c.chiefComplaint)
-          ? c.chiefComplaint.join(", ")
-          : c.chiefComplaint,
-          historyOfPresentIllness: Array.isArray(c.historyOfPresentIllness)
-          ? c.historyOfPresentIllness.join(", ")
-          : c.historyOfPresentIllness,
-          physicalExamination: Array.isArray(c.physicalExamination)
-          ? c.physicalExamination.join(", ")
-          : c.physicalExamination,
-          followUpInstructions: Array.isArray(c.followUpInstructions)
-          ? c.followUpInstructions.join(", ")
-          : c.followUpInstructions,
-        consultationNotes: Array.isArray(c.consultationNotes)
-          ? c.consultationNotes.join(", ")
-          : c.consultationNotes,
+        diagnosis: c.diagnosis,
+        chiefComplaint: c.chiefComplaint,
+        historyOfPresentIllness: c.historyOfPresentIllness,
+        physicalExamination: c.physicalExamination,
+        followUpInstructions: c.followUpInstructions,
+        consultationNotes: c.consultationNotes,
         followUpDate: c.followUpDate
           ? new Date(c.followUpDate).toLocaleDateString()
           : null,
@@ -354,12 +254,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
               ? new Date(p.endDate).toLocaleDateString()
               : null,
             status: p.status,
-            refillsLeft: p.refillsLeft ?? 0,
-            totalRefills: p.totalRefills ?? 0,
             instructions: p.instructions,
             sideEffects: p.sideEffects ?? [],
             cost: p.cost ?? 0,
-            pharmacy: p.pharmacy ?? "",
             consultationId: p.consultationId,
             appointmentDate: c.appointmentDate
               ? new Date(c.appointmentDate).toLocaleDateString()
@@ -367,7 +264,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
             reason: c.reason,
           })),
       }));
-
 
       console.log(data);
 
@@ -379,135 +275,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
       return [];
     }
   };
-
-  // Mock consultation prescriptions data
-  // const consultationPrescriptions = [
-  //   {
-  //     id: "cons-001",
-  //     consultationDate: "2024-01-15",
-  //     doctor: "Dr. Sarah Safari",
-  //     doctorSpecialty: "General Medicine",
-  //     appointmentType: "Regular Consultation",
-  //     diagnosis: "Hypertension and mild anxiety",
-  //     consultationNotes:
-  //       "Patient presented with elevated blood pressure readings. Recommended lifestyle changes and medication management.",
-  //     followUpDate: "2024-02-15",
-  //     prescriptions: [
-  //       {
-  //         id: "rx-001",
-  //         medication: "Lisinopril",
-  //         dosage: "10mg",
-  //         frequency: "Once daily",
-  //         duration: "30 days",
-  //         prescribedBy: "Dr. Sarah Safari",
-  //         prescribedDate: "2024-01-15",
-  //         startDate: "2024-01-15",
-  //         endDate: "2024-02-14",
-  //         status: "active",
-  //         refillsLeft: 2,
-  //         totalRefills: 3,
-  //         instructions:
-  //           "Take with food in the morning. Monitor blood pressure daily.",
-  //         sideEffects: ["Dizziness", "Dry cough", "Fatigue"],
-  //         cost: 25.99,
-  //         pharmacy: "MediCura Pharmacy",
-  //         consultationId: "cons-001",
-  //         appointmentDate: "2024-01-15",
-  //         reason: "High blood pressure management",
-  //       },
-  //       {
-  //         id: "rx-002",
-  //         medication: "Alprazolam",
-  //         dosage: "0.25mg",
-  //         frequency: "As needed",
-  //         duration: "30 days",
-  //         prescribedBy: "Dr. Sarah Safari",
-  //         prescribedDate: "2024-01-15",
-  //         startDate: "2024-01-15",
-  //         endDate: "2024-02-14",
-  //         status: "active",
-  //         refillsLeft: 1,
-  //         totalRefills: 2,
-  //         instructions:
-  //           "Take only when experiencing anxiety. Do not exceed 2 tablets per day.",
-  //         sideEffects: ["Drowsiness", "Dizziness", "Memory problems"],
-  //         cost: 18.5,
-  //         pharmacy: "MediCura Pharmacy",
-  //         consultationId: "cons-001",
-  //         appointmentDate: "2024-01-15",
-  //         reason: "Anxiety management",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "cons-002",
-  //     consultationDate: "2024-01-08",
-  //     doctor: "Dr. Michael Chen",
-  //     doctorSpecialty: "Cardiology",
-  //     appointmentType: "Follow-up",
-  //     diagnosis: "Post-cardiac event monitoring",
-  //     consultationNotes:
-  //       "Patient recovering well from recent cardiac event. Continue current medication regimen.",
-  //     prescriptions: [
-  //       {
-  //         id: "rx-003",
-  //         medication: "Metoprolol",
-  //         dosage: "50mg",
-  //         frequency: "Twice daily",
-  //         duration: "90 days",
-  //         prescribedBy: "Dr. Michael Chen",
-  //         prescribedDate: "2024-01-08",
-  //         startDate: "2024-01-08",
-  //         endDate: "2024-04-08",
-  //         status: "active",
-  //         refillsLeft: 3,
-  //         totalRefills: 5,
-  //         instructions:
-  //           "Take with meals. Do not stop suddenly without consulting doctor.",
-  //         sideEffects: ["Fatigue", "Cold hands/feet", "Dizziness"],
-  //         cost: 32.75,
-  //         pharmacy: "MediCura Pharmacy",
-  //         consultationId: "cons-002",
-  //         appointmentDate: "2024-01-08",
-  //         reason: "Cardiac monitoring and management",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "cons-003",
-  //     consultationDate: "2023-12-20",
-  //     doctor: "Dr. Sarah Safari",
-  //     doctorSpecialty: "General Medicine",
-  //     appointmentType: "Sick Visit",
-  //     diagnosis: "Bacterial infection - completed treatment",
-  //     consultationNotes:
-  //       "Patient completed full course of antibiotics. Infection cleared successfully.",
-  //     prescriptions: [
-  //       {
-  //         id: "rx-004",
-  //         medication: "Amoxicillin",
-  //         dosage: "500mg",
-  //         frequency: "Three times daily",
-  //         duration: "10 days",
-  //         prescribedBy: "Dr. Sarah Safari",
-  //         prescribedDate: "2023-12-20",
-  //         startDate: "2023-12-20",
-  //         endDate: "2023-12-30",
-  //         status: "completed",
-  //         refillsLeft: 0,
-  //         totalRefills: 0,
-  //         instructions:
-  //           "Take with food. Complete entire course even if feeling better.",
-  //         sideEffects: ["Nausea", "Diarrhea", "Stomach upset"],
-  //         cost: 15.25,
-  //         pharmacy: "MediCura Pharmacy",
-  //         consultationId: "cons-003",
-  //         appointmentDate: "2023-12-20",
-  //         reason: "Bacterial infection treatment",
-  //       },
-  //     ],
-  //   },
-  // ];
 
   // Flatten all prescriptions from consultations
   const allPrescriptions = consultationPrescriptions.flatMap(
@@ -616,13 +383,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
     );
   };
 
-  const handleRequestRefill = (prescriptionId) => {
-    // In a real app, this would make an API call
-    alert(
-      "Refill request submitted successfully! You will be notified when it's ready for pickup."
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
       {/* Header */}
@@ -702,16 +462,115 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
                 <div className="space-y-2 text-14-regular text-dark-700">
                   <div>
-                    <span className="text-white font-medium">Diagnosis:</span>{" "}
-                    {consultation.diagnosis}
+                    <span className="text-white font-medium">
+                      Chief Complaint:
+                    </span>
+                    {Array.isArray(consultation.chiefComplaint) &&
+                    consultation.chiefComplaint.length > 0 ? (
+                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                        {consultation.chiefComplaint.map((item, index) => (
+                          <li
+                            key={index}
+                            className="text-14-regular text-dark-700"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-dark-700">No diagnosis provided</p>
+                    )}
                   </div>
+
                   <div>
-                    <span className="text-white font-medium">Notes:</span>{" "}
-                    {consultation.consultationNotes}
+                    <span className="text-white font-medium">
+                      History of Present Illness:
+                    </span>
+                    {Array.isArray(consultation.historyOfPresentIllness) &&
+                    consultation.historyOfPresentIllness.length > 0 ? (
+                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                        {consultation.historyOfPresentIllness.map(
+                          (item, index) => (
+                            <li
+                              key={index}
+                              className="text-14-regular text-dark-700"
+                            >
+                              {item}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="text-dark-700">No diagnosis provided</p>
+                    )}
                   </div>
+
+                  <div>
+                    <span className="text-white font-medium">
+                      Physical Examination:
+                    </span>
+                    {Array.isArray(consultation.physicalExamination) &&
+                    consultation.physicalExamination.length > 0 ? (
+                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                        {consultation.physicalExamination.map((item, index) => (
+                          <li
+                            key={index}
+                            className="text-14-regular text-dark-700"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-dark-700">No diagnosis provided</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <span className="text-white font-medium">Diagnosis:</span>
+                    {Array.isArray(consultation.diagnosis) &&
+                    consultation.diagnosis.length > 0 ? (
+                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                        {consultation.diagnosis.map((item, index) => (
+                          <li
+                            key={index}
+                            className="text-14-regular text-dark-700"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-dark-700">No diagnosis provided</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <span className="text-white font-medium">
+                      Consultation Notes:
+                    </span>
+                    {Array.isArray(consultation.consultationNotes) &&
+                    consultation.consultationNotes.length > 0 ? (
+                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                        {consultation.consultationNotes.map((item, index) => (
+                          <li
+                            key={index}
+                            className="text-14-regular text-dark-700"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-dark-700">No diagnosis provided</p>
+                    )}
+                  </div>
+
                   {consultation.followUpDate && (
                     <div>
-                      <span className="text-white font-medium">Follow-up:</span>{" "}
+                      <span className="text-white font-medium">
+                        Expected Follow-up Date:
+                      </span>{" "}
                       {consultation.followUpDate}
                     </div>
                   )}
@@ -767,11 +626,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 {prescription.status.charAt(0).toUpperCase() +
                                   prescription.status.slice(1)}
                               </span>
-                              {prescription.status === "active" && (
-                                <span className="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-12-medium">
-                                  {prescription.refillsLeft} refills left
-                                </span>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -789,17 +643,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
                           >
                             <Download className="w-4 h-4 lg:w-5 lg:h-5" />
                           </button>
-                          {prescription.status === "active" &&
-                            prescription.refillsLeft > 0 && (
-                              <button
-                                onClick={() =>
-                                  handleRequestRefill(prescription.id)
-                                }
-                                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                              >
-                                <RefreshCw className="w-4 h-4 lg:w-5 lg:h-5" />
-                              </button>
-                            )}
                         </div>
                       </div>
                     </div>
@@ -813,9 +656,11 @@ const PatientConsultation = ({ onBack, patientData }) => {
         {filteredPrescriptions.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Pill className="w-8 h-8 text-white" />
+              <NotepadTextDashed className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-18-bold text-white mb-2">No medicines found</h3>
+            <h3 className="text-18-bold text-white mb-2">
+              No Prescription found
+            </h3>
             <p className="text-14-regular text-dark-700">
               Try adjusting your search or filter criteria
             </p>
@@ -837,7 +682,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
         onClose={() => setIsModalOpen(false)}
         prescription={selectedPrescription}
         onDownloadPDF={handleDownloadPDF}
-        onRequestRefill={handleRequestRefill}
       />
     </div>
   );

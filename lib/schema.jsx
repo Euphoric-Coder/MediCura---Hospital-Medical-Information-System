@@ -197,6 +197,8 @@ export const Prescriptions = pgTable("prescriptions", {
   status: varchar("status").default("recommended"), // ordered, completed, pending
   medicineValidity: varchar("medicineValidity"),
   prescribedDuration: varchar("prescribedDuration"),
+  sideEffects: jsonb("sideEffects"),
+  cost: numeric("cost"),
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
@@ -217,7 +219,6 @@ export const LabTests = pgTable("lab_tests", {
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
-
 
 // Pharmacist Table
 export const Pharmacists = pgTable("pharmacists", {
