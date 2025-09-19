@@ -24,7 +24,7 @@ import {
 } from "@/lib/schema";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/dbConfig";
-import { set } from "date-fns";
+import { format, set } from "date-fns";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -218,9 +218,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
       const data = consultations.map((c) => ({
         id: c.id,
-        consultationDate: c.consultationDate
-          ? new Date(c.consultationDate).toLocaleDateString()
-          : null,
+        consultationDate: c.consultationDate.toString(),
         doctor: c.doctor,
         doctorSpecialty: c.doctorSpecialty,
         appointmentType: c.appointmentType,
@@ -230,9 +228,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
         physicalExamination: c.physicalExamination,
         followUpInstructions: c.followUpInstructions,
         consultationNotes: c.consultationNotes,
-        followUpDate: c.followUpDate
-          ? new Date(c.followUpDate).toLocaleDateString()
-          : null,
+        followUpDate: c.followUpDate,
         prescriptions: prescriptions
           .filter((p) => p.consultationId === c.id)
           .map((p) => ({
@@ -452,7 +448,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
                       {consultation.appointmentType}
                     </h3>
                     <p className="text-12-regular lg:text-14-regular text-green-400">
-                      {consultation.consultationDate}
+                      {format(consultation.consultationDate, "PPP")}
                     </p>
                     <p className="text-12-regular lg:text-14-regular text-dark-700">
                       {consultation.doctor} - {consultation.doctorSpecialty}
@@ -571,7 +567,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
                       <span className="text-white font-medium">
                         Expected Follow-up Date:
                       </span>{" "}
-                      {consultation.followUpDate}
+                      {format(consultation.followUpDate, "PPP")}
                     </div>
                   )}
                 </div>
