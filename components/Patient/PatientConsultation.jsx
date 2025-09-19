@@ -14,6 +14,8 @@ import {
   RefreshCw,
   Stethoscope,
   NotepadTextDashed,
+  Check,
+  AlarmClock,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import {
@@ -175,6 +177,20 @@ const PatientConsultation = ({ onBack, patientData }) => {
     fetchConsultationsWithPrescriptions(patientData.userId);
   }, [patientData]);
 
+  const updateMedicineStatus = async (id) => {
+    try {
+      const updateStatus = await db
+        .update(Prescriptions)
+        .set({
+          status: "ordered",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const fetchConsultationsWithPrescriptions = async (patientId) => {
     try {
       // Fetch consultations + doctor + appointment
@@ -315,6 +331,8 @@ const PatientConsultation = ({ onBack, patientData }) => {
         return <X className="w-4 h-4" />;
       case "pending":
         return <Clock className="w-4 h-4" />;
+      case "ordered":
+        return <AlarmClock className="w-4 h-4" />;
       default:
         return <Clock className="w-4 h-4" />;
     }
@@ -474,7 +492,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-dark-700">No diagnosis provided</p>
+                      <p className="text-dark-700">
+                        No Chief Complaint provided
+                      </p>
                     )}
                   </div>
 
@@ -497,7 +517,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
                         )}
                       </ul>
                     ) : (
-                      <p className="text-dark-700">No diagnosis provided</p>
+                      <p className="text-dark-700">
+                        No History of Present Illness provided
+                      </p>
                     )}
                   </div>
 
@@ -518,7 +540,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-dark-700">No diagnosis provided</p>
+                      <p className="text-dark-700">
+                        No Physical Examination provided
+                      </p>
                     )}
                   </div>
 
@@ -558,7 +582,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-dark-700">No diagnosis provided</p>
+                      <p className="text-dark-700">
+                        No Consultation Notes provided
+                      </p>
                     )}
                   </div>
 
@@ -626,20 +652,34 @@ const PatientConsultation = ({ onBack, patientData }) => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 lg:gap-3">
+                        {prescription.status === "recommended" && (
                           <button
-                            onClick={() => handleViewDetails(prescription)}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                            onClick={() =>
+                              updateMedicineStatus(prescription.id)
+                            }
+                            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
                           >
-                            <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
+                            <Check className="w-4 h-4 lg:w-5 lg:h-5" />
+                            Order
                           </button>
-                          <button
-                            onClick={() => handleDownloadPDF(prescription)}
-                            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                          >
-                            <Download className="w-4 h-4 lg:w-5 lg:h-5" />
-                          </button>
-                        </div>
+                        )}
+
+                        {prescription.status === "active" && (
+                          <div className="flex items-center gap-2 lg:gap-3">
+                            <button
+                              onClick={() => handleViewDetails(prescription)}
+                              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                            >
+                              <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDownloadPDF(prescription)}
+                              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                            >
+                              <Download className="w-4 h-4 lg:w-5 lg:h-5" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
