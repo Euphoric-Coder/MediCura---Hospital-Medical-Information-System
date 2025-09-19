@@ -197,11 +197,13 @@ export const Prescriptions = pgTable("prescriptions", {
   startDate: varchar("startDate"),
   endDate: varchar("endDate"),
 
-  status: varchar("status").default("recommended"), // ordered, completed, pending
+  status: varchar("status").default("recommended"), // ordered, completed, pending, cancelled, request-calcellation, discontinued
   medicineValidity: varchar("medicineValidity"),
   prescribedDuration: varchar("prescribedDuration"),
   sideEffects: jsonb("sideEffects"),
   cost: numeric("cost"),
+
+  billGenerated: boolean("billGenerated").default(false),
 
   createdAt: timestamp("createdAt").defaultNow(),
 });

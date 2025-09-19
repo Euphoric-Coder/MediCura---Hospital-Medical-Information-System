@@ -35,7 +35,6 @@ const PrescriptionDetailsModal = ({
   isOpen,
   onClose,
   prescription,
-  onDownloadPDF,
   onRequestRefill,
 }) => {
   if (!isOpen || !prescription) return null;
@@ -53,6 +52,26 @@ const PrescriptionDetailsModal = ({
               className="text-dark-600 hover:text-white transition-colors"
             >
               <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="flex justify-end mb-3 gap-3">
+            <span
+              className={`px-3 py-1 rounded-full text-12-medium border ${getStatusColor(
+                prescription.status
+              )} flex items-center gap-1`}
+            >
+              {getStatusIcon(prescription.status)}
+              {/* {prescription.status.charAt(0).toUpperCase() +
+                                  prescription.status.slice(1)} */}
+            </span>
+            <button
+              // onClick={() => onDownloadPDF(prescription)}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
+              disabled={prescription.billGenerated}
+            >
+              <Download className="w-5 h-5" />
+              Download PDF
             </button>
           </div>
 
@@ -83,16 +102,22 @@ const PrescriptionDetailsModal = ({
               </div>
               <div>
                 <span className="text-white">Start Date:</span>{" "}
-                {format(prescription.startDate, "PPP")}
+                {prescription.startDate
+                  ? format(prescription.startDate, "PPP")
+                  : "NA"}
               </div>
               <div>
                 <span className="text-white">End Date:</span>{" "}
-                {prescription.endDate}
+                {prescription.endDate
+                  ? format(prescription.endDate, "PPP")
+                  : "NA"}
               </div>
               {prescription.appointmentDate && (
                 <div className="md:col-span-2">
                   <span className="text-white">From Consultation:</span>{" "}
-                  {prescription.appointmentDate}
+                  {prescription.appointmentDate
+                    ? format(prescription.appointmentDate, "PPP")
+                    : "NA"}
                 </div>
               )}
             </div>
@@ -116,7 +141,9 @@ const PrescriptionDetailsModal = ({
                 </div>
                 <div>
                   <span className="text-white">Appointment Date:</span>{" "}
-                  {prescription.appointmentDate}
+                  {prescription.appointmentDate
+                    ? format(prescription.appointmentDate, "PPP")
+                    : "NA"}
                 </div>
               </div>
             </div>
@@ -133,7 +160,7 @@ const PrescriptionDetailsModal = ({
           </div>
 
           {/* Side Effects */}
-          {prescription.sideEffects.length > 0 && (
+          {prescription.sideEffects.length > 0 ? (
             <div className="bg-red-500/10 rounded-2xl p-6 mb-6">
               <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
                 Possible Side Effects
@@ -149,22 +176,113 @@ const PrescriptionDetailsModal = ({
                 ))}
               </div>
             </div>
+          ) : (
+            <div className="bg-red-500/10 rounded-2xl p-6 mb-6">
+              <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
+                Possible Side Effects
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-12-medium text-red-400">
+                  No Side Effects
+                </span>
+              </div>
+            </div>
           )}
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              onClick={() => onDownloadPDF(prescription)}
-              className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              Download PDF
-            </button>
-          </div>
         </div>
       </div>
     </div>
   );
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "active":
+      return "bg-green-500/20 text-green-400 border-green-500/30";
+
+    case "completed":
+      return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+
+    case "discontinued":
+      return "bg-red-500/20 text-red-400 border-red-500/30";
+
+    case "pending":
+      return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+
+    case "ordered":
+      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+
+    case "recommended":
+      return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+
+    case "request-cancellation":
+      return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+
+    default:
+      return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+  }
+};
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case "active":
+      return (
+        <p className="flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          Active
+        </p>
+      );
+
+    case "completed":
+      return (
+        <p className="flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          Course Completed
+        </p>
+      );
+
+    case "discontinued":
+      return (
+        <p className="flex items-center gap-2">
+          <X className="w-4 h-4" />
+          Discontinued By Doctor
+        </p>
+      );
+
+    case "pending":
+      return (
+        <p className="flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          Pending Dispensing By Pharmacist
+        </p>
+      );
+
+    case "ordered":
+      return (
+        <p className="flex items-center gap-2">
+          <AlarmClock className="w-4 h-4" />
+          Ordered: Pending Approval
+        </p>
+      );
+
+    case "recommended":
+      return (
+        <p className="flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4" />
+          Recommended By Doctor
+        </p>
+      );
+
+    case "request-cancellation":
+      return (
+        <p className="flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          Requested Cancellation To Doctor
+        </p>
+      );
+
+    default:
+      return <Clock className="w-4 h-4" />;
+  }
 };
 
 const PatientConsultation = ({ onBack, patientData }) => {
@@ -178,48 +296,20 @@ const PatientConsultation = ({ onBack, patientData }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      fetchConsultationsWithPrescriptions(patientData.userId);
-    } catch (error) {
-      console.error("Error fetching consultations:", error);
-    } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    }
-  }, [patientData]);
+    const fetchData = async () => {
+      try {
+        await fetchConsultationsWithPrescriptions(patientData.userId);
+      } catch (error) {
+        console.error("Error fetching consultations:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+      }
+    };
 
-  const orderMedicine = async (id) => {
-    try {
-      const updateStatus = await db
-        .update(Prescriptions)
-        .set({
-          status: "ordered",
-          updatedAt: new Date(),
-        })
-        .where(eq(Prescriptions.id, id));
-
-      refreshPrescriptions();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const requestCancellation = async (id) => {
-    try {
-      const updateStatus = await db
-        .update(Prescriptions)
-        .set({
-          status: "request-cancellation",
-          updatedAt: new Date(),
-        })
-        .where(eq(Prescriptions.id, id));
-
-      refreshPrescriptions();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    fetchData();
+  }, []);
 
   const fetchConsultationsWithPrescriptions = async (patientId) => {
     try {
@@ -288,25 +378,22 @@ const PatientConsultation = ({ onBack, patientData }) => {
             doctorId: c.doctorId,
             prescribedBy: c.doctor,
             prescribedDate: c.consultationDate
-              ? new Date(c.consultationDate).toLocaleDateString()
+              ? c.consultationDate.toString()
               : null,
-            startDate: c.consultationDate.toString(),
+            startDate: p.startDate,
             endDate: p.endDate
               ? new Date(p.endDate).toLocaleDateString()
               : null,
             status: p.status,
             instructions: p.instructions,
             sideEffects: p.sideEffects ?? [],
+            billGenerated: p.billGenerated,
             cost: p.cost ?? 0,
             consultationId: p.consultationId,
-            appointmentDate: c.appointmentDate
-              ? new Date(c.appointmentDate).toLocaleDateString()
-              : null,
+            appointmentDate: c.appointmentDate ? c.appointmentDate : null,
             reason: c.reason,
           })),
       }));
-
-      console.log(data);
 
       setConsultationPrescriptions(data);
 
@@ -314,6 +401,38 @@ const PatientConsultation = ({ onBack, patientData }) => {
     } catch (error) {
       console.error("Error fetching consultations:", error);
       return [];
+    }
+  };
+
+  const orderMedicine = async (id) => {
+    try {
+      const updateStatus = await db
+        .update(Prescriptions)
+        .set({
+          status: "ordered",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, id));
+
+      refreshPrescriptions();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const requestCancellation = async (id) => {
+    try {
+      const updateStatus = await db
+        .update(Prescriptions)
+        .set({
+          status: "request-cancellation",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, id));
+
+      refreshPrescriptions();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -339,154 +458,163 @@ const PatientConsultation = ({ onBack, patientData }) => {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
-
-      case "completed":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-
-      case "discontinued":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
-
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-
-      case "ordered":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-
-      case "recommended":
-        return "bg-purple-500/20 text-purple-400 border-purple-500/30";
-
-      case "request-cancellation":
-        return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-
-      default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "active":
-        return (
-          <p className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" />
-            Active
-          </p>
-        );
-
-      case "completed":
-        return (
-          <p className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" />
-            Course Completed
-          </p>
-        );
-
-      case "discontinued":
-        return (
-          <p className="flex items-center gap-2">
-            <X className="w-4 h-4" />
-            Discontinued By Doctor
-          </p>
-        );
-
-      case "pending":
-        return (
-          <p className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            Pending Dispensing By Pharmacist
-          </p>
-        );
-
-      case "ordered":
-        return (
-          <p className="flex items-center gap-2">
-            <AlarmClock className="w-4 h-4" />
-            Ordered: Pending Approval
-          </p>
-        );
-
-      case "recommended":
-        return (
-          <p className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4" />
-            Recommended By Doctor
-          </p>
-        );
-
-      case "request-cancellation":
-        return (
-          <p className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4" />
-            Requested Cancellation To Doctor
-          </p>
-        );
-
-      default:
-        return <Clock className="w-4 h-4" />;
-    }
-  };
-
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);
     setIsModalOpen(true);
   };
 
-  const handleDownloadPDF = (prescription) => {
+  const downloadDoctorPrescription = (consultation, patientData) => {
     const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    let yPos = 30;
 
-    // Header
+    // 🔹 Adds a wrapped text block (auto page-break if needed)
+    const addWrappedText = (
+      text,
+      x = 20,
+      gap = 8,
+      fontSize = 12,
+      color = [40, 40, 40],
+      maxWidth = 170
+    ) => {
+      if (!text) return;
+      doc.setFontSize(fontSize);
+      doc.setTextColor(...color);
+
+      const splitText = doc.splitTextToSize(text, maxWidth);
+      splitText.forEach((line) => {
+        if (yPos > pageHeight - 20) {
+          doc.addPage();
+          yPos = 30;
+        }
+        doc.text(line, x, yPos);
+        yPos += gap;
+      });
+    };
+
+    // 🔹 Adds a section with bullets (handles arrays safely)
+    const addBulletList = (title, items, x = 30) => {
+      if (!Array.isArray(items) || items.length === 0) return;
+
+      addWrappedText(title, 20, 10, 13, [30, 30, 30]);
+      items.forEach((item) => {
+        if (typeof item === "string") {
+          addWrappedText(`• ${item}`, x, 8, 12, [60, 60, 60], 160);
+        } else {
+          addWrappedText(
+            `• ${JSON.stringify(item)}`,
+            x,
+            8,
+            12,
+            [60, 60, 60],
+            160
+          );
+        }
+      });
+      yPos += 5;
+    };
+
+    // ---------------- HEADER ----------------
     doc.setFontSize(20);
-    doc.setTextColor(40, 40, 40);
-    doc.text("MediCura Medical Center", 20, 30);
-
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text("123 Healthcare Drive, Medical City, MC 12345", 20, 40);
-    doc.text("Phone: (555) 123-4567", 20, 50);
-
-    // Title
-    doc.setFontSize(16);
-    doc.setTextColor(40, 40, 40);
-    doc.text("PRESCRIPTION RECORD", 20, 70);
-
-    // Patient Info
-    doc.setFontSize(14);
-    doc.text("Patient Information:", 20, 90);
-    doc.setFontSize(12);
-    doc.text("Name: John Doe", 30, 105);
-    doc.text("DOB: January 15, 1990", 30, 115);
-    doc.text("Patient ID: P-001", 30, 125);
-
-    // Prescription Details
-    doc.setFontSize(14);
-    doc.text("Prescription Details:", 20, 145);
-    doc.setFontSize(12);
-    doc.text(`Medication: ${prescription.medication}`, 30, 160);
-    doc.text(`Dosage: ${prescription.dosage}`, 30, 170);
-    doc.text(`Frequency: ${prescription.frequency}`, 30, 180);
-    doc.text(`Duration: ${prescription.duration}`, 30, 190);
-    doc.text(`Prescribed by: ${prescription.prescribedBy}`, 30, 200);
-    doc.text(`Date Prescribed: ${prescription.prescribedDate}`, 30, 210);
-
-    // Instructions
-    doc.setFontSize(14);
-    doc.text("Instructions:", 20, 230);
-    doc.setFontSize(12);
-    const splitInstructions = doc.splitTextToSize(
-      prescription.instructions,
-      160
+    doc.text("MediCura Medical Center", 20, yPos);
+    yPos += 10;
+    addWrappedText(
+      "123 Healthcare Drive, Medical City, MC 12345",
+      20,
+      8,
+      12,
+      [100, 100, 100]
     );
-    doc.text(splitInstructions, 30, 245);
+    addWrappedText("Phone: (+91) 9878324512", 20, 8, 12, [100, 100, 100]);
 
-    doc.save(
-      `prescription-${prescription.medication
-        .replace(/\s+/g, "-")
-        .toLowerCase()}-${new Date().toISOString().split("T")[0]}.pdf`
+    yPos += 10;
+    addWrappedText("CONSULTATION RECORD", 20, 12, 16);
+
+    // ---------------- PATIENT INFO ----------------
+    yPos += 10;
+    addWrappedText("Patient Information:", 20, 12, 14);
+    addWrappedText(`Name: ${patientData?.name ?? "NA"}`, 30);
+    addWrappedText(
+      `DOB: ${format(patientData?.dateOfBirth, "PPP") ?? "NA"}`,
+      30
     );
+    addWrappedText(`Patient ID: ${patientData?.userId ?? "NA"}`, 30);
+
+    // ---------------- CONSULTATION INFO ----------------
+    yPos += 10;
+    addWrappedText("Consultation Details:", 20, 12, 14);
+    addWrappedText(
+      `Doctor: ${consultation.doctor} (${consultation.doctorSpecialty})`,
+      30
+    );
+    addWrappedText(
+      `Date: ${
+        consultation.consultationDate
+          ? new Date(consultation.consultationDate).toLocaleDateString()
+          : "NA"
+      }`,
+      30
+    );
+
+    addBulletList("Chief Complaint:", consultation.chiefComplaint);
+    addBulletList(
+      "History of Present Illness:",
+      consultation.historyOfPresentIllness
+    );
+    addBulletList("Physical Examination:", consultation.physicalExamination);
+    addBulletList("Diagnosis:", consultation.diagnosis);
+    addBulletList("Consultation Notes:", consultation.consultationNotes);
+
+    if (consultation.followUpDate) {
+      addWrappedText(
+        `Expected Follow-up Date: ${new Date(
+          consultation.followUpDate
+        ).toLocaleDateString()}`,
+        30
+      );
+    }
+
+    // ---------------- PRESCRIPTIONS ----------------
+    yPos += 5;
+    addWrappedText("Prescriptions:", 20, 12, 14);
+
+    consultation.prescriptions.forEach((p, index) => {
+      addWrappedText(`${index + 1}. ${p.medication}`, 30, 10, 12, [30, 30, 30]);
+      addWrappedText(`   Dosage: ${p.dosage}`, 35);
+      addWrappedText(`   Frequency: ${p.frequency}`, 35);
+      addWrappedText(`   Duration: ${p.duration}`, 35);
+      addWrappedText(`   Prescribed by: ${p.prescribedBy}`, 35);
+
+      if (p.instructions) {
+        addWrappedText("   Instructions:", 35);
+        addWrappedText(p.instructions, 40, 8, 11, [80, 80, 80], 150);
+      }
+
+      if (Array.isArray(p.sideEffects) && p.sideEffects.length) {
+        addWrappedText("   Possible Side Effects:", 35);
+        p.sideEffects.forEach((effect) => {
+          addWrappedText(`• ${effect}`, 40, 8, 11, [200, 50, 50], 150);
+        });
+      }
+
+      yPos += 5;
+    });
+
+    // ---------------- FOOTER ----------------
+    if (yPos > pageHeight - 30) {
+      doc.addPage();
+      yPos = 30;
+    }
+    yPos += 10;
+    addWrappedText(
+      "---- End of Consultation Record ----",
+      70,
+      10,
+      12,
+      [120, 120, 120]
+    );
+
+    doc.save(`consultation-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   if (loading) {
@@ -555,7 +683,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
         <div className="flex justify-end mb-4">
           <Button
-            onClick={refreshPrescriptions(patientData.userId)}
+            onClick={() => refreshPrescriptions(patientData.userId)}
             className="btn2"
           >
             <RefreshCw />
@@ -572,20 +700,33 @@ const PatientConsultation = ({ onBack, patientData }) => {
             >
               {/* Consultation Header */}
               <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4 lg:p-6 mb-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Stethoscope className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Stethoscope className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-16-bold lg:text-20-bold text-white">
+                        {consultation.appointmentType}
+                      </h3>
+                      <p className="text-12-regular lg:text-14-regular text-green-400">
+                        {format(consultation.consultationDate, "PPP")}
+                      </p>
+                      <p className="text-12-regular lg:text-14-regular text-dark-700">
+                        {consultation.doctor} - {consultation.doctorSpecialty}
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3 className="text-16-bold lg:text-20-bold text-white">
-                      {consultation.appointmentType}
-                    </h3>
-                    <p className="text-12-regular lg:text-14-regular text-green-400">
-                      {format(consultation.consultationDate, "PPP")}
-                    </p>
-                    <p className="text-12-regular lg:text-14-regular text-dark-700">
-                      {consultation.doctor} - {consultation.doctorSpecialty}
-                    </p>
+                    <button
+                      onClick={() =>
+                        downloadDoctorPrescription(consultation, patientData)
+                      }
+                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download PDF
+                    </button>
                   </div>
                 </div>
 
@@ -798,7 +939,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
                               <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
                             </button>
                             <button
-                              onClick={() => handleDownloadPDF(prescription)}
+                              // onClick={() => handleDownloadPDF(prescription)}
                               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
                             >
                               <Download className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -842,7 +983,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         prescription={selectedPrescription}
-        onDownloadPDF={handleDownloadPDF}
+        // onDownloadPDF={handleDownloadPDF}
       />
     </div>
   );
