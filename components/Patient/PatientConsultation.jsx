@@ -910,44 +910,46 @@ const PatientConsultation = ({ onBack, patientData }) => {
                           </div>
                         </div>
 
-                        {prescription.status === "recommended" && (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              onClick={() => orderMedicine(prescription.id)}
-                              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
-                            >
-                              <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
-                              Order Medicine
-                            </Button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewDetails(prescription)}
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                          >
+                            <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
+                          </button>
+                          {prescription.status === "recommended" && (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                onClick={() => orderMedicine(prescription.id)}
+                                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
+                              >
+                                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
+                                Order Medicine
+                              </Button>
 
-                            <Button
-                              onClick={() =>
-                                requestCancellation(prescription.id)
-                              }
-                              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
-                            >
-                              <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
-                              Cancel Medicine
-                            </Button>
-                          </div>
-                        )}
+                              <Button
+                                onClick={() =>
+                                  requestCancellation(prescription.id)
+                                }
+                                className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
+                              >
+                                <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
+                                Cancel Medicine
+                              </Button>
+                            </div>
+                          )}
 
-                        {prescription.status === "active" && (
-                          <div className="flex items-center gap-2 lg:gap-3">
-                            <button
-                              onClick={() => handleViewDetails(prescription)}
-                              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
-                            >
-                              <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
-                            </button>
-                            <button
-                              // onClick={() => handleDownloadPDF(prescription)}
-                              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                            >
-                              <Download className="w-4 h-4 lg:w-5 lg:h-5" />
-                            </button>
-                          </div>
-                        )}
+                          {prescription.status === "active" && (
+                            <div className="flex items-center gap-2 lg:gap-3">
+                              <button
+                                // onClick={() => handleDownloadPDF(prescription)}
+                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                              >
+                                <Download className="w-4 h-4 lg:w-5 lg:h-5" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
