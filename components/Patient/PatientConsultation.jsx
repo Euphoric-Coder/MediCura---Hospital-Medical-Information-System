@@ -75,7 +75,9 @@ const PrescriptionDetailsModal = ({
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-green-500 disabled:hover:to-green-600`}
             >
               <Download className="w-5 h-5" />
-              Download PDF
+              {prescription.billGenerated
+                ? "Download Bill"
+                : " Bill Not Generated"}
             </button>
           </div>
 
@@ -87,10 +89,10 @@ const PrescriptionDetailsModal = ({
               </div>
               <div>
                 <h3 className="text-18-bold lg:text-20-bold text-white">
-                  {prescription.medication}
+                  {prescription.medication || "N/A"}
                 </h3>
                 <p className="text-14-regular text-purple-400">
-                  {prescription.dosage} - {prescription.frequency}
+                  {prescription.dosage || "N/A"} - {prescription.frequency || "N/A"}
                 </p>
               </div>
             </div>
@@ -98,11 +100,11 @@ const PrescriptionDetailsModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-14-regular text-dark-700">
               <div>
                 <span className="text-white">Duration:</span>{" "}
-                {prescription.duration}
+                {prescription.duration || "N/A"}
               </div>
               <div>
                 <span className="text-white">Prescribed by:</span>{" "}
-                {prescription.prescribedBy}
+                {prescription.prescribedBy || "N/A"}
               </div>
               <div>
                 <span className="text-white">Start Date:</span>{" "}
@@ -141,7 +143,7 @@ const PrescriptionDetailsModal = ({
               <div className="space-y-2 text-14-regular text-dark-700">
                 <div>
                   <span className="text-white">Reason for Visit:</span>{" "}
-                  {prescription.reason}
+                  {prescription.reason || "N/A"}
                 </div>
                 <div>
                   <span className="text-white">Appointment Date:</span>{" "}
@@ -159,7 +161,7 @@ const PrescriptionDetailsModal = ({
               Instructions
             </h4>
             <p className="text-14-regular text-blue-300">
-              {prescription.instructions}
+              {prescription.instructions || "N/A"}
             </p>
           </div>
 
@@ -206,7 +208,7 @@ const getStatusColor = (status) => {
     case "completed":
       return "bg-gray-500/20 text-gray-400 border-gray-500/30";
 
-    case "discontinued":
+    case "discontinued-doctor" || "discontinued-pharmacist":
       return "bg-red-500/20 text-red-400 border-red-500/30";
 
     case "pending":
@@ -244,11 +246,19 @@ const getStatusIcon = (status) => {
         </p>
       );
 
-    case "discontinued":
+    case "discontinued-doctor":
       return (
         <p className="flex items-center gap-2">
           <X className="w-4 h-4" />
           Discontinued By Doctor
+        </p>
+      );
+
+    case "discontinued-pharmacist":
+      return (
+        <p className="flex items-center gap-2">
+          <X className="w-4 h-4" />
+          Cancelled By Pharmacist
         </p>
       );
 

@@ -199,11 +199,15 @@ export const Prescriptions = pgTable("prescriptions", {
 
   status: varchar("status").default("recommended"), // ordered, completed, pending, cancelled, request-calcellation, discontinued
   medicineValidity: varchar("medicineValidity"),
-  prescribedDuration: varchar("prescribedDuration"),
   sideEffects: jsonb("sideEffects"),
   cost: numeric("cost"),
 
   billGenerated: boolean("billGenerated").default(false),
+
+  dispensedDuration: varchar("dispensedDuration"), // e.g., "30 days", "60 days"
+  refillsRemaining: integer("refillsRemaining").default(0),
+  lastDispensedDate: varchar("lastDispensedDate"),
+  pharmacistNotes: varchar("pharmacistNotes"),
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
