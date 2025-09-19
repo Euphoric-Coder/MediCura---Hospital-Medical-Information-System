@@ -83,7 +83,7 @@ const PrescriptionDetailsModal = ({
               </div>
               <div>
                 <span className="text-white">Start Date:</span>{" "}
-                {prescription.startDate}
+                {format(prescription.startDate, "PPP")}
               </div>
               <div>
                 <span className="text-white">End Date:</span>{" "}
@@ -290,11 +290,7 @@ const PatientConsultation = ({ onBack, patientData }) => {
             prescribedDate: c.consultationDate
               ? new Date(c.consultationDate).toLocaleDateString()
               : null,
-            startDate: p.startDate
-              ? new Date(p.startDate).toLocaleDateString()
-              : c.consultationDate
-              ? new Date(c.consultationDate).toLocaleDateString()
-              : null,
+            startDate: c.consultationDate.toString(),
             endDate: p.endDate
               ? new Date(p.endDate).toLocaleDateString()
               : null,
@@ -331,7 +327,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
   );
 
   const filteredPrescriptions = allPrescriptions.filter((prescription) => {
-    console.log(prescription);
     const matchesSearch =
       prescription.medication
         .toLowerCase()

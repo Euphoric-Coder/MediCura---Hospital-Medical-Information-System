@@ -194,6 +194,9 @@ export const Prescriptions = pgTable("prescriptions", {
   duration: varchar("duration"),
   instructions: varchar("instructions"),
 
+  startDate: varchar("startDate"),
+  endDate: varchar("endDate"),
+
   status: varchar("status").default("recommended"), // ordered, completed, pending
   medicineValidity: varchar("medicineValidity"),
   prescribedDuration: varchar("prescribedDuration"),
