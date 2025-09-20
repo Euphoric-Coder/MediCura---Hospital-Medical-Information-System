@@ -31,7 +31,10 @@ const PharmacistDashboardWithSidebar = ({ pharmacistData }) => {
         );
       case "inventory":
         return (
-          <PharmacistInventory onBack={() => setCurrentPage("dashboard")} />
+          <PharmacistInventory
+            onBack={() => setCurrentPage("dashboard")}
+            pharmacistData={pharmacistData}
+          />
         );
       case "billing":
         return <PharmacistBilling onBack={() => setCurrentPage("dashboard")} />;

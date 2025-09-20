@@ -88,43 +88,29 @@ const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Medicine data:", medicineData);
     onAdd(medicineData);
     onClose();
   };
 
-  const InputField = ({
-    label,
-    type,
-    value,
-    onChange,
-    placeholder,
-    icon: Icon,
-    required,
-  }) => (
-    <div>
-      <label className="shad-input-label block mb-2">
-        {label} {required && "*"}
-      </label>
-      <div className="relative">
-        {Icon && (
-          <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-600" />
-        )}
-        <input
-          type={type}
-          value={value ?? ""}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          className={`shad-input w-full text-white ${
-            Icon ? "pl-10" : "pl-3"
-          } bg-dark-300 border border-dark-500 rounded-lg`}
-        />
-      </div>
-    </div>
-  );
-
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        onClose();
+        setMedicineData({
+          name: "",
+          category: "",
+          manufacturer: "",
+          batchNumber: "",
+          expiryDate: "",
+          quantity: 0,
+          minStockLevel: 0,
+          unitPrice: 0,
+          location: "",
+        });
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-dark-400 border border-dark-500 rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-white">
@@ -339,7 +325,7 @@ const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
   );
 };
 
-const PharmacistInventory = ({ onBack }) => {
+const PharmacistInventory = ({ onBack, pharmacistData }) => {
   const [medicines, setMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -351,24 +337,19 @@ const PharmacistInventory = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      fetchMedicine();
-    } catch (error) {
-      console.error("Error fetching medicines:", error);
-    } finally {
-      setLoading(false);
-    }
+    fetchMedicine();
   }, []);
 
   const fetchMedicine = async () => {
+    setLoading(true); // make sure to show loader when fetch starts
     try {
       const res = await fetch("/api/medicines");
       const data = await res.json();
-
-      console.log(data);
       setMedicines(data);
     } catch (error) {
       console.error("Error fetching medicines:", error);
+    } finally {
+      setLoading(false); // hide loader only after fetch is done
     }
   };
 
@@ -461,18 +442,37 @@ const PharmacistInventory = ({ onBack }) => {
     );
   };
 
-  const handleAddMedicine = (newMedicine) => {
-    const id = (medicines.length + 1).toString();
-    const status = getStockStatus({ ...newMedicine, id, status: "in-stock" });
+  const handleAddMedicine = async (newMedicine) => {
+    try {
+      console.log(newMedicine);
 
-    setMedicines((prev) => [...prev, { ...newMedicine, id, status }]);
-    setMessage(`${newMedicine.name} added to inventory`);
-    setMessageType("success");
+      const data = {
+        ...newMedicine,
+        pharmacistId: pharmacistData.userId,
+      };
 
-    setTimeout(() => {
-      setMessage("");
-      setMessageType("");
-    }, 3000);
+      console.log(data);
+
+      // const res = await fetch("/api/medicines", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(newMedicine),
+      // });
+
+      // if (!res.ok) {
+      //   throw new Error("Failed to add medicine");
+      // }
+
+      setMessage(`${newMedicine.name} added to inventory`);
+      setMessageType("success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (err) {
+      console.error("Error adding medicine:", err);
+    }
   };
 
   const handleEditMedicine = (medicine) => {
@@ -500,6 +500,19 @@ const PharmacistInventory = ({ onBack }) => {
     (m) => m.status === "out-of-stock"
   ).length;
   const expiredCount = medicines.filter((m) => m.status === "expired").length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white text-lg animate-pulse">
+            Loading Medicine Data...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

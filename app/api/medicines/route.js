@@ -11,15 +11,21 @@ export async function GET() {
 // Add new medicine
 export async function POST(req) {
   const body = await req.json();
-  const [newMed] = await db.insert(Medicines).values(body).returning();
 
-  // Log restock
+  // separates pharmacistId from the medicine data
+  const { pharmacistId, ...medicineData } = body;
+
+  const [newMed] = await db.insert(Medicines).values(medicineData).returning();
+
+  // Log Add Medicine
   await db.insert(InventoryLogs).values({
     medicineId: newMed.id,
+    pharmacistId,
     action: "add",
     quantityChange: newMed.quantity,
     prevQuantity: 0,
     newQuantity: newMed.quantity,
+    unitPrice: newMed.unitPrice,
     notes: "Initial stock added",
   });
 

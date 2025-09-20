@@ -295,7 +295,7 @@ export const InventoryLogs = pgTable("inventory_logs", {
 
   medicineId: uuid("medicineId")
     .notNull()
-    .references(() => Medicines.id, { onDelete: "cascade" }),
+    .references(() => Medicines.id),
 
   pharmacistId: uuid("pharmacistId").references(() => Pharmacists.userId, {
     onDelete: "set null",
@@ -307,6 +307,9 @@ export const InventoryLogs = pgTable("inventory_logs", {
 
   // Quantity change (+ve for increase, -ve for decrease)
   quantityChange: integer("quantityChange").notNull(),
+
+  // Previous quantity before transaction
+  prevQuantity: integer("prevQuantity").notNull(),
 
   // Running quantity after transaction
   newQuantity: integer("newQuantity").notNull(),
