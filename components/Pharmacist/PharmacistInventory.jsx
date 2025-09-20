@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Package,
@@ -258,61 +258,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, editingMedicine }) => {
 };
 
 const PharmacistInventory = ({ onBack }) => {
-  const [medicines, setMedicines] = useState([
-    {
-      id: "1",
-      name: "Lisinopril 10mg",
-      category: "Cardiovascular",
-      manufacturer: "Pfizer",
-      batchNumber: "LIS001",
-      expiryDate: "2025-06-15",
-      quantity: 150,
-      minStockLevel: 50,
-      unitPrice: 2.5,
-      location: "A-1-01",
-      status: "in-stock",
-    },
-    {
-      id: "2",
-      name: "Amoxicillin 500mg",
-      category: "Antibiotic",
-      manufacturer: "GSK",
-      batchNumber: "AMX002",
-      expiryDate: "2026-03-20",
-      quantity: 25,
-      minStockLevel: 30,
-      unitPrice: 1.75,
-      location: "B-2-05",
-      status: "low-stock",
-    },
-    {
-      id: "3",
-      name: "Metformin 500mg",
-      category: "Diabetes",
-      manufacturer: "Teva",
-      batchNumber: "MET003",
-      expiryDate: "2026-12-10",
-      quantity: 0,
-      minStockLevel: 40,
-      unitPrice: 1.25,
-      location: "C-1-03",
-      status: "out-of-stock",
-    },
-    {
-      id: "4",
-      name: "Ibuprofen 400mg",
-      category: "Pain Relief",
-      manufacturer: "Johnson & Johnson",
-      batchNumber: "IBU004",
-      expiryDate: "2026-01-30",
-      quantity: 80,
-      minStockLevel: 25,
-      unitPrice: 0.85,
-      location: "D-3-02",
-      status: "expired",
-    },
-  ]);
-
+  const [medicines, setMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -320,6 +266,22 @@ const PharmacistInventory = ({ onBack }) => {
   const [editingMedicine, setEditingMedicine] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  useEffect(() => {
+    fetchMedicine();
+  }, []);
+
+  const fetchMedicine = async () => {
+    try {
+      const res = await fetch("/api/medicines");
+      const data = await res.json();
+
+      console.log(data);
+      setMedicines(data);
+    } catch (error) {
+      console.error("Error fetching medicines:", error);
+    }
+  };
 
   const categories = [
     "all",
