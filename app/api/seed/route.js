@@ -294,7 +294,7 @@ export async function GET() {
         location: "A-1-01",
       },
       {
-        id: "82b465ab-dd94-448a-8199-51aaff2b7f5d",
+        id: "24523ec6-d27e-41a3-a89c-cef9cc479775",
         name: "Amoxicillin 500mg",
         category: "Antibiotic",
         manufacturer: "Sun Pharma",
@@ -306,7 +306,7 @@ export async function GET() {
         location: "B-2-05",
       },
       {
-        id: "921c0bb9-fd2d-43ec-ad2a-191a8cc49d73",
+        id: "2d3ac5d4-3824-4750-9613-1430d7600b32",
         name: "Metformin 500mg",
         category: "Diabetes",
         manufacturer: "Dr. Reddy’s",
@@ -326,12 +326,15 @@ export async function GET() {
     const logs = medicines.map((med) => ({
       medicineId: med.id,
       pharmacistId,
-      action: "added",
+      action: "add",
       quantityChange: med.quantity,
+      prevQuantity: 0,
       newQuantity: med.quantity,
       notes: "Initial stock added during pharmacy setup",
       unitPrice: med.unitPrice,
     }));
+
+    // console.log(logs);
 
     await db.insert(InventoryLogs).values(logs);
 

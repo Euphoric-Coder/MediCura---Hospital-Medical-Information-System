@@ -8,6 +8,9 @@ export async function PUT(req, { params }) {
   const { id } = params;
   const body = await req.json();
 
+  // Separates pharmacistId from the medicine data
+  const { pharmacistId, ...medicineData } = body;
+
   // Fetch old record
   const [oldMed] = await db
     .select()
@@ -19,7 +22,7 @@ export async function PUT(req, { params }) {
   }
 
   // Exclude stock-related fields (handled by restock/dispense APIs)
-  const { quantity, ...nonStockUpdates } = body;
+  const { quantity, ...nonStockUpdates } = medicineData;
 
   if (Object.keys(nonStockUpdates).length === 0) {
     return NextResponse.json(
@@ -37,10 +40,12 @@ export async function PUT(req, { params }) {
   // Log metadata change for audit
   await db.insert(InventoryLogs).values({
     medicineId: id,
+    pharmacistId,
     action: "metadata-update",
     quantityChange: 0, // stock unchanged
     prevQuantity: oldMed.quantity,
     newQuantity: oldMed.quantity,
+    unitPrice: nonStockUpdates.unitPrice,
     notes: `Metadata updated: ${Object.keys(nonStockUpdates).join(", ")}`,
   });
 

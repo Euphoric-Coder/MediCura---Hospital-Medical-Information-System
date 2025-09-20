@@ -18,19 +18,29 @@ import {
   AlertCircle,
   ChevronDown,
   Check,
+  RefreshCcw,
 } from "lucide-react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import FormInput from "../FormUI/FormInput";
 
-const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
+const AddMedicineDialog = ({
+  isOpen,
+  onClose,
+  onAdd,
+  onEdit,
+  editingMedicine,
+}) => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [customCategory, setCustomCategory] = useState("");
   const [medicineData, setMedicineData] = useState({
@@ -89,7 +99,11 @@ const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Medicine data:", medicineData);
-    onAdd(medicineData);
+    if (!editingMedicine) {
+      onAdd(medicineData);
+    } else {
+      onEdit(medicineData);
+    }
     onClose();
   };
 
@@ -257,6 +271,7 @@ const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
               }
               placeholder="0"
               required
+              disabled={editingMedicine}
               icon={<Boxes className="w-5 h-5" />}
             />
 
@@ -325,13 +340,93 @@ const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
   );
 };
 
+const RestockModal = ({ medicine }) => {
+  const [open, setOpen] = useState(false);
+  const [restockAmount, setRestockAmount] = useState(0);
+
+  const handleRestock = () => {
+    console.log(medicine);
+    console.log(`Restocked ${medicine.name} with ${restockAmount} units`);
+    console.log(typeof restockAmount);
+    // 👉 call your API here
+    setOpen(false); // close modal after restock
+    setRestockAmount(0);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 
+                   rounded-full text-green-400 text-12-medium lg:text-14-medium 
+                   hover:bg-green-500/30 transition-all"
+      >
+        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        Restock
+      </button>
+
+      <Dialog
+        open={open}
+        onOpenChange={() => {
+          setOpen(false);
+          setRestockAmount(0);
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-gray-900 border border-green-700 shadow-lg rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-green-400 font-semibold">
+              Restock Medicine
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Enter the quantity to add for{" "}
+              <span className="text-green-400 font-semibold">
+                {medicine.name}
+              </span>
+              .
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3 py-3">
+            <Input
+              type="number"
+              min="1"
+              placeholder="Enter quantity"
+              value={restockAmount}
+              onChange={(e) => setRestockAmount(e.target.value)}
+              className="bg-gray-800 border-green-700 text-white placeholder-gray-400 
+                         focus:border-green-500 focus:ring-green-500"
+            />
+          </div>
+
+          <DialogFooter className="flex justify-end gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setOpen(false)}
+              className="bg-gray-800 border border-green-700 text-green-400 hover:bg-gray-700 rounded-3xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRestock}
+              disabled={!restockAmount}
+              className="bg-green-600 hover:bg-green-500 text-white rounded-3xl"
+            >
+              Confirm Restock
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
 const PharmacistInventory = ({ onBack, pharmacistData }) => {
   const [medicines, setMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingMedicine, setEditingMedicine] = useState(null);
+  const [editingMedicine, setEditingMedicine] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [loading, setLoading] = useState(true);
@@ -350,6 +445,16 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       console.error("Error fetching medicines:", error);
     } finally {
       setLoading(false); // hide loader only after fetch is done
+    }
+  };
+
+  const refreshMedicine = async () => {
+    try {
+      const res = await fetch("/api/medicines");
+      const data = await res.json();
+      setMedicines(data);
+    } catch (error) {
+      console.error("Error fetching medicines:", error);
     }
   };
 
@@ -382,47 +487,51 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     return "in-stock";
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "in-stock":
-        return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-10-medium sm:text-12-medium text-green-400">
-              In Stock
-            </span>
-          </div>
-        );
-      case "low-stock":
-        return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-            <span className="text-10-medium sm:text-12-medium text-yellow-400">
-              Low Stock
-            </span>
-          </div>
-        );
-      case "out-of-stock":
-        return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span className="text-10-medium sm:text-12-medium text-red-400">
-              Out of Stock
-            </span>
-          </div>
-        );
-      case "expired":
-        return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-full">
-            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-            <span className="text-10-medium sm:text-12-medium text-gray-400">
-              Expired
-            </span>
-          </div>
-        );
-      default:
-        return null;
+  const getStatusBadge = (currentStock, minStock, status) => {
+    // Check expired first (always takes priority)
+    if (status === "expired") {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-full">
+          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+          <span className="text-10-medium sm:text-12-medium text-gray-400">
+            Expired
+          </span>
+        </div>
+      );
     }
+
+    // Handle stock levels
+    if (currentStock === 0) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <span className="text-10-medium sm:text-12-medium text-red-400">
+            Out of Stock
+          </span>
+        </div>
+      );
+    }
+
+    if (currentStock <= minStock) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
+          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+          <span className="text-10-medium sm:text-12-medium text-yellow-400">
+            Low Stock
+          </span>
+        </div>
+      );
+    }
+
+    // Default: in stock
+    return (
+      <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
+        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        <span className="text-10-medium sm:text-12-medium text-green-400">
+          In Stock
+        </span>
+      </div>
+    );
   };
 
   const getStockLevelBar = (current, min) => {
@@ -453,16 +562,17 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
 
       console.log(data);
 
-      // const res = await fetch("/api/medicines", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(newMedicine),
-      // });
+      const res = await fetch("/api/medicines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-      // if (!res.ok) {
-      //   throw new Error("Failed to add medicine");
-      // }
+      if (!res.ok) {
+        throw new Error("Failed to add medicine");
+      }
 
+      refreshMedicine();
       setMessage(`${newMedicine.name} added to inventory`);
       setMessageType("success");
 
@@ -475,7 +585,43 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleEditMedicine = (medicine) => {
+  const handleEditMedicine = async (updatedMedicine) => {
+    try {
+      console.log("Edited Medicine Data:", updatedMedicine);
+
+      const data = {
+        ...updatedMedicine,
+        pharmacistId: pharmacistData.userId,
+      };
+
+      // const res = await fetch(`/api/medicines/${updatedMedicine.id}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(updatedMedicine),
+      // });
+
+      // if (!res.ok) {
+      //   const error = await res.json();
+      //   console.error("Error updating medicine:", error);
+      //   return;
+      // }
+
+      refreshMedicine();
+      setMessage(`${updatedMedicine.name} edited in inventory`);
+      setMessageType("success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (err) {
+      console.error("Unexpected error while editing medicine:", err);
+    }
+  };
+
+  const openEditModal = (medicine) => {
     setEditingMedicine(medicine);
     setShowAddModal(true);
   };
@@ -681,13 +827,19 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
 
           {/* Medicine List */}
           <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
-            <div className="flex items-center gap-3 mb-6 lg:mb-8">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Package className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+            <div className="flex justify-between items-center mb-6 lg:mb-8">
+              <div className="flex  items-center gap-3">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Package className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                </div>
+                <h2 className="text-18-bold lg:text-24-bold text-white">
+                  Medicine Inventory
+                </h2>
               </div>
-              <h2 className="text-18-bold lg:text-24-bold text-white">
-                Medicine Inventory
-              </h2>
+              <Button onClick={() => refreshMedicine()} className="btn2">
+                <RefreshCcw />
+                Refresh Medicine Data
+              </Button>
             </div>
 
             <div className="space-y-4">
@@ -707,7 +859,14 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                           <h3 className="text-16-bold lg:text-20-bold text-white">
                             {medicine.name}
                           </h3>
-                          {getStatusBadge(medicine.status)}
+                          {getStatusBadge(
+                            medicine.quantity,
+                            medicine.minStockLevel,
+                            medicine.status
+                          )}
+                          {medicine.quantity <= medicine.minStockLevel && (
+                            <RestockModal medicine={medicine} />
+                          )}
                         </div>
 
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4 text-12-regular lg:text-14-regular text-dark-700">
@@ -763,9 +922,9 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                       </div>
                     </div>
 
-                    <div className="flex flex-row lg:flex-col items-start lg:items-end gap-2 flex-shrink-0">
+                    <div className="flex flex-row lg:flex-col justify-end lg:items-end gap-2 flex-shrink-0">
                       <button
-                        onClick={() => handleEditMedicine(medicine)}
+                        onClick={() => openEditModal(medicine)}
                         className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25"
                       >
                         <Edit className="w-4 h-4" />
@@ -816,6 +975,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
           setEditingMedicine(null);
         }}
         onAdd={handleAddMedicine}
+        onEdit={handleEditMedicine}
         editingMedicine={editingMedicine}
       />
     </>

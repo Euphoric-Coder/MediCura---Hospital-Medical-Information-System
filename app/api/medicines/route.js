@@ -26,7 +26,7 @@ export async function POST(req) {
     prevQuantity: 0,
     newQuantity: newMed.quantity,
     unitPrice: newMed.unitPrice,
-    notes: "Initial stock added",
+    notes: `Initial stock of ${newMed.name} added`,
   });
 
   return NextResponse.json(newMed);
