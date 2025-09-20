@@ -11,249 +11,331 @@ import {
   TrendingUp,
   TrendingDown,
   X,
+  Factory,
+  Hash,
+  MapPin,
+  Boxes,
+  AlertCircle,
+  ChevronDown,
+  Check,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "../ui/button";
+import FormInput from "../FormUI/FormInput";
 
-const AddMedicineModal = ({ isOpen, onClose, onAdd, editingMedicine }) => {
+const AddMedicineDialog = ({ isOpen, onClose, onAdd, editingMedicine }) => {
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [customCategory, setCustomCategory] = useState("");
   const [medicineData, setMedicineData] = useState({
-    name: editingMedicine?.name || "",
-    category: editingMedicine?.category || "",
-    manufacturer: editingMedicine?.manufacturer || "",
-    batchNumber: editingMedicine?.batchNumber || "",
-    expiryDate: editingMedicine?.expiryDate || "",
-    quantity: editingMedicine?.quantity || 0,
-    minStockLevel: editingMedicine?.minStockLevel || 0,
-    unitPrice: editingMedicine?.unitPrice || 0,
-    location: editingMedicine?.location || "",
+    name: "",
+    category: "",
+    manufacturer: "",
+    batchNumber: "",
+    expiryDate: "",
+    quantity: 0,
+    minStockLevel: 0,
+    unitPrice: 0,
+    location: "",
   });
 
-  const handleSubmit = (et) => {
+  useEffect(() => {
+    if (editingMedicine) {
+      setMedicineData(editingMedicine);
+    } else {
+      setMedicineData({
+        name: "",
+        category: "",
+        manufacturer: "",
+        batchNumber: "",
+        expiryDate: "",
+        quantity: 0,
+        minStockLevel: 0,
+        unitPrice: 0,
+        location: "",
+      });
+    }
+  }, [editingMedicine]);
+
+  const categories = [
+    "Cardiovascular",
+    "Antibiotic",
+    "Analgesic",
+    "Antipyretic",
+    "Antihistamine",
+    "Antidiabetic",
+    "Antidepressant",
+  ];
+
+  const handleCategorySelect = (cat) => {
+    setMedicineData((prev) => ({ ...prev, category: cat }));
+    setShowCategoryDropdown(false);
+  };
+
+  const handleCustomCategory = () => {
+    if (customCategory.trim() !== "") {
+      setMedicineData((prev) => ({ ...prev, category: customCategory.trim() }));
+      setCustomCategory("");
+      setShowCategoryDropdown(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     onAdd(medicineData);
-    setMedicineData({
-      name: "",
-      category: "",
-      manufacturer: "",
-      batchNumber: "",
-      expiryDate: "",
-      quantity: 0,
-      minStockLevel: 0,
-      unitPrice: 0,
-      location: "",
-    });
     onClose();
   };
 
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-4 sm:p-6 lg:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-18-bold sm:text-20-bold lg:text-24-bold text-white">
-              {editingMedicine ? "Edit Medicine" : "Add New Medicine"}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-dark-600 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Medicine Name *
-                </label>
-                <input
-                  type="text"
-                  value={medicineData.name}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g., Lisinopril 10mg"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Category *
-                </label>
-                <input
-                  type="text"
-                  value={medicineData.category}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      category: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g., Cardiovascular"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Manufacturer *
-                </label>
-                <input
-                  type="text"
-                  value={medicineData.manufacturer}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      manufacturer: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g., Pfizer"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Batch Number *
-                </label>
-                <input
-                  type="text"
-                  value={medicineData.batchNumber}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      batchNumber: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g., LIS001"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Expiry Date *
-                </label>
-                <input
-                  type="date"
-                  value={medicineData.expiryDate}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      expiryDate: e.target.value,
-                    }))
-                  }
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Location *
-                </label>
-                <input
-                  type="text"
-                  value={medicineData.location}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      location: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g., A-1-01"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Quantity *
-                </label>
-                <input
-                  type="number"
-                  value={medicineData.quantity}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      quantity: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  placeholder="0"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Minimum Stock Level *
-                </label>
-                <input
-                  type="number"
-                  value={medicineData.minStockLevel}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      minStockLevel: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  placeholder="0"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="shad-input-label block mb-2">
-                  Unit Price ($) *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={medicineData.unitPrice}
-                  onChange={(e) =>
-                    setMedicineData((prev) => ({
-                      ...prev,
-                      unitPrice: parseFloat(e.target.value) || 0,
-                    }))
-                  }
-                  placeholder="0.00"
-                  className="shad-input w-full text-white"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
-              >
-                {editingMedicine ? "Update Medicine" : "Add Medicine"}
-              </button>
-            </div>
-          </form>
-        </div>
+  const InputField = ({
+    label,
+    type,
+    value,
+    onChange,
+    placeholder,
+    icon: Icon,
+    required,
+  }) => (
+    <div>
+      <label className="shad-input-label block mb-2">
+        {label} {required && "*"}
+      </label>
+      <div className="relative">
+        {Icon && (
+          <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-600" />
+        )}
+        <input
+          type={type}
+          value={value ?? ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          className={`shad-input w-full text-white ${
+            Icon ? "pl-10" : "pl-3"
+          } bg-dark-300 border border-dark-500 rounded-lg`}
+        />
       </div>
     </div>
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-dark-400 border border-dark-500 rounded-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-white">
+            {editingMedicine ? "Edit Medicine" : "Add New Medicine"}
+          </DialogTitle>
+          <DialogDescription className="text-dark-600">
+            Fill in the medicine details below
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput
+              id="name"
+              label="Medicine Name"
+              value={medicineData.name}
+              onChange={(e) =>
+                setMedicineData({ ...medicineData, name: e.target.value })
+              }
+              placeholder="e.g., Paracetamol 500mg"
+              required
+              icon={<Package className="w-5 h-5" />}
+            />
+
+            <FormInput
+              id="manufacturer"
+              label="Manufacturer"
+              value={medicineData.manufacturer}
+              onChange={(e) =>
+                setMedicineData({
+                  ...medicineData,
+                  manufacturer: e.target.value,
+                })
+              }
+              placeholder="e.g., Cipla"
+              required
+              icon={<Factory className="w-5 h-5" />}
+            />
+
+            {/* Category Dropdown */}
+            <div className="sm:col-span-2">
+              <label className="shad-input-label block mb-2">Category *</label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                >
+                  <span>{medicineData.category || "Select a category"}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-dark-600 transition-transform ${
+                      showCategoryDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showCategoryDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                    <div className="p-3 border-b border-dark-500">
+                      <span className="text-14-medium text-dark-700">
+                        Categories
+                      </span>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {categories.map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => handleCategorySelect(cat)}
+                          className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                        >
+                          <span className="text-16-medium text-white">
+                            {cat}
+                          </span>
+                          {medicineData.category === cat && (
+                            <Check className="w-5 h-5 text-green-500" />
+                          )}
+                        </button>
+                      ))}
+
+                      <div className="border-t border-dark-500 my-2"></div>
+
+                      {/* Custom Category */}
+                      <div className="p-3 flex gap-2 items-center">
+                        <input
+                          type="text"
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                          placeholder="Add custom category"
+                          className="shad-input w-full text-white bg-dark-300 border border-dark-500 rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleCustomCategory}
+                          size="icon"
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Plus className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <FormInput
+              id="batchNumber"
+              label="Batch Number"
+              value={medicineData.batchNumber}
+              onChange={(e) =>
+                setMedicineData({
+                  ...medicineData,
+                  batchNumber: e.target.value,
+                })
+              }
+              placeholder="e.g., PCM123"
+              required
+              icon={<Hash className="w-5 h-5" />}
+            />
+
+            <FormInput
+              id="expiryDate"
+              label="Expiry Date"
+              type="date"
+              value={medicineData.expiryDate}
+              onChange={(e) =>
+                setMedicineData({ ...medicineData, expiryDate: e.target.value })
+              }
+              required
+              icon={<Calendar className="w-5 h-5" />}
+            />
+
+            <FormInput
+              id="quantity"
+              label="Quantity"
+              type="number"
+              value={medicineData.quantity}
+              onChange={(e) =>
+                setMedicineData({
+                  ...medicineData,
+                  quantity: parseInt(e.target.value) || 0,
+                })
+              }
+              placeholder="0"
+              required
+              icon={<Boxes className="w-5 h-5" />}
+            />
+
+            <FormInput
+              id="minStockLevel"
+              label="Minimum Stock Level"
+              type="number"
+              value={medicineData.minStockLevel}
+              onChange={(e) =>
+                setMedicineData({
+                  ...medicineData,
+                  minStockLevel: parseInt(e.target.value) || 0,
+                })
+              }
+              placeholder="0"
+              required
+              icon={<AlertCircle className="w-5 h-5" />}
+            />
+
+            <FormInput
+              id="unitPrice"
+              label="Unit Price ($)"
+              type="number"
+              value={medicineData.unitPrice}
+              onChange={(e) =>
+                setMedicineData({
+                  ...medicineData,
+                  unitPrice: parseFloat(e.target.value) || 0,
+                })
+              }
+              placeholder="0.00"
+              required
+            />
+
+            <FormInput
+              id="location"
+              label="Storage Location"
+              value={medicineData.location}
+              onChange={(e) =>
+                setMedicineData({ ...medicineData, location: e.target.value })
+              }
+              placeholder="e.g., Rack A3"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              onClick={onClose}
+              variant="outline"
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+            >
+              {editingMedicine ? "Update Medicine" : "Add Medicine"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -714,7 +796,7 @@ const PharmacistInventory = ({ onBack }) => {
       </div>
 
       {/* Add/Edit Medicine Modal */}
-      <AddMedicineModal
+      <AddMedicineDialog
         isOpen={showAddModal}
         onClose={() => {
           setShowAddModal(false);

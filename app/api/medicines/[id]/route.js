@@ -18,23 +18,31 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ error: "Medicine not found" }, { status: 404 });
   }
 
+  // Exclude stock-related fields (handled by restock/dispense APIs)
+  const { quantity, ...nonStockUpdates } = body;
+
+  if (Object.keys(nonStockUpdates).length === 0) {
+    return NextResponse.json(
+      { error: "No non-stock fields to update" },
+      { status: 400 }
+    );
+  }
+
   const [updated] = await db
     .update(Medicines)
-    .set(body)
+    .set(nonStockUpdates)
     .where(eq(Medicines.id, id))
     .returning();
 
-  // If quantity was adjusted directly (not restock flow)
-  if (body.quantity !== undefined && body.quantity !== oldMed.quantity) {
-    await db.insert(InventoryLogs).values({
-      medicineId: id,
-      action: "adjustment", // clearer than "update"
-      quantityChange: body.quantity - oldMed.quantity,
-      prevQuantity: oldMed.quantity,
-      newQuantity: body.quantity,
-      notes: "Manual stock adjustment via update",
-    });
-  }
+  // Log metadata change for audit
+  await db.insert(InventoryLogs).values({
+    medicineId: id,
+    action: "metadata-update",
+    quantityChange: 0, // stock unchanged
+    prevQuantity: oldMed.quantity,
+    newQuantity: oldMed.quantity,
+    notes: `Metadata updated: ${Object.keys(nonStockUpdates).join(", ")}`,
+  });
 
   return NextResponse.json(updated);
 }
