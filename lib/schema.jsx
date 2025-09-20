@@ -273,18 +273,49 @@ export const Pharmacists = pgTable("pharmacists", {
   hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
+// Medicine Table
 export const Medicines = pgTable("medicines", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name").notNull(),
-  brand: varchar("brand"),
-  dosageForm: varchar("dosageForm"), // Tablet, Syrup, Injection
-  strength: varchar("strength"), // e.g., 500mg
-  stock: integer("stock").default(0), // current units in stock
-  reorderLevel: integer("reorderLevel").default(10), // low stock threshold
-  expiryDate: date("expiryDate"),
+  category: varchar("category"),
+  manufacturer: varchar("manufacturer"),
   batchNumber: varchar("batchNumber"),
-  costPrice: numeric("costPrice"),
-  sellingPrice: numeric("sellingPrice"),
+  expiryDate: date("expiryDate"),
+  quantity: integer("quantity").default(0),
+  minStockLevel: integer("minStockLevel").default(0),
+  unitPrice: numeric("unitPrice"),
+  location: varchar("location"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+// Inventory Logs
+export const InventoryLogs = pgTable("inventory_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  medicineId: uuid("medicineId")
+    .notNull()
+    .references(() => Medicines.id, { onDelete: "cascade" }),
+
+  pharmacistId: uuid("pharmacistId").references(() => Pharmacists.userId, {
+    onDelete: "set null",
+  }),
+
+  // Type of transaction
+  action: varchar("action").notNull(),
+  // "added", "restocked", "dispensed", "adjusted"
+
+  // Quantity change (+ve for increase, -ve for decrease)
+  quantityChange: integer("quantityChange").notNull(),
+
+  // Running quantity after transaction
+  newQuantity: integer("newQuantity").notNull(),
+
+  // Optional notes (batch details, correction reason, etc.)
+  notes: varchar("notes"),
+
+  // Unit price snapshot at the time
+  unitPrice: numeric("unitPrice"),
+
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
