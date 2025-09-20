@@ -360,14 +360,37 @@ const AddMedicineDialog = ({
 const RestockModal = ({ medicine }) => {
   const [open, setOpen] = useState(false);
   const [restockAmount, setRestockAmount] = useState(0);
+  const [restockFull, setRestockFull] = useState(false);
+
+  const currentQty = parseInt(medicine.quantity, 10) || 0;
+  const minStock = parseInt(medicine.minStockLevel, 10) || 0;
 
   const handleRestock = () => {
+    let finalAmount = restockAmount;
+
+    // If stock is empty → auto restock = 2 × minStock
+    if (currentQty === 0) {
+      finalAmount = minStock * 2;
+    }
+
     console.log(medicine);
-    console.log(`Restocked ${medicine.name} with ${restockAmount} units`);
-    console.log(typeof restockAmount);
-    // 👉 call your API here
-    setOpen(false); // close modal after restock
+    console.log(`Restocked ${medicine.name} with ${finalAmount} units`);
+
+    // 👉 call your API here with finalAmount
+    setOpen(false);
     setRestockAmount(0);
+    setRestockFull(false);
+  };
+
+  const handleCheckboxChange = (e) => {
+    const checked = e.target.checked;
+    setRestockFull(checked);
+
+    if (checked) {
+      setRestockAmount(minStock * 2 - currentQty);
+    } else {
+      setRestockAmount(0);
+    }
   };
 
   return (
@@ -387,6 +410,7 @@ const RestockModal = ({ medicine }) => {
         onOpenChange={() => {
           setOpen(false);
           setRestockAmount(0);
+          setRestockFull(false);
         }}
       >
         <DialogContent className="sm:max-w-md bg-gray-900 border border-green-700 shadow-lg rounded-xl">
@@ -395,25 +419,59 @@ const RestockModal = ({ medicine }) => {
               Restock Medicine
             </DialogTitle>
             <DialogDescription className="text-gray-300">
-              Enter the quantity to add for{" "}
-              <span className="text-green-400 font-semibold">
-                {medicine.name}
+              {currentQty === 0 ? (
+                <span>
+                  Stock is empty. Restock will be set to{" "}
+                  <span className="text-green-400 font-semibold">
+                    {minStock * 2}
+                  </span>{" "}
+                  units.
+                </span>
+              ) : (
+                <span>
+                  Enter the quantity to add for{" "}
+                  <span className="text-green-400 font-semibold">
+                    {medicine.name}
+                  </span>
+                  .
+                </span>
+              )}
+              <br />
+              <span className="text-xs text-gray-400">
+                Current: {currentQty} | Min: {minStock}
               </span>
-              .
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-3 py-3">
-            <Input
-              type="number"
-              min="1"
-              placeholder="Enter quantity"
-              value={restockAmount}
-              onChange={(e) => setRestockAmount(e.target.value)}
-              className="bg-gray-800 border-green-700 text-white placeholder-gray-400 
-                         focus:border-green-500 focus:ring-green-500"
-            />
-          </div>
+          {/* Show input + checkbox only if stock > 0 */}
+          {currentQty > 0 && (
+            <div className="flex flex-col gap-3 py-3">
+              <Input
+                type="number"
+                min="1"
+                placeholder="Enter quantity"
+                value={restockAmount}
+                onChange={(e) =>
+                  setRestockAmount(parseInt(e.target.value, 10) || 0)
+                }
+                disabled={restockFull}
+                className={`bg-gray-800 border-green-700 text-white placeholder-gray-400 
+                           focus:border-green-500 focus:ring-green-500 ${
+                             restockFull ? "opacity-60 cursor-not-allowed" : ""
+                           }`}
+              />
+
+              <label className="flex items-center gap-2 text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={restockFull}
+                  onChange={handleCheckboxChange}
+                  className="w-4 h-4 accent-green-500"
+                />
+                Restock Full (2 × Min Stock Level)
+              </label>
+            </div>
+          )}
 
           <DialogFooter className="flex justify-end gap-2">
             <Button
@@ -425,7 +483,7 @@ const RestockModal = ({ medicine }) => {
             </Button>
             <Button
               onClick={handleRestock}
-              disabled={!restockAmount}
+              disabled={currentQty > 0 && !restockAmount}
               className="bg-green-600 hover:bg-green-500 text-white rounded-3xl"
             >
               Confirm Restock
@@ -505,14 +563,6 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
   };
 
   const getStatusBadge = (currentStock, minStock, status) => {
-    console.log(
-      parseInt(currentStock),
-      parseInt(minStock),
-      status,
-      currentStock,
-      minStock,
-      status
-    );
     // Check expired first (always takes priority)
     if (status === "expired") {
       return (
@@ -581,7 +631,6 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       </div>
     );
   };
-
 
   const handleAddMedicine = async (newMedicine) => {
     try {
@@ -897,7 +946,8 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                             medicine.minStockLevel,
                             medicine.status
                           )}
-                          {medicine.quantity <= medicine.minStockLevel && (
+                          {parseInt(medicine.quantity) <=
+                            parseInt(medicine.minStockLevel) && (
                             <RestockModal medicine={medicine} />
                           )}
                         </div>
