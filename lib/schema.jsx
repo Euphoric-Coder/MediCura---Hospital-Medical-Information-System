@@ -285,6 +285,7 @@ export const Medicines = pgTable("medicines", {
   minStockLevel: integer("minStockLevel").default(0),
   unitPrice: numeric("unitPrice"),
   location: varchar("location"),
+  status: varchar("status").default("in-stock"), // in-stock, out-of-stock, expired, low-stock
   createdAt: timestamp("createdAt").defaultNow(),
 });
 

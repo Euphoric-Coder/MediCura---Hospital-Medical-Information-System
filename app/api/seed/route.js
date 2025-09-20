@@ -1,5 +1,11 @@
 import { db } from "@/lib/dbConfig";
-import { Doctors, Patients, Pharmacists } from "@/lib/schema";
+import {
+  Doctors,
+  InventoryLogs,
+  Medicines,
+  Patients,
+  Pharmacists,
+} from "@/lib/schema";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -224,71 +230,117 @@ export async function GET() {
     //   },
     // ];
 
-    const pharmacist = [
+    // const pharmacist = [
+    //   {
+    //     userId: "a0442548-e117-4244-b3c0-f6ed691d3cc0",
+
+    //     // Profile Info
+    //     name: "Nehal Wadhera",
+    //     phone: "+91-9876543210",
+    //     avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+    //     dateOfBirth: new Date("1985-04-12"),
+    //     gender: "Female",
+    //     address: "C-124, South Extension II, New Delhi, India",
+    //     emergencyContactName: "Rajesh Wadhera",
+    //     emergencyPhone: "+91-9812345678",
+
+    //     // Professional Info
+    //     pharmacyLicenseNumber: "DL-23456/2025",
+    //     pharmacyType: "Retail",
+    //     currentPharmacy: "Apollo Pharmacy, South Extension II, New Delhi",
+    //     yearsOfExperience: 12,
+    //     specializations: "Chronic Care, Geriatrics, Pediatrics",
+
+    //     // Education
+    //     pharmacySchool:
+    //       "Delhi Institute of Pharmaceutical Sciences and Research (DIPSAR)",
+    //     graduationYear: "2008",
+    //     residencyProgram: "Hospital Pharmacy Residency - AIIMS New Delhi",
+    //     certifications: "Drug Safety Certification, Clinical Pharmacology",
+    //     continuingEducation:
+    //       "Annual CME workshops in Clinical Pharmacy, Diabetes Care Training",
+
+    //     // Practice
+    //     workSchedule: "Mon-Sat, 9:00 AM - 7:00 PM",
+    //     languagesSpoken: "English, Hindi",
+    //     clinicalServices:
+    //       "Medication Therapy Management, Immunization Counseling, Chronic Disease Support",
+    //     insuranceExperience:
+    //       "Handled Mediclaim and cashless pharmacy insurance claims with Apollo Pharmacy",
+
+    //     // Consent
+    //     practiceConsent: true,
+    //     dataConsent: true,
+    //     regulatoryConsent: true,
+
+    //     // Onboarding
+    //     hasOnboarded: true,
+    //   },
+    // ];
+
+    const pharmacistId = "a0442548-e117-4244-b3c0-f6ed691d3cc0";
+
+    const medicines = [
       {
-        userId: "a0442548-e117-4244-b3c0-f6ed691d3cc0",
-
-        // Profile Info
-        name: "Nehal Wadhera",
-        phone: "+91-9876543210",
-        avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-        dateOfBirth: new Date("1985-04-12"),
-        gender: "Female",
-        address: "C-124, South Extension II, New Delhi, India",
-        emergencyContactName: "Rajesh Wadhera",
-        emergencyPhone: "+91-9812345678",
-
-        // Professional Info
-        pharmacyLicenseNumber: "DL-23456/2025",
-        pharmacyType: "Retail",
-        currentPharmacy: "Apollo Pharmacy, South Extension II, New Delhi",
-        yearsOfExperience: 12,
-        specializations: "Chronic Care, Geriatrics, Pediatrics",
-
-        // Education
-        pharmacySchool:
-          "Delhi Institute of Pharmaceutical Sciences and Research (DIPSAR)",
-        graduationYear: "2008",
-        residencyProgram: "Hospital Pharmacy Residency - AIIMS New Delhi",
-        certifications: "Drug Safety Certification, Clinical Pharmacology",
-        continuingEducation:
-          "Annual CME workshops in Clinical Pharmacy, Diabetes Care Training",
-
-        // Practice
-        workSchedule: "Mon-Sat, 9:00 AM - 7:00 PM",
-        languagesSpoken: "English, Hindi",
-        clinicalServices:
-          "Medication Therapy Management, Immunization Counseling, Chronic Disease Support",
-        insuranceExperience:
-          "Handled Mediclaim and cashless pharmacy insurance claims with Apollo Pharmacy",
-
-        // Consent
-        practiceConsent: true,
-        dataConsent: true,
-        regulatoryConsent: true,
-
-        // Onboarding
-        hasOnboarded: true,
+        id: "065ba3c3-4b91-4bb4-9cd4-73075482cad8",
+        name: "Paracetamol 500mg",
+        category: "Pain Relief",
+        manufacturer: "Cipla",
+        batchNumber: "PARA001",
+        expiryDate: new Date("2026-06-30"),
+        quantity: 200,
+        minStockLevel: 50,
+        unitPrice: 1.5,
+        location: "A-1-01",
+      },
+      {
+        id: "82b465ab-dd94-448a-8199-51aaff2b7f5d",
+        name: "Amoxicillin 500mg",
+        category: "Antibiotic",
+        manufacturer: "Sun Pharma",
+        batchNumber: "AMOX002",
+        expiryDate: new Date("2025-12-31"),
+        quantity: 100,
+        minStockLevel: 30,
+        unitPrice: 2.0,
+        location: "B-2-05",
+      },
+      {
+        id: "921c0bb9-fd2d-43ec-ad2a-191a8cc49d73",
+        name: "Metformin 500mg",
+        category: "Diabetes",
+        manufacturer: "Dr. Reddy’s",
+        batchNumber: "MET003",
+        expiryDate: new Date("2027-03-15"),
+        quantity: 150,
+        minStockLevel: 40,
+        unitPrice: 1.25,
+        location: "C-3-02",
       },
     ];
 
-    // console.log(dummyDoctors);
+    // Insert medicines
+    await db.insert(Medicines).values(medicines);
 
-    try {
-      await db.insert(Pharmacists).values(pharmacist);
-    } catch (error) {
-      console.log(error);
-    }
+    // Insert logs for initial stock
+    const logs = medicines.map((med) => ({
+      medicineId: med.id,
+      pharmacistId,
+      action: "added",
+      quantityChange: med.quantity,
+      newQuantity: med.quantity,
+      notes: "Initial stock added during pharmacy setup",
+      unitPrice: med.unitPrice,
+    }));
+
+    await db.insert(InventoryLogs).values(logs);
 
     return NextResponse.json({
       // message: "6 dummy doctors seeded successfully (India-specific)!",
-      message: "1 dummy pharmacist data seeded successfully!",
+      message: "Medicine & Inventory data seeded successfully!",
     });
   } catch (error) {
-    console.error("Error seeding pharmacist:", error);
-    return NextResponse.json(
-      { error: "Failed to seed pharmacists" },
-      { status: 500 }
-    );
+    console.error("Error seeding data:", error);
+    return NextResponse.json({ error: "Failed to seed data" }, { status: 500 });
   }
 }
