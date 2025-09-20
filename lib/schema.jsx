@@ -280,10 +280,10 @@ export const Medicines = pgTable("medicines", {
   category: varchar("category"),
   manufacturer: varchar("manufacturer"),
   batchNumber: varchar("batchNumber"),
-  expiryDate: date("expiryDate"),
-  quantity: integer("quantity").default(0),
-  minStockLevel: integer("minStockLevel").default(0),
-  unitPrice: numeric("unitPrice"),
+  expiryDate: varchar("expiryDate"),
+  quantity: varchar("quantity").default(0),
+  minStockLevel: varchar("minStockLevel").default(0),
+  unitPrice: varchar("unitPrice"),
   location: varchar("location"),
   status: varchar("status").default("in-stock"), // in-stock, out-of-stock, expired, low-stock
   createdAt: timestamp("createdAt").defaultNow(),
@@ -306,19 +306,19 @@ export const InventoryLogs = pgTable("inventory_logs", {
   // "added", "restocked", "dispensed", "adjusted"
 
   // Quantity change (+ve for increase, -ve for decrease)
-  quantityChange: integer("quantityChange").notNull(),
+  quantityChange: varchar("quantityChange").notNull(),
 
   // Previous quantity before transaction
-  prevQuantity: integer("prevQuantity").notNull(),
+  prevQuantity: varchar("prevQuantity").notNull(),
 
   // Running quantity after transaction
-  newQuantity: integer("newQuantity").notNull(),
+  newQuantity: varchar("newQuantity").notNull(),
 
   // Optional notes (batch details, correction reason, etc.)
   notes: varchar("notes"),
 
   // Unit price snapshot at the time
-  unitPrice: numeric("unitPrice"),
+  unitPrice: varchar("unitPrice"),
 
   createdAt: timestamp("createdAt").defaultNow(),
 });

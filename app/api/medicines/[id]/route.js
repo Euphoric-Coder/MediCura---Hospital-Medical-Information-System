@@ -22,7 +22,7 @@ export async function PUT(req, { params }) {
   }
 
   // Exclude stock-related fields (handled by restock/dispense APIs)
-  const { quantity, ...nonStockUpdates } = medicineData;
+  const { quantity, createdAt, ...nonStockUpdates } = medicineData;
 
   if (Object.keys(nonStockUpdates).length === 0) {
     return NextResponse.json(

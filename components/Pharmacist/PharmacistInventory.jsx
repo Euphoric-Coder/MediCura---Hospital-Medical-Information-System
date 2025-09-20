@@ -19,6 +19,7 @@ import {
   ChevronDown,
   Check,
   RefreshCcw,
+  IndianRupee,
 } from "lucide-react";
 import {
   Dialog,
@@ -270,7 +271,6 @@ const AddMedicineDialog = ({
                 })
               }
               placeholder="0"
-              required
               disabled={editingMedicine}
               icon={<Boxes className="w-5 h-5" />}
             />
@@ -304,6 +304,7 @@ const AddMedicineDialog = ({
               }
               placeholder="0.00"
               required
+              icon={<IndianRupee className="w-5 h-5" />}
             />
 
             <FormInput
@@ -314,6 +315,8 @@ const AddMedicineDialog = ({
                 setMedicineData({ ...medicineData, location: e.target.value })
               }
               placeholder="e.g., Rack A3"
+              required
+              icon={<MapPin className="w-5 h-5" />}
             />
           </div>
 
@@ -594,19 +597,22 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
         pharmacistId: pharmacistData.userId,
       };
 
-      // const res = await fetch(`/api/medicines/${updatedMedicine.id}`, {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(updatedMedicine),
-      // });
+      console.log(data);
+      console.log(typeof data.expiryDate);
 
-      // if (!res.ok) {
-      //   const error = await res.json();
-      //   console.error("Error updating medicine:", error);
-      //   return;
-      // }
+      const res = await fetch(`/api/medicines/${updatedMedicine.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("Error updating medicine:", error);
+        return;
+      }
 
       refreshMedicine();
       setMessage(`${updatedMedicine.name} edited in inventory`);
