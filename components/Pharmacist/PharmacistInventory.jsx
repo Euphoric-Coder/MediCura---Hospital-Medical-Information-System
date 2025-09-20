@@ -505,6 +505,14 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
   };
 
   const getStatusBadge = (currentStock, minStock, status) => {
+    console.log(
+      parseInt(currentStock),
+      parseInt(minStock),
+      status,
+      currentStock,
+      minStock,
+      status
+    );
     // Check expired first (always takes priority)
     if (status === "expired") {
       return (
@@ -518,7 +526,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     }
 
     // Handle stock levels
-    if (currentStock === 0) {
+    if (parseInt(currentStock) === 0) {
       return (
         <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
           <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -529,7 +537,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       );
     }
 
-    if (currentStock <= minStock) {
+    if (parseInt(currentStock) <= parseInt(minStock)) {
       return (
         <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
           <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
@@ -552,11 +560,17 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
   };
 
   const getStockLevelBar = (current, min) => {
-    const percentage = Math.min((current / (min * 2)) * 100, 100);
-    let colorClass = "bg-green-500";
+    // Convert varchar -> number safely
+    const curr = parseInt(current, 10) || 0;
+    const minimum = parseInt(min, 10) || 0;
 
-    if (current === 0) colorClass = "bg-red-500";
-    else if (current <= min) colorClass = "bg-yellow-500";
+    // percentage capped at 100
+    const percentage =
+      minimum > 0 ? Math.min((curr / (minimum * 2)) * 100, 100) : 0;
+
+    let colorClass = "bg-green-500";
+    if (curr === 0) colorClass = "bg-red-500";
+    else if (curr <= minimum) colorClass = "bg-yellow-500";
 
     return (
       <div className="w-full bg-dark-500 rounded-full h-2">
@@ -567,6 +581,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       </div>
     );
   };
+
 
   const handleAddMedicine = async (newMedicine) => {
     try {
