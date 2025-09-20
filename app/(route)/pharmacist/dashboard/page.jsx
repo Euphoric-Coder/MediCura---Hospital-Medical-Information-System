@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import LoginRedirect from "@/components/Onboarding/LoginRedirect";
 import PharmacistDashboardWithSidebar from "@/components/Pharmacist/PharmacistDashboardWithSidebar";
 
+
 export default function PatientPage() {
   const router = useRouter();
   const { data: session, status } = useSession();

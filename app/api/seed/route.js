@@ -231,7 +231,7 @@ export async function GET() {
         // Profile Info
         name: "Ritu Sharma",
         phone: "+91-9876543210",
-        avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+        avatar: "https://randomuser.me/api/portraits/men/45.jpg",
         dateOfBirth: new Date("1985-04-12"),
         gender: "Female",
         address: "C-124, South Extension II, New Delhi, India",

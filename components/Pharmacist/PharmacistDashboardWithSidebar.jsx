@@ -9,7 +9,7 @@ import PharmacistReports from "./PharmacistReports";
 import PharmacistDrugInteractions from "./PharmacistDrugInteractions";
 import { Plus, Menu } from "lucide-react";
 
-const PharmacistDashboardWithSidebar = ({ onLogout }) => {
+const PharmacistDashboardWithSidebar = ({ pharmacistData }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -24,7 +24,7 @@ const PharmacistDashboardWithSidebar = ({ onLogout }) => {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "dashboard":
-        return <PharmacistDashboard onLogout={onLogout} />;
+        return <PharmacistDashboard />;
       case "prescriptions":
         return (
           <PharmacistPrescriptions onBack={() => setCurrentPage("dashboard")} />
@@ -115,7 +115,7 @@ const PharmacistDashboardWithSidebar = ({ onLogout }) => {
           </div>
         );
       default:
-        return <PharmacistDashboard onLogout={onLogout} />;
+        return <PharmacistDashboard />;
     }
   };
 
@@ -125,9 +125,9 @@ const PharmacistDashboardWithSidebar = ({ onLogout }) => {
       <PharmacistSidebar
         currentPage={currentPage}
         onNavigate={handleNavigate}
-        onLogout={onLogout}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
+        pharmacistData={pharmacistData}
       />
 
       {/* Main Content */}

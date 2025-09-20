@@ -17,13 +17,14 @@ import {
   X,
   User,
 } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 const PharmacistSidebar = ({
   currentPage,
   onNavigate,
-  onLogout,
   isOpen = true,
   onToggle,
+  pharmacistData,
 }) => {
   const menuItems = [
     {
@@ -157,7 +158,7 @@ const PharmacistSidebar = ({
               </div>
               <div>
                 <h3 className="text-14-semibold lg:text-16-semibold text-white">
-                  PharmD. Michael Chen
+                  {pharmacistData.name}
                 </h3>
                 <p className="text-10-regular lg:text-12-regular text-blue-400">
                   Clinical Pharmacist
@@ -273,7 +274,12 @@ const PharmacistSidebar = ({
           </button>
 
           <button
-            onClick={onLogout}
+            onClick={() =>
+              signOut({
+                redirect: true,
+                callbackUrl: "/sign-in",
+              })
+            }
             className="w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group text-red-400 hover:bg-red-500/10 hover:text-red-300"
           >
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-red-500/20 rounded-xl flex items-center justify-center group-hover:bg-red-500/30 transition-all duration-300">
