@@ -266,9 +266,16 @@ const PharmacistInventory = ({ onBack }) => {
   const [editingMedicine, setEditingMedicine] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMedicine();
+    try {
+      fetchMedicine();
+    } catch (error) {
+      console.error("Error fetching medicines:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const fetchMedicine = async () => {
