@@ -55,6 +55,7 @@ const AddMedicineDialog = ({
     unitPrice: 0,
     location: "",
   });
+  const [reasonOfEdit, setReasonOfEdit] = useState("");
 
   useEffect(() => {
     if (editingMedicine) {
@@ -103,7 +104,7 @@ const AddMedicineDialog = ({
     if (!editingMedicine) {
       onAdd(medicineData);
     } else {
-      onEdit(medicineData);
+      onEdit(medicineData, reasonOfEdit);
     }
     onClose();
   };
@@ -124,6 +125,7 @@ const AddMedicineDialog = ({
           unitPrice: 0,
           location: "",
         });
+        setReasonOfEdit("");
       }}
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-dark-400 border border-dark-500 rounded-3xl">
@@ -319,6 +321,18 @@ const AddMedicineDialog = ({
               icon={<MapPin className="w-5 h-5" />}
             />
           </div>
+
+          {editingMedicine && (
+            <FormInput
+              id="reason"
+              label="Reason for Updating Metadata"
+              value={reasonOfEdit}
+              onChange={(e) => setReasonOfEdit(e.target.value)}
+              placeholder="e.g., Mistake in batch number"
+              required={editingMedicine}
+              icon={<Hash className="w-5 h-5" />}
+            />
+          )}
 
           {/* Buttons */}
           <div className="flex gap-4">
@@ -588,18 +602,16 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleEditMedicine = async (updatedMedicine) => {
+  const handleEditMedicine = async (updatedMedicine, reason) => {
     try {
-      console.log("Edited Medicine Data:", updatedMedicine);
-
       const data = {
         ...updatedMedicine,
         pharmacistId: pharmacistData.userId,
+        reason,
       };
 
       console.log(data);
-      console.log(typeof data.expiryDate);
-
+      console.log(reason);
       const res = await fetch(`/api/medicines/${updatedMedicine.id}`, {
         method: "PUT",
         headers: {

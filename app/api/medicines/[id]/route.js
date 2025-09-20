@@ -9,7 +9,7 @@ export async function PUT(req, { params }) {
   const body = await req.json();
 
   // Separates pharmacistId from the medicine data
-  const { pharmacistId, ...medicineData } = body;
+  const { pharmacistId, reason, ...medicineData } = body;
 
   // Fetch old record
   const [oldMed] = await db
@@ -37,6 +37,13 @@ export async function PUT(req, { params }) {
     .where(eq(Medicines.id, id))
     .returning();
 
+  const changes = Object.keys(nonStockUpdates)
+    .filter((key) => oldMed[key] !== nonStockUpdates[key])
+    .map(
+      (key) => `- ${key}: ${oldMed[key] ?? "null"} → ${nonStockUpdates[key]}`
+    )
+    .join("\n");
+
   // Log metadata change for audit
   await db.insert(InventoryLogs).values({
     medicineId: id,
@@ -46,7 +53,10 @@ export async function PUT(req, { params }) {
     prevQuantity: oldMed.quantity,
     newQuantity: oldMed.quantity,
     unitPrice: nonStockUpdates.unitPrice,
-    notes: `Metadata updated: ${Object.keys(nonStockUpdates).join(", ")}`,
+    notes:
+      changes.length > 0
+        ? `Updated Data for medicine ${oldMed.name}:\n${changes}\nReason of Update: ${reason}`
+        : `Updated Data for medicine ${oldMed.name}: no changes detected`,
   });
 
   return NextResponse.json(updated);
