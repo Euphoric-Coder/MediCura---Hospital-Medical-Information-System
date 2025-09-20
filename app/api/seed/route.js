@@ -226,16 +226,16 @@ export async function GET() {
 
     const pharmacist = [
       {
-        userId: "a0442548-e117-4244-b3c0-f6ed691d3cc0", // generate a new UUID or use an existing User's ID
+        userId: "a0442548-e117-4244-b3c0-f6ed691d3cc0",
 
         // Profile Info
-        name: "Ritu Sharma",
+        name: "Nehal Wadhera",
         phone: "+91-9876543210",
         avatar: "https://randomuser.me/api/portraits/men/45.jpg",
         dateOfBirth: new Date("1985-04-12"),
         gender: "Female",
         address: "C-124, South Extension II, New Delhi, India",
-        emergencyContactName: "Rajesh Sharma",
+        emergencyContactName: "Rajesh Wadhera",
         emergencyPhone: "+91-9812345678",
 
         // Professional Info

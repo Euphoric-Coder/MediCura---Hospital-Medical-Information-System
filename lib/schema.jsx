@@ -273,6 +273,22 @@ export const Pharmacists = pgTable("pharmacists", {
   hasOnboarded: boolean("hasOnboarded").default(false),
 });
 
+export const Medicines = pgTable("medicines", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name").notNull(),
+  brand: varchar("brand"),
+  dosageForm: varchar("dosageForm"), // Tablet, Syrup, Injection
+  strength: varchar("strength"), // e.g., 500mg
+  stock: integer("stock").default(0), // current units in stock
+  reorderLevel: integer("reorderLevel").default(10), // low stock threshold
+  expiryDate: date("expiryDate"),
+  batchNumber: varchar("batchNumber"),
+  costPrice: numeric("costPrice"),
+  sellingPrice: numeric("sellingPrice"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+
 // Receptionist Table
 export const Receptionists = pgTable("receptionists", {
   userId: uuid("userId")
