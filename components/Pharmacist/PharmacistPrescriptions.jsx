@@ -593,6 +593,20 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
       form // pass updated form details
     );
 
+    setNotes("");
+    setForm({
+      medication: "",
+      cost: "",
+      medicineValidity: "",
+      dispensedDuration: "",
+      refillsRemaining: 0,
+      nextRefillDate: "",
+      lastDispensedDate: "",
+      sideEffects: [],
+      interaction: [],
+    });
+    setFirstTime(false);
+
     handleClose();
   };
 
@@ -630,6 +644,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
             sideEffects: [],
             interaction: [],
           });
+          setFirstTime(false);
         }
         setOpen(open);
       }}
@@ -930,13 +945,13 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
           <Button
             onClick={(e) => handleAction(e, "pending")}
             disabled={!notes.trim()}
-            className="w-full bg-yellow-600 hover:bg-yellow-500 text-white rounded-3xl disabled:opacity-50"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Mark Pending
           </Button>
           <Button
             onClick={(e) => handleAction(e, "dispensed")}
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-3xl"
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-3xl"
           >
             Confirm Dispense
           </Button>
