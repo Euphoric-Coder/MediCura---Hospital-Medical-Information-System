@@ -5,6 +5,7 @@ import {
   Medicines,
   Patients,
   Pharmacists,
+  Receptionists,
 } from "@/lib/schema";
 import { NextResponse } from "next/server";
 
@@ -278,69 +279,102 @@ export async function GET() {
     //   },
     // ];
 
-    const pharmacistId = "a0442548-e117-4244-b3c0-f6ed691d3cc0";
+    // const pharmacistId = "a0442548-e117-4244-b3c0-f6ed691d3cc0";
 
-    const medicines = [
+    // const medicines = [
+    //   {
+    //     id: "065ba3c3-4b91-4bb4-9cd4-73075482cad8",
+    //     name: "Paracetamol 500mg",
+    //     category: "Pain Relief",
+    //     manufacturer: "Cipla",
+    //     batchNumber: "PARA001",
+    //     expiryDate: new Date("2026-06-30"),
+    //     quantity: 200,
+    //     minStockLevel: 50,
+    //     unitPrice: 1.5,
+    //     location: "A-1-01",
+    //   },
+    //   {
+    //     id: "24523ec6-d27e-41a3-a89c-cef9cc479775",
+    //     name: "Amoxicillin 500mg",
+    //     category: "Antibiotic",
+    //     manufacturer: "Sun Pharma",
+    //     batchNumber: "AMOX002",
+    //     expiryDate: new Date("2025-12-31"),
+    //     quantity: 100,
+    //     minStockLevel: 30,
+    //     unitPrice: 2.0,
+    //     location: "B-2-05",
+    //   },
+    //   {
+    //     id: "2d3ac5d4-3824-4750-9613-1430d7600b32",
+    //     name: "Metformin 500mg",
+    //     category: "Diabetes",
+    //     manufacturer: "Dr. Reddy’s",
+    //     batchNumber: "MET003",
+    //     expiryDate: new Date("2027-03-15"),
+    //     quantity: 150,
+    //     minStockLevel: 40,
+    //     unitPrice: 1.25,
+    //     location: "C-3-02",
+    //   },
+    // ];
+
+    const receptionist = [
       {
-        id: "065ba3c3-4b91-4bb4-9cd4-73075482cad8",
-        name: "Paracetamol 500mg",
-        category: "Pain Relief",
-        manufacturer: "Cipla",
-        batchNumber: "PARA001",
-        expiryDate: new Date("2026-06-30"),
-        quantity: 200,
-        minStockLevel: 50,
-        unitPrice: 1.5,
-        location: "A-1-01",
-      },
-      {
-        id: "24523ec6-d27e-41a3-a89c-cef9cc479775",
-        name: "Amoxicillin 500mg",
-        category: "Antibiotic",
-        manufacturer: "Sun Pharma",
-        batchNumber: "AMOX002",
-        expiryDate: new Date("2025-12-31"),
-        quantity: 100,
-        minStockLevel: 30,
-        unitPrice: 2.0,
-        location: "B-2-05",
-      },
-      {
-        id: "2d3ac5d4-3824-4750-9613-1430d7600b32",
-        name: "Metformin 500mg",
-        category: "Diabetes",
-        manufacturer: "Dr. Reddy’s",
-        batchNumber: "MET003",
-        expiryDate: new Date("2027-03-15"),
-        quantity: 150,
-        minStockLevel: 40,
-        unitPrice: 1.25,
-        location: "C-3-02",
+        userId: "c0cb881d-cb85-461d-8114-3fce41a8fdf8",
+        name: "Mrittika Saha",
+        phone: "9876543210",
+        avatar: "/avatars/john.png",
+        dateOfBirth: "1985-03-12",
+        gender: "Female",
+        address: "123 Main Street, Cityville",
+        emergencyContactName: "Nirmala Saha",
+        emergencyPhone: "9876543211",
+
+        licenseNumber: "PHARMA-12345",
+        yearsOfExperience: 8,
+        specialization: "Clinical Pharmacology",
+        certifications: "BPharm, PharmD",
+        currentEmployer: "City Hospital",
+        reasonForLeaving: "Career growth",
+
+        education: "PharmD, University of Health",
+        softwareSkills: "MediSoft, PharmacyPro",
+        languagesSpoken: "English, Hindi",
+        workSchedule: "Full-time",
+        shiftPreference: "Day",
+        availableHours: "09:00 - 18:00",
+        transportationMethod: "Own Vehicle",
+
+        hasOnboarded: true,
       },
     ];
 
     // Insert medicines
-    await db.insert(Medicines).values(medicines);
+    // await db.insert(Medicines).values(medicines);
 
     // Insert logs for initial stock
-    const logs = medicines.map((med) => ({
-      medicineId: med.id,
-      pharmacistId,
-      action: "add",
-      quantityChange: med.quantity,
-      prevQuantity: 0,
-      newQuantity: med.quantity,
-      notes: "Initial stock added during pharmacy setup",
-      unitPrice: med.unitPrice,
-    }));
+    // const logs = medicines.map((med) => ({
+    //   medicineId: med.id,
+    //   pharmacistId,
+    //   action: "add",
+    //   quantityChange: med.quantity,
+    //   prevQuantity: 0,
+    //   newQuantity: med.quantity,
+    //   notes: "Initial stock added during pharmacy setup",
+    //   unitPrice: med.unitPrice,
+    // }));
 
     // console.log(logs);
 
-    await db.insert(InventoryLogs).values(logs);
+    // await db.insert(InventoryLogs).values(logs);
+
+    await db.insert(Receptionists).values(receptionist);
 
     return NextResponse.json({
       // message: "6 dummy doctors seeded successfully (India-specific)!",
-      message: "Medicine & Inventory data seeded successfully!",
+      message: "Receptionist data seeded successfully!",
     });
   } catch (error) {
     console.error("Error seeding data:", error);

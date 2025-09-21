@@ -10,7 +10,7 @@ import ReceptionistInsurance from "./ReceptionistInsurance";
 import ReceptionistReports from "./ReceptionistReports";
 import { Plus, Menu } from "lucide-react";
 
-const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
+const ReceptionistDashboardWithSidebar = ({ receptionistData }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -25,7 +25,7 @@ const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "dashboard":
-        return <ReceptionistDashboard onLogout={onLogout} />;
+        return <ReceptionistDashboard />;
       case "patient-registration":
         return (
           <ReceptionistPatientRegistration
@@ -127,7 +127,7 @@ const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
           </div>
         );
       default:
-        return <ReceptionistDashboard onLogout={onLogout} />;
+        return <ReceptionistDashboard />;
     }
   };
 
@@ -137,9 +137,9 @@ const ReceptionistDashboardWithSidebar = ({ onLogout }) => {
       <ReceptionistSidebar
         currentPage={currentPage}
         onNavigate={handleNavigate}
-        onLogout={onLogout}
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
+        receptionistData={receptionistData}
       />
 
       {/* Main Content */}

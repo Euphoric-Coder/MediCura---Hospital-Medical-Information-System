@@ -46,7 +46,7 @@ export default function PatientPage() {
             .where(eq(Receptionists.userId, userId));
 
           if (receptionist.length > 0) {
-            console.log("Pharmacist data:", receptionist[0]);
+            console.log("Receptionist data:", receptionist[0]);
             setReceptionistData(receptionist[0]);
             setOnboardingStatus(receptionist[0].hasOnboarded);
           }
