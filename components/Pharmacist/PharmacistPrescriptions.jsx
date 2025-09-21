@@ -18,7 +18,18 @@ import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
 import { Consultations, Doctors, Patients, Prescriptions } from "@/lib/schema";
 import { eq } from "drizzle-orm";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { set } from "date-fns";
+import { Textarea } from "../ui/textarea";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -223,6 +234,295 @@ const PrescriptionDetailsModal = ({
         </div>
       </div>
     </div>
+  );
+};
+
+const VerifyPrescriptionModal = ({ prescription, onVerify }) => {
+  const [open, setOpen] = useState(false);
+
+  if (!prescription) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 
+                     text-white px-3 py-2 rounded-lg text-sm shadow-lg"
+        >
+          Verify Prescription
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent
+        className="
+          w-[95vw] sm:max-w-md md:max-w-2xl lg:max-w-4xl 
+          max-h-[90vh] overflow-y-auto 
+          bg-dark-400 border border-blue-500 rounded-3xl
+        "
+      >
+        <DialogHeader>
+          <DialogTitle className="text-white">Verify Prescription</DialogTitle>
+          <DialogDescription className="text-dark-600">
+            Review all patient and prescription details before verifying.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Patient & Prescription Details */}
+        <div className="space-y-4 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-dark-600">
+            <p>
+              <span className="text-white">Patient:</span>{" "}
+              {prescription.patientName} ({prescription.patientId})
+            </p>
+            <p>
+              <span className="text-white">Phone:</span>{" "}
+              {prescription.patientPhone}
+            </p>
+            <p>
+              <span className="text-white">Prescribed By:</span>{" "}
+              {prescription.prescribedBy}
+            </p>
+            <p>
+              <span className="text-white">Date:</span>{" "}
+              {prescription.prescribedDate}
+            </p>
+          </div>
+
+          <div className="bg-dark-500/30 rounded-lg p-3">
+            <h4 className="text-white text-sm mb-2">Medication</h4>
+            <p className="text-dark-600">
+              {prescription.medication} ({prescription.dosage},{" "}
+              {prescription.frequency}) — {prescription.duration}
+            </p>
+          </div>
+
+          {/* Allergies */}
+          {Array.isArray(prescription.allergies) &&
+          prescription.allergies.length > 0 ? (
+            <div className="bg-yellow-500/10 rounded-lg p-3">
+              <h4 className="text-yellow-400 text-sm mb-2">Allergies</h4>
+              <ul className="list-disc pl-5 text-yellow-300 text-sm">
+                {prescription.allergies.map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="bg-green-500/10 rounded-lg p-3">
+              <h4 className="text-green-400 text-sm">No reported allergies</h4>
+            </div>
+          )}
+
+          {/* Consultation Details */}
+          <div className="bg-blue-500/10 rounded-lg p-3 space-y-3">
+            <h4 className="text-blue-400 text-sm mb-2">Consultation Details</h4>
+            {[
+              "chiefComplaint",
+              "historyOfPresentIllness",
+              "physicalExamination",
+              "assessment",
+              "followUpInstructions",
+            ].map(
+              (field) =>
+                Array.isArray(prescription[field]) &&
+                prescription[field].length > 0 && (
+                  <div key={field}>
+                    <p className="text-white text-sm capitalize mb-1">
+                      {field.replace(/([A-Z])/g, " $1")}:
+                    </p>
+                    <ul className="list-disc pl-5 text-dark-600 text-sm">
+                      {prescription[field].map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+            )}
+          </div>
+        </div>
+
+        <DialogFooter className="flex justify-end gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => setOpen(false)}
+            className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              onVerify(prescription.id);
+              setOpen(false);
+            }}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg"
+          >
+            Confirm Verify
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const DiscontinuePrescriptionModal = ({
+  label,
+  prescription,
+  onDiscontinue,
+}) => {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+
+  if (!prescription) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
+                     text-white px-3 py-2 rounded-lg text-sm shadow-lg"
+        >
+          {label}
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-lg bg-dark-400 border border-red-500 rounded-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-white">{label}</DialogTitle>
+          <DialogDescription className="text-dark-600">
+            Provide reasoning for discontinuing this prescription.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Patient + Prescription Context */}
+        <div className="space-y-2 text-sm text-dark-700 mb-4">
+          <p>
+            <span className="text-white">Patient:</span>{" "}
+            {prescription.patientName} ({prescription.patientId})
+          </p>
+          <p>
+            <span className="text-white">Medication:</span>{" "}
+            {prescription.medication} ({prescription.dosage},{" "}
+            {prescription.frequency})
+          </p>
+          <p>
+            <span className="text-white">Prescribed By:</span>{" "}
+            {prescription.prescribedBy}
+          </p>
+        </div>
+
+        {/* Reason Textarea */}
+        <div className="mb-4">
+          <label className="text-white text-sm mb-2 block">
+            Reason for discontinuation:
+          </label>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="e.g., Patient allergic to prescribed medicine, interaction risk with existing medication..."
+            className="shad-textArea text-white"
+            rows={4}
+          />
+        </div>
+
+        <DialogFooter className="flex justify-end gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => setOpen(false)}
+            className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (!reason.trim()) return;
+              onDiscontinue(prescription.id, reason);
+              setOpen(false);
+              setReason("");
+            }}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg"
+          >
+            Confirm Discontinue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const RejectPrescriptionModal = ({ prescription, onReject }) => {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+
+  if (!prescription) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
+                     text-white px-3 py-2 rounded-lg text-sm shadow-lg"
+        >
+          Reject
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-lg bg-dark-400 border border-red-500 rounded-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-white">Reject Prescription</DialogTitle>
+          <DialogDescription className="text-dark-600">
+            Please provide a reason for rejecting this prescription.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="text-sm text-dark-700 space-y-2">
+          <p>
+            <span className="text-white">Patient:</span>{" "}
+            {prescription.patientName} ({prescription.patientId})
+          </p>
+          <p>
+            <span className="text-white">Medication:</span>{" "}
+            {prescription.medication}
+          </p>
+          <p>
+            <span className="text-white">Prescribed By:</span>{" "}
+            {prescription.prescribedBy}
+          </p>
+          <p>
+            <span className="text-white">Date:</span>{" "}
+            {prescription.prescribedDate}
+          </p>
+        </div>
+
+        <textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Enter rejection reason..."
+          className="w-full bg-gray-800 border border-red-700 text-white rounded-lg p-2 resize-none mt-4"
+          rows={4}
+        />
+
+        <DialogFooter className="flex justify-end gap-3 mt-6">
+          <Button
+            variant="secondary"
+            onClick={() => setOpen(false)}
+            className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              onReject(prescription.id, reason);
+              setReason("");
+              setOpen(false);
+            }}
+            disabled={!reason.trim()}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg"
+          >
+            Confirm Reject
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -494,18 +794,23 @@ const PharmacistPrescriptions = ({ onBack }) => {
       case "ordered":
         return (
           <div className="flex gap-2">
-            <button
-              onClick={() => handleUpdateStatus(prescription.id, "verified")}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
-            >
-              Verify
-            </button>
-            <button
-              onClick={() => handleUpdateStatus(prescription.id, "rejected")}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25"
-            >
-              Reject
-            </button>
+            <VerifyPrescriptionModal
+              prescription={prescription}
+              onVerify={(id) => console.log(id)}
+            />
+            {/* <RejectPrescriptionModal
+              prescription={prescription}
+              onReject={(id, reason) =>
+                handleUpdateStatus(id, "rejected", reason)
+              }
+            /> */}
+            <DiscontinuePrescriptionModal
+              label="Advise to Discontinue"
+              prescription={prescription}
+              onDiscontinue={(id, reason) =>
+                handleUpdateStatus(id, "discontinued", reason)
+              }
+            />
           </div>
         );
       case "verified":
@@ -522,6 +827,14 @@ const PharmacistPrescriptions = ({ onBack }) => {
           <div className="text-12-medium lg:text-14-medium text-green-400 px-3 lg:px-4 py-2">
             Completed
           </div>
+        );
+      case "request-cancellation":
+        return (
+          <DiscontinuePrescriptionModal
+            label="Discontinue"
+            prescription={prescription}
+            onDiscontinue={(id, reason) => console.log(id, reason)}
+          />
         );
       case "rejected":
         return (

@@ -92,7 +92,8 @@ const PrescriptionDetailsModal = ({
                   {prescription.medication || "N/A"}
                 </h3>
                 <p className="text-14-regular text-purple-400">
-                  {prescription.dosage || "N/A"} - {prescription.frequency || "N/A"}
+                  {prescription.dosage || "N/A"} -{" "}
+                  {prescription.frequency || "N/A"}
                 </p>
               </div>
             </div>
@@ -262,6 +263,14 @@ const getStatusIcon = (status) => {
         <p className="flex items-center gap-2">
           <X className="w-4 h-4" />
           Cancelled By Pharmacist
+        </p>
+      );
+
+    case "advised-discontinued":
+      return (
+        <p className="flex items-center gap-2">
+          <X className="w-4 h-4" />
+          Advised Discontinued
         </p>
       );
 
