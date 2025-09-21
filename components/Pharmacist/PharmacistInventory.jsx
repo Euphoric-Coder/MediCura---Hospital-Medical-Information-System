@@ -34,6 +34,7 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import FormInput from "../FormUI/FormInput";
+import { toast } from "sonner";
 
 const AddMedicineDialog = ({
   isOpen,
@@ -357,7 +358,7 @@ const AddMedicineDialog = ({
   );
 };
 
-const RestockModal = ({ medicine }) => {
+const RestockModal = ({ medicine, onRestock }) => {
   const [open, setOpen] = useState(false);
   const [restockAmount, setRestockAmount] = useState(0);
   const [restockFull, setRestockFull] = useState(false);
@@ -373,9 +374,12 @@ const RestockModal = ({ medicine }) => {
       finalAmount = minStock * 2;
     }
 
-    console.log(medicine);
-    console.log(typeof finalAmount);
-    console.log(`Restocked ${medicine.name} with ${finalAmount} units`);
+    onRestock(
+      medicine.id,
+      finalAmount,
+      `Restocked ${medicine.name} with ${finalAmount} units`,
+      medicine.name
+    );
 
     // 👉 call your API here with finalAmount
     setOpen(false);
@@ -713,6 +717,34 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     setShowAddModal(true);
   };
 
+  const handleRestock = async (medicineId, amount, reason, name) => {
+    try {
+      const load = toast.loading("Restocking Medicine...");
+
+      const res = await fetch(`/api/medicines/${medicineId}/restock`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          restockQuantity: amount,
+          notes: reason,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Restock failed:", error);
+        return;
+      }
+
+      toast.dismiss(load);
+      refreshMedicine();
+      toast.success(`Successfully Restocked ${name}!`);
+    } catch (err) {
+      console.error("Unexpected error while restocking:", err);
+    }
+  };
+
   const handleDeleteMedicine = (id) => {
     const medicine = medicines.find((m) => m.id === id);
     setMedicines((prev) => prev.filter((medicine) => medicine.id !== id));
@@ -953,7 +985,10 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                           )}
                           {parseInt(medicine.quantity) <=
                             parseInt(medicine.minStockLevel) && (
-                            <RestockModal medicine={medicine} />
+                            <RestockModal
+                              medicine={medicine}
+                              onRestock={handleRestock}
+                            />
                           )}
                         </div>
 
