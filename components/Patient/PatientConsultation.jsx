@@ -217,6 +217,9 @@ const getStatusColor = (status) => {
     case "ordered":
       return "bg-blue-500/20 text-blue-400 border-blue-500/30";
 
+    case "verified":
+      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+
     case "recommended":
       return "bg-purple-500/20 text-purple-400 border-purple-500/30";
 
@@ -266,7 +269,15 @@ const getStatusIcon = (status) => {
       return (
         <p className="flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          Pending Dispensing By Pharmacist
+          Yet to be Dispensed By Pharmacist
+        </p>
+      );
+
+    case "verified":
+      return (
+        <p className="flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          Verified By Pharmacist
         </p>
       );
 
