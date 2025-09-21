@@ -378,7 +378,8 @@ const RestockModal = ({ medicine, onRestock }) => {
       medicine.id,
       finalAmount,
       `Restocked ${medicine.name} with ${finalAmount} units`,
-      medicine.name
+      medicine.name,
+      medicine.unitPrice
     );
 
     // 👉 call your API here with finalAmount
