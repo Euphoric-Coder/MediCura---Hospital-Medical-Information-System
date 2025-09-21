@@ -382,7 +382,6 @@ const RestockModal = ({ medicine, onRestock }) => {
       medicine.unitPrice
     );
 
-    // 👉 call your API here with finalAmount
     setOpen(false);
     setRestockAmount(0);
     setRestockFull(false);
@@ -502,6 +501,133 @@ const RestockModal = ({ medicine, onRestock }) => {
         </DialogContent>
       </Dialog>
     </div>
+  );
+};
+
+const DeleteMedicineModal = ({ medicine, onDelete }) => {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const reasons = [
+    "Expired Medicine",
+    "Damaged Stock",
+    "Recalled by Manufacturer",
+    "Other",
+  ];
+
+  const handleConfirmDelete = async () => {
+    // Require customReason only if "Other"
+    if (!reason || (reason === "Other" && !customReason.trim())) return;
+
+    // Merge reason + additional notes
+    const finalReason =
+      reason === "Other"
+        ? `Other: ${customReason.trim()}`
+        : `${reason}${customReason.trim() ? ` - ${customReason.trim()}` : ""}`;
+
+    console.log("Delete Details:");
+    console.log(medicine);
+    console.log("Reasons:", finalReason);
+    // try {
+    //   setLoading(true);
+    //   await onDelete(medicine.id, finalReason);
+    setOpen(false); // close modal
+    setReason("");
+    setCustomReason("");
+    // } finally {
+    //   setLoading(false);
+    // }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          setReason("");
+          setCustomReason("");
+          setLoading(false);
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <button
+          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
+                     text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg 
+                     hover:shadow-red-500/25"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md bg-gray-900 border border-red-700 rounded-xl">
+        <DialogHeader>
+          <DialogTitle className="text-red-400 font-semibold">
+            Delete Medicine
+          </DialogTitle>
+          <DialogDescription className="text-gray-300">
+            Are you sure you want to delete{" "}
+            <span className="text-white font-semibold">{medicine?.name}</span>?
+            Please select a reason before confirming.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-3 py-3">
+          {reasons.map((r) => (
+            <label
+              key={r}
+              className="flex items-center gap-2 text-gray-300 cursor-pointer"
+            >
+              <input
+                type="radio"
+                value={r}
+                checked={reason === r}
+                onChange={(e) => setReason(e.target.value)}
+                className="w-4 h-4 accent-red-500"
+              />
+              {r}
+            </label>
+          ))}
+
+          {/* Show textarea always for notes */}
+          <textarea
+            value={customReason}
+            onChange={(e) => setCustomReason(e.target.value)}
+            placeholder={
+              reason === "Other"
+                ? "Enter custom reason"
+                : "Additional notes (optional)"
+            }
+            className="bg-gray-800 border border-red-700 rounded-lg text-white p-2 resize-none"
+            rows={3}
+          />
+        </div>
+
+        <DialogFooter className="flex justify-end gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setOpen(false);
+              setReason("");
+              setCustomReason("");
+            }}
+            className="bg-gray-800 border border-red-700 text-red-400 hover:bg-gray-700 rounded-3xl"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            disabled={!reason || (reason === "Other" && !customReason.trim())}
+            className="bg-red-600 hover:bg-red-500 text-white rounded-3xl"
+          >
+            {loading ? "Deleting..." : "Confirm Delete"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -748,11 +874,11 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleDeleteMedicine = (id) => {
-    const medicine = medicines.find((m) => m.id === id);
-    setMedicines((prev) => prev.filter((medicine) => medicine.id !== id));
-    setMessage(`${medicine?.name} removed from inventory`);
-    setMessageType("success");
+  const handleDeleteMedicine = (medicine, reason) => {
+    // const medicine = medicines.find((m) => m.id === id);
+    // setMedicines((prev) => prev.filter((medicine) => medicine.id !== id));
+    // setMessage(`${medicine?.name} removed from inventory`);
+    // setMessageType("success");
 
     setTimeout(() => {
       setMessage("");
@@ -1055,12 +1181,10 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleDeleteMedicine(medicine.id)}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-500/25"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <DeleteMedicineModal
+                        medicine={medicine}
+                        onDelete={handleDeleteMedicine}
+                      />
                     </div>
                   </div>
                 </div>
