@@ -27,7 +27,8 @@ export async function POST(
     return NextResponse.json({ error: "Medicine not found" }, { status: 404 });
   }
 
-  const newQuantity = medicine.quantity + restockQuantity;
+  const currentQty = parseInt(medicine.quantity, 10) || 0;
+  const newQuantity = currentQty + restockQuantity;
 
   // Update medicine stock
   const [updatedMed] = await db

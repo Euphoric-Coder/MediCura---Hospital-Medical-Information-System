@@ -374,6 +374,7 @@ const RestockModal = ({ medicine }) => {
     }
 
     console.log(medicine);
+    console.log(typeof finalAmount);
     console.log(`Restocked ${medicine.name} with ${finalAmount} units`);
 
     // 👉 call your API here with finalAmount
@@ -476,7 +477,11 @@ const RestockModal = ({ medicine }) => {
           <DialogFooter className="flex justify-end gap-2">
             <Button
               variant="secondary"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setRestockAmount(0);
+                setRestockFull(false);
+              }}
               className="bg-gray-800 border border-green-700 text-green-400 hover:bg-gray-700 rounded-3xl"
             >
               Cancel
