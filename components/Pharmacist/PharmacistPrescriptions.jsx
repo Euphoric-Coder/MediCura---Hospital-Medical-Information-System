@@ -13,6 +13,7 @@ import {
   Eye,
   Download,
   Phone,
+  ChevronDown,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
@@ -528,6 +529,8 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
+
   // Editable state for prescription fields
   const [form, setForm] = useState({
     medication: "",
@@ -535,10 +538,13 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
     medicineValidity: "",
     dispensedDuration: "",
     refillsRemaining: 0,
+    nextRefillDate: "",
     lastDispensedDate: "",
     sideEffects: [],
     interaction: [],
   });
+
+  const [firstTime, setFirstTime] = useState(false);
 
   // Temp values for sideEffect / interaction input
   const [sideEffectInput, setSideEffectInput] = useState("");
@@ -562,16 +568,6 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
   useEffect(() => {
     if (open && prescription) {
       fetchMedicines();
-      setForm({
-        medication: prescription.medication || "",
-        cost: prescription.cost || "",
-        medicineValidity: prescription.medicineValidity || "",
-        dispensedDuration: prescription.dispensedDuration || "",
-        refillsRemaining: prescription.refillsRemaining || 0,
-        lastDispensedDate: prescription.lastDispensedDate || "",
-        sideEffects: prescription.sideEffects || [],
-        interaction: prescription.interaction || [],
-      });
     }
   }, [open, prescription]);
 
@@ -656,41 +652,63 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
             </p>
           </div>
 
-          {/* Medicine Dropdown */}
+          {/* Dropdown for Medicines */}
           <div className="mb-4">
-            <label className="text-white text-sm mb-2 block">
+            <label className="shad-input-label block mb-2">
               Select Dispensed Medicine
             </label>
-            <select
-              value={form.medication}
-              onChange={(e) => {
-                const selected = medicines.find(
-                  (m) => m.name === e.target.value
-                );
-                setForm((prev) => ({
-                  ...prev,
-                  medication: e.target.value,
-                  cost: selected?.unitPrice || prev.cost,
-                  medicineValidity:
-                    selected?.expiryDate || prev.medicineValidity,
-                }));
-              }}
-              className="w-full px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
-               focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
-            >
-              <option value="" className="bg-dark-500 text-dark-600">
-                Select Medicine
-              </option>
-              {medicines.map((m) => (
-                <option
-                  key={m.id}
-                  value={m.name}
-                  className="bg-dark-500 text-white"
-                >
-                  {m.name} — {m.unitPrice ? `$${m.unitPrice}` : "N/A"}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMedicineDropdown(!showMedicineDropdown)}
+                className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+              >
+                <span className="text-white">
+                  {form.medication || "Select Medicine"}
+                </span>
+                <ChevronDown
+                  className={`w-5 h-5 text-dark-600 transition-transform ${
+                    showMedicineDropdown ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Medicine Dropdown */}
+              {showMedicineDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                  <div className="p-3 border-b border-dark-500">
+                    <span className="text-14-medium text-dark-700">
+                      Available Medicines
+                    </span>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto">
+                    {medicines.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            medication: m.name,
+                            cost: m.unitPrice || "",
+                            medicineValidity: m.expiryDate || "",
+                          }));
+                          setShowMedicineDropdown(false);
+                        }}
+                        className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                      >
+                        <span className="text-16-medium text-white">
+                          {m.name}
+                        </span>
+                        {form.medication === m.name && (
+                          <Check className="w-5 h-5 text-green-500" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Auto-filled Cost */}
@@ -700,7 +718,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
               type="text"
               value={form.cost || ""}
               readOnly
-              className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-dark-700 text-white font-bold 
+              className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
                placeholder-dark-600 outline-none cursor-not-allowed"
             />
           </div>
@@ -714,7 +732,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
               type="text"
               value={form.medicineValidity || ""}
               readOnly
-              className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-dark-700 text-white font-bold 
+              className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
                placeholder-dark-600 outline-none cursor-not-allowed"
             />
           </div>
@@ -744,6 +762,18 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
           />
 
           <FormInput
+            label="Next Refill Date"
+            type="date"
+            value={form.nextRefillDate}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                nextRefillDate: e.target.value,
+              }))
+            }
+          />
+
+          <FormInput
             label="Last Dispensed Date"
             type="date"
             value={form.lastDispensedDate}
@@ -753,7 +783,25 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
                 lastDispensedDate: e.target.value,
               }))
             }
+            disabled={firstTime}
           />
+
+          {/* First Time Checkbox */}
+          <div className="mb-4 flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="firstTime"
+              checked={form.firstTime}
+              onChange={(e) => setFirstTime(e.target.checked)}
+              className="w-4 h-4 accent-green-500 cursor-pointer"
+            />
+            <label
+              htmlFor="firstTime"
+              className="text-sm text-white cursor-pointer"
+            >
+              First Time Dispense
+            </label>
+          </div>
 
           {/* Side Effects */}
           <div>
@@ -765,7 +813,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
                 type="text"
                 value={sideEffectInput}
                 onChange={(e) => setSideEffectInput(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
+                className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
                  placeholder-dark-600 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none"
                 placeholder="Add side effect"
               />
@@ -803,7 +851,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
                 type="text"
                 value={interactionInput}
                 onChange={(e) => setInteractionInput(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
+                className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
                  placeholder-dark-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
                 placeholder="Add interaction"
               />

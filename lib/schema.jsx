@@ -206,6 +206,7 @@ export const Prescriptions = pgTable("prescriptions", {
   billGenerated: boolean("billGenerated").default(false),
 
   dispensedDuration: varchar("dispensedDuration"), // e.g., "30 days", "60 days"
+  nextRefillDate: varchar("nextRefillDate"),
   refillsRemaining: integer("refillsRemaining").default(0),
   lastDispensedDate: varchar("lastDispensedDate"),
   pharmacistNotes: varchar("pharmacistNotes"),
