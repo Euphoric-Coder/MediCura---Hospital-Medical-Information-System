@@ -717,7 +717,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     setShowAddModal(true);
   };
 
-  const handleRestock = async (medicineId, amount, reason, name) => {
+  const handleRestock = async (medicineId, amount, reason, name, unitPrice) => {
     try {
       const load = toast.loading(`Restocking ${name}...`);
 
@@ -729,6 +729,8 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
         body: JSON.stringify({
           restockQuantity: amount,
           notes: reason,
+          unitPrice,
+          pharmacistId: pharmacistData.userId,
         }),
       });
 

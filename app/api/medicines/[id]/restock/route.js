@@ -8,7 +8,7 @@ export async function POST(
   { params }
 ) {
   const { id } = params;
-  const { restockQuantity, notes } = await req.json();
+  const { restockQuantity, notes, unitPrice, pharmacistId } = await req.json();
 
   if (!restockQuantity || restockQuantity <= 0) {
     return NextResponse.json(
@@ -40,10 +40,12 @@ export async function POST(
   // Log restock
   await db.insert(InventoryLogs).values({
     medicineId: id,
+    pharmacistId,
     action: "restock",
     quantityChange: restockQuantity,
     prevQuantity: medicine.quantity,
     newQuantity,
+    unitPrice,
     notes: notes || "Stock replenished",
   });
 
