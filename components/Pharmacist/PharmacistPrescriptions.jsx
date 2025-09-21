@@ -30,6 +30,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { set } from "date-fns";
 import { Textarea } from "../ui/textarea";
+import { toast } from "sonner";
+import FormInput from "../FormUI/FormInput";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -108,14 +110,71 @@ const PrescriptionDetailsModal = ({
             </div>
           </div>
 
-          {/* Instructions */}
-          <div className="bg-green-500/10 rounded-2xl p-4 sm:p-6 mb-6">
-            <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
-              Instructions
-            </h4>
-            <p className="text-12-regular sm:text-14-regular text-green-300">
-              {prescription.instructions}
-            </p>
+          {/* Instructions & Clinical Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Instructions */}
+            <div className="bg-green-500/10 rounded-2xl p-4 sm:p-6">
+              <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
+                Instructions
+              </h4>
+              <p className="text-12-regular sm:text-14-regular text-green-300">
+                {prescription.instructions}
+              </p>
+
+              {/* Chief Complaint */}
+              {prescription.chiefComplaint && (
+                <div className="mt-4">
+                  <h5 className="text-12-bold sm:text-14-bold text-white mb-2">
+                    Chief Complaint
+                  </h5>
+                  <ul className="list-disc list-inside text-12-regular sm:text-14-regular text-green-300 space-y-1">
+                    {Array.isArray(prescription.chiefComplaint) ? (
+                      prescription.chiefComplaint.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))
+                    ) : (
+                      <li>{prescription.chiefComplaint}</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {/* HPI / History of Present Illness */}
+              {prescription.historyOfPresentIllness && (
+                <div className="mt-4">
+                  <h5 className="text-12-bold sm:text-14-bold text-white mb-2">
+                    History of Present Illness
+                  </h5>
+                  <ul className="list-disc list-inside text-12-regular sm:text-14-regular text-green-300 space-y-1">
+                    {Array.isArray(prescription.historyOfPresentIllness) ? (
+                      prescription.historyOfPresentIllness.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))
+                    ) : (
+                      <li>{prescription.historyOfPresentIllness}</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Allergies */}
+            <div className="bg-pink-500/10 rounded-2xl p-4 sm:p-6">
+              <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
+                Allergies
+              </h4>
+              {prescription.allergies && prescription.allergies.length > 0 ? (
+                <ul className="list-disc list-inside text-12-regular sm:text-14-regular text-pink-300 space-y-1">
+                  {prescription.allergies.map((allergy, index) => (
+                    <li key={index}>{allergy}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-12-regular sm:text-14-regular text-pink-300">
+                  None reported
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Drug Information */}
@@ -187,10 +246,11 @@ const PrescriptionDetailsModal = ({
               Pharmacist Notes
             </h4>
             <textarea
-              value={notes}
+              value={notes || "NA"}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any notes about this prescription..."
-              className="shad-textArea w-full text-white min-h-[100px] resize-none"
+              className="p-2 rounded-3xl shad-textArea w-full text-white min-h-[100px] resize-none disabled:cursor-not-allowed disabled:opacity-50"
+              disabled
               rows={4}
             />
           </div>
@@ -225,10 +285,13 @@ const PrescriptionDetailsModal = ({
 
             <button
               onClick={() => onDownloadPDF(prescription)}
-              className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg text-14-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2"
+              className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg text-14-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={prescription.status === "dispensed" ? false : true}
             >
               <Download className="w-5 h-5" />
-              Download PDF
+              {prescription.status === "dispensed"
+                ? "Download Dispensed Prescription"
+                : "Not Yet Dispensed"}
             </button>
           </div>
         </div>
@@ -364,30 +427,36 @@ const VerifyPrescriptionModal = ({ prescription, onVerify }) => {
   );
 };
 
-const DiscontinuePrescriptionModal = ({
-  label,
-  prescription,
-  onDiscontinue,
-}) => {
+const DiscontinuePrescriptionModal = ({ prescription, onDiscontinue }) => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
 
   if (!prescription) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) {
+          setReason("");
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
                      text-white px-3 py-2 rounded-lg text-sm shadow-lg"
         >
-          {label}
+          Advise Discontinue
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-lg bg-dark-400 border border-red-500 rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="text-white">{label}</DialogTitle>
+          <DialogTitle className="text-white">
+            Advise Discontinue Prescription
+          </DialogTitle>
           <DialogDescription className="text-dark-600">
             Provide reasoning for discontinuing this prescription.
           </DialogDescription>
@@ -427,7 +496,10 @@ const DiscontinuePrescriptionModal = ({
         <DialogFooter className="flex justify-end gap-3">
           <Button
             variant="secondary"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              setReason("");
+            }}
             className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
           >
             Cancel
@@ -435,11 +507,12 @@ const DiscontinuePrescriptionModal = ({
           <Button
             onClick={() => {
               if (!reason.trim()) return;
-              onDiscontinue(prescription.id, reason);
+              onDiscontinue(prescription.id, reason.trim());
               setOpen(false);
               setReason("");
             }}
-            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg"
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!reason.trim()}
           >
             Confirm Discontinue
           </Button>
@@ -449,76 +522,354 @@ const DiscontinuePrescriptionModal = ({
   );
 };
 
-const RejectPrescriptionModal = ({ prescription, onReject }) => {
+const DispensePrescriptionModal = ({ prescription, onAction }) => {
   const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState("");
+  const [medicines, setMedicines] = useState([]);
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Editable state for prescription fields
+  const [form, setForm] = useState({
+    medication: "",
+    cost: "",
+    medicineValidity: "",
+    dispensedDuration: "",
+    refillsRemaining: 0,
+    lastDispensedDate: "",
+    sideEffects: [],
+    interaction: [],
+  });
+
+  // Temp values for sideEffect / interaction input
+  const [sideEffectInput, setSideEffectInput] = useState("");
+  const [interactionInput, setInteractionInput] = useState("");
+
+  const fetchMedicines = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/medicines");
+      if (!res.ok) throw new Error("Failed to fetch medicines");
+      const data = await res.json();
+      setMedicines(data);
+    } catch (err) {
+      console.error("Error fetching medicines:", err);
+      toast.error("Unable to load medicines");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (open && prescription) {
+      fetchMedicines();
+      setForm({
+        medication: prescription.medication || "",
+        cost: prescription.cost || "",
+        medicineValidity: prescription.medicineValidity || "",
+        dispensedDuration: prescription.dispensedDuration || "",
+        refillsRemaining: prescription.refillsRemaining || 0,
+        lastDispensedDate: prescription.lastDispensedDate || "",
+        sideEffects: prescription.sideEffects || [],
+        interaction: prescription.interaction || [],
+      });
+    }
+  }, [open, prescription]);
 
   if (!prescription) return null;
+
+  const handleClose = () => {
+    setOpen(false);
+    setNotes("");
+  };
+
+  const handleAction = (status) => {
+    if (status === "pending" && !notes.trim()) {
+      toast.error("Notes are required when marking as Pending");
+      return;
+    }
+
+    onAction(
+      prescription.id,
+      status,
+      notes.trim(),
+      form // pass updated form details
+    );
+
+    handleClose();
+  };
+
+  const handleAddItem = (field, value) => {
+    if (!value.trim()) return;
+    setForm((prev) => ({
+      ...prev,
+      [field]: [...prev[field], value.trim()],
+    }));
+    if (field === "sideEffects") setSideEffectInput("");
+    if (field === "interaction") setInteractionInput("");
+  };
+
+  const handleRemoveItem = (field, index) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
-                     text-white px-3 py-2 rounded-lg text-sm shadow-lg"
+        <button
+          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+                     text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium 
+                     transition-all duration-300 shadow-lg hover:shadow-green-500/25"
         >
-          Reject
-        </Button>
+          Dispense
+        </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg bg-dark-400 border border-red-500 rounded-3xl">
+      <DialogContent className="max-w-lg md:max-w-3xl bg-dark-400 border border-green-600 rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-white">Reject Prescription</DialogTitle>
+          <DialogTitle className="text-white">Dispense Medication</DialogTitle>
           <DialogDescription className="text-dark-600">
-            Please provide a reason for rejecting this prescription.
+            Update prescription details before dispensing.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="text-sm text-dark-700 space-y-2">
-          <p>
-            <span className="text-white">Patient:</span>{" "}
-            {prescription.patientName} ({prescription.patientId})
-          </p>
-          <p>
-            <span className="text-white">Medication:</span>{" "}
-            {prescription.medication}
-          </p>
-          <p>
-            <span className="text-white">Prescribed By:</span>{" "}
-            {prescription.prescribedBy}
-          </p>
-          <p>
-            <span className="text-white">Date:</span>{" "}
-            {prescription.prescribedDate}
-          </p>
+        {/* Editable Prescription Form */}
+        <div className="space-y-4 py-4">
+          {/* Current Prescribed Medicine Info */}
+          <div className="mb-6 p-4 rounded-xl bg-dark-500/40 border border-dark-600">
+            <h4 className="text-white text-sm font-semibold mb-2">
+              Prescribed Medicine
+            </h4>
+            <p className="text-dark-600 text-sm">
+              <span className="text-white">Name:</span>{" "}
+              {prescription?.medication}
+            </p>
+            <p className="text-dark-600 text-sm">
+              <span className="text-white">Dosage:</span> {prescription?.dosage}
+              {prescription?.frequency ? ` — ${prescription.frequency}` : ""}
+            </p>
+            <p className="text-dark-600 text-sm">
+              <span className="text-white">Duration:</span>{" "}
+              {prescription?.duration}
+            </p>
+          </div>
+
+          {/* Medicine Dropdown */}
+          <div className="mb-4">
+            <label className="text-white text-sm mb-2 block">
+              Select Dispensed Medicine
+            </label>
+            <select
+              value={form.medication}
+              onChange={(e) => {
+                const selected = medicines.find(
+                  (m) => m.name === e.target.value
+                );
+                setForm((prev) => ({
+                  ...prev,
+                  medication: e.target.value,
+                  cost: selected?.unitPrice || prev.cost,
+                  medicineValidity:
+                    selected?.expiryDate || prev.medicineValidity,
+                }));
+              }}
+              className="w-full px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
+               focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+            >
+              <option value="" className="bg-dark-500 text-dark-600">
+                Select Medicine
+              </option>
+              {medicines.map((m) => (
+                <option
+                  key={m.id}
+                  value={m.name}
+                  className="bg-dark-500 text-white"
+                >
+                  {m.name} — {m.unitPrice ? `$${m.unitPrice}` : "N/A"}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Auto-filled Cost */}
+          <div>
+            <label className="text-white text-sm mb-2 block">Cost</label>
+            <input
+              type="text"
+              value={form.cost || ""}
+              readOnly
+              className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-dark-700 text-white font-bold 
+               placeholder-dark-600 outline-none cursor-not-allowed"
+            />
+          </div>
+
+          {/* Auto-filled Medicine Validity */}
+          <div>
+            <label className="text-white text-sm mb-2 block">
+              Medicine Validity
+            </label>
+            <input
+              type="text"
+              value={form.medicineValidity || ""}
+              readOnly
+              className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-dark-700 text-white font-bold 
+               placeholder-dark-600 outline-none cursor-not-allowed"
+            />
+          </div>
+
+          <FormInput
+            label="Dispensed Duration"
+            type="text"
+            value={form.dispensedDuration}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                dispensedDuration: e.target.value,
+              }))
+            }
+          />
+
+          <FormInput
+            label="Refills Remaining"
+            type="number"
+            value={form.refillsRemaining}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                refillsRemaining: parseInt(e.target.value, 10),
+              }))
+            }
+          />
+
+          <FormInput
+            label="Last Dispensed Date"
+            type="date"
+            value={form.lastDispensedDate}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                lastDispensedDate: e.target.value,
+              }))
+            }
+          />
+
+          {/* Side Effects */}
+          <div>
+            <label className="text-white text-sm mb-2 block">
+              Side Effects
+            </label>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={sideEffectInput}
+                onChange={(e) => setSideEffectInput(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
+                 placeholder-dark-600 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none"
+                placeholder="Add side effect"
+              />
+              <Button
+                size="sm"
+                onClick={() => handleAddItem("sideEffects", sideEffectInput)}
+                className="bg-green-600 hover:bg-green-500 text-white"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {form.sideEffects.map((s, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-yellow-400 flex items-center gap-2"
+                >
+                  {s}
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => handleRemoveItem("sideEffects", i)}
+                  />
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactions */}
+          <div>
+            <label className="text-white text-sm mb-2 block">
+              Drug Interactions
+            </label>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={interactionInput}
+                onChange={(e) => setInteractionInput(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg bg-dark-500 border border-dark-600 text-white 
+                 placeholder-dark-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+                placeholder="Add interaction"
+              />
+              <Button
+                size="sm"
+                onClick={() => handleAddItem("interaction", interactionInput)}
+                className="bg-green-600 hover:bg-green-500 text-white"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {form.interaction.map((i, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 flex items-center gap-2"
+                >
+                  {i}
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => handleRemoveItem("interaction", idx)}
+                  />
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Pharmacist Notes */}
+          <div>
+            <label className="text-white text-sm mb-2 block">
+              Pharmacist Notes{" "}
+              <span className="text-green-400">
+                (Optional for Dispense, Required for Pending)
+              </span>
+            </label>
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Enter pharmacist notes..."
+              className="shad-textArea text-white"
+              rows={4}
+            />
+          </div>
         </div>
 
-        <textarea
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="Enter rejection reason..."
-          className="w-full bg-gray-800 border border-red-700 text-white rounded-lg p-2 resize-none mt-4"
-          rows={4}
-        />
-
-        <DialogFooter className="flex justify-end gap-3 mt-6">
+        {/* Actions */}
+        <DialogFooter className="flex justify-end gap-3">
           <Button
             variant="secondary"
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
           >
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              onReject(prescription.id, reason);
-              setReason("");
-              setOpen(false);
-            }}
-            disabled={!reason.trim()}
-            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg"
+            onClick={() => handleAction("pending")}
+            disabled={!notes.trim()}
+            className="bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg disabled:opacity-50"
           >
-            Confirm Reject
+            Mark Pending
+          </Button>
+          <Button
+            onClick={() => handleAction("dispensed")}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg"
+          >
+            Confirm Dispense
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -605,6 +956,10 @@ const PharmacistPrescriptions = ({ onBack }) => {
     console.log(data);
   };
 
+  const refreshPrescriptions = () => {
+    getPharmacistPrescriptions();
+  };
+
   const filteredPrescriptions = prescriptions.filter((prescription) => {
     const matchesSearch =
       prescription.patientName
@@ -684,37 +1039,64 @@ const PharmacistPrescriptions = ({ onBack }) => {
     );
   };
 
-  const handleUpdateStatus = (prescriptionId, newStatus, notes) => {
-    setPrescriptions((prev) =>
-      prev.map((prescription) =>
-        prescription.id === prescriptionId
-          ? { ...prescription, status: newStatus }
-          : prescription
-      )
+  const handleUpdateStatus = async (prescriptionId, status, notes) => {
+    const prescription = prescriptions.find((p) => p.id === prescriptionId);
+
+    const toastId = toast.loading(
+      `Updating status for "${prescription?.medication}"...`
     );
 
-    const prescription = prescriptions.find((p) => p.id === prescriptionId);
-    let message = "";
+    try {
+      const res = await fetch("/api/prescription-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prescriptionId,
+          status,
+          notes,
+        }),
+      });
 
-    switch (newStatus) {
-      case "verified":
-        message = `Prescription verified for ${prescription?.patientName}`;
-        break;
-      case "dispensed":
-        message = `Medication dispensed to ${prescription?.patientName}`;
-        break;
-      case "rejected":
-        message = `Prescription rejected for ${prescription?.patientName}`;
-        break;
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to update prescription status");
+      }
+
+      let message = "";
+      switch (status) {
+        case "verified":
+          message = `Medicine "${prescription?.medication}" verified for ${prescription?.patientName}`;
+          break;
+        case "pending":
+          message = `Medicine "${prescription?.medication}" marked as pending for ${prescription?.patientName}`;
+          break;
+        case "advised-discontinued":
+          message = `Prescription advised to discontinue for ${prescription?.patientName}`;
+          break;
+        default:
+          message = `Prescription status updated`;
+      }
+
+      if (status === "advised-discontinued") {
+        toast.error(message, { id: toastId });
+      } else {
+        toast.success(message, { id: toastId });
+      }
+
+      refreshPrescriptions();
+      setMessage(message);
+      setMessageType(status === "advised-discontinued" ? "error" : "success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (error) {
+      console.error("Error updating prescription:", error);
+
+      // 🔹 Update toast to error
+      toast.error("Failed to update prescription status", { id: toastId });
     }
-
-    setMessage(message);
-    setMessageType(newStatus === "rejected" ? "error" : "success");
-
-    setTimeout(() => {
-      setMessage("");
-      setMessageType("");
-    }, 3000);
   };
 
   const handleViewDetails = (prescription) => {
@@ -757,33 +1139,57 @@ const PharmacistPrescriptions = ({ onBack }) => {
             </span>
           </div>
         );
+
+      case "ordered":
+        return (
+          <div
+            className={`${baseClasses} bg-purple-500/20 border border-purple-500/30 text-purple-400`}
+          >
+            <Clock className="w-3 h-3" />
+            <span>Ordered</span>
+          </div>
+        );
+
+      case "active":
+        return (
+          <div
+            className={`${baseClasses} bg-cyan-500/20 border border-cyan-500/30 text-cyan-400`}
+          >
+            <CheckCircle className="w-3 h-3" />
+            <span className="">Active</span>
+          </div>
+        );
+
       case "verified":
         return (
           <div
-            className={`${baseClasses} bg-blue-500/20 border border-blue-500/30`}
+            className={`${baseClasses} bg-blue-500/20 border border-blue-500/30 text-blue-400`}
           >
             <CheckCircle className="w-3 h-3" />
-            <span className="text-blue-400">Verified</span>
+            <span>Verified</span>
           </div>
         );
+
       case "dispensed":
         return (
           <div
-            className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
+            className={`${baseClasses} bg-green-500/20 border border-green-500/30 text-green-400`}
           >
             <CheckCircle className="w-3 h-3" />
-            <span className="text-green-400">Dispensed</span>
+            <span>Dispensed</span>
           </div>
         );
-      case "rejected":
+
+      case "advised-discontinued":
         return (
           <div
-            className={`${baseClasses} bg-red-500/20 border border-red-500/30`}
+            className={`${baseClasses} bg-orange-500/20 border border-orange-500/30 text-orange-400`}
           >
-            <X className="w-3 h-3" />
-            <span className="text-red-400">Rejected</span>
+            <AlertTriangle className="w-3 h-3" />
+            <span>Advised Discontinued</span>
           </div>
         );
+
       default:
         return null;
     }
@@ -796,45 +1202,31 @@ const PharmacistPrescriptions = ({ onBack }) => {
           <div className="flex gap-2">
             <VerifyPrescriptionModal
               prescription={prescription}
-              onVerify={(id) => console.log(id)}
+              onVerify={(id) => handleUpdateStatus(id, "verified")}
             />
-            {/* <RejectPrescriptionModal
-              prescription={prescription}
-              onReject={(id, reason) =>
-                handleUpdateStatus(id, "rejected", reason)
-              }
-            /> */}
             <DiscontinuePrescriptionModal
-              label="Advise to Discontinue"
               prescription={prescription}
               onDiscontinue={(id, reason) =>
-                handleUpdateStatus(id, "discontinued", reason)
+                handleUpdateStatus(id, "advised-discontinued", reason)
               }
             />
           </div>
         );
       case "verified":
         return (
-          <button
-            onClick={() => handleUpdateStatus(prescription.id, "dispensed")}
-            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-          >
-            Dispense
-          </button>
+          <DispensePrescriptionModal
+            prescription={prescription}
+            onAction={(id, status, notes) =>
+              // handleUpdateStatus(id, status, notes)
+              console.log(id, status, notes)
+            }
+          />
         );
       case "dispensed":
         return (
           <div className="text-12-medium lg:text-14-medium text-green-400 px-3 lg:px-4 py-2">
             Completed
           </div>
-        );
-      case "request-cancellation":
-        return (
-          <DiscontinuePrescriptionModal
-            label="Discontinue"
-            prescription={prescription}
-            onDiscontinue={(id, reason) => console.log(id, reason)}
-          />
         );
       case "rejected":
         return (
@@ -989,21 +1381,26 @@ const PharmacistPrescriptions = ({ onBack }) => {
 
               {/* Status Filter */}
               <div className="flex gap-2">
-                {["all", "pending", "verified", "dispensed", "rejected"].map(
-                  (status) => (
-                    <button
-                      key={status}
-                      onClick={() => setStatusFilter(status)}
-                      className={`px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 ${
-                        statusFilter === status
-                          ? "bg-blue-500 text-white"
-                          : "bg-dark-400/50 text-dark-700 hover:bg-dark-400/70 hover:text-white"
-                      }`}
-                    >
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </button>
-                  )
-                )}
+                {[
+                  "all",
+                  "active",
+                  "ordered",
+                  "pending",
+                  "verified",
+                  "dispensed",
+                ].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 ${
+                      statusFilter === status
+                        ? "bg-blue-500 text-white"
+                        : "bg-dark-400/50 text-dark-700 hover:bg-dark-400/70 hover:text-white"
+                    }`}
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -1020,81 +1417,87 @@ const PharmacistPrescriptions = ({ onBack }) => {
             </div>
 
             <div className="space-y-4">
-              {filteredPrescriptions.map((prescription) => (
-                <div
-                  key={prescription.id}
-                  className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 lg:gap-6">
-                      <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <Pill className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+              {filteredPrescriptions
+                .filter(
+                  (prescription) =>
+                    prescription.status !== "discontinued" &&
+                    prescription.status !== "request-cancellation"
+                )
+                .map((prescription) => (
+                  <div
+                    key={prescription.id}
+                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 lg:gap-6">
+                        <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                          <Pill className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                        </div>
+
+                        <div className="space-y-2 min-w-0 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                            <h3 className="text-16-bold lg:text-20-bold text-white">
+                              {prescription.medication}
+                            </h3>
+                            {getStatusBadge(
+                              prescription.status,
+                              prescription.priority
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
+                            <div>
+                              <span className="text-white">Patient:</span>{" "}
+                              {prescription.patientName} (
+                              {prescription.patientId})
+                            </div>
+                            <div>
+                              <span className="text-white">Dosage:</span>{" "}
+                              {prescription.dosage}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
+                            <div>
+                              <span className="text-white">Prescribed by:</span>{" "}
+                              {prescription.prescribedBy}
+                            </div>
+                            <div>
+                              <span className="text-white">Date:</span>{" "}
+                              {prescription.prescribedDate}
+                            </div>
+                            <div>
+                              <span className="text-white">Cost:</span> $
+                              {prescription.cost.toFixed(2)}
+                            </div>
+                          </div>
+
+                          <div className="bg-dark-500/30 rounded-lg px-3 py-2">
+                            <p className="text-10-regular lg:text-12-regular text-dark-600">
+                              <span className="text-white">Instructions:</span>{" "}
+                              {prescription.instructions}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="space-y-2 min-w-0 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                          <h3 className="text-16-bold lg:text-20-bold text-white">
-                            {prescription.medication}
-                          </h3>
-                          {getStatusBadge(
-                            prescription.status,
-                            prescription.priority
-                          )}
+                      <div className="flex md:flex-row flex-col lg:flex-col items-start lg:items-end gap-2 lg:gap-4 flex-shrink-0">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleViewDetails(prescription)}
+                            className="flex gap-1 items-center bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                          >
+                            <Eye className="w-4 h-4" /> View
+                          </button>
+                          <button className="flex gap-1 items-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
+                            <Phone className="w-4 h-4" /> Phone
+                          </button>
                         </div>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
-                          <div>
-                            <span className="text-white">Patient:</span>{" "}
-                            {prescription.patientName} ({prescription.patientId}
-                            )
-                          </div>
-                          <div>
-                            <span className="text-white">Dosage:</span>{" "}
-                            {prescription.dosage}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
-                          <div>
-                            <span className="text-white">Prescribed by:</span>{" "}
-                            {prescription.prescribedBy}
-                          </div>
-                          <div>
-                            <span className="text-white">Date:</span>{" "}
-                            {prescription.prescribedDate}
-                          </div>
-                          <div>
-                            <span className="text-white">Cost:</span> $
-                            {prescription.cost.toFixed(2)}
-                          </div>
-                        </div>
-
-                        <div className="bg-dark-500/30 rounded-lg px-3 py-2">
-                          <p className="text-10-regular lg:text-12-regular text-dark-600">
-                            <span className="text-white">Instructions:</span>{" "}
-                            {prescription.instructions}
-                          </p>
-                        </div>
+                        {getActionButtons(prescription)}
                       </div>
-                    </div>
-
-                    <div className="flex flex-row lg:flex-col items-start lg:items-end gap-2 lg:gap-4 flex-shrink-0">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleViewDetails(prescription)}
-                          className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
-                          <Phone className="w-4 h-4" />
-                        </button>
-                      </div>
-                      {getActionButtons(prescription)}
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {filteredPrescriptions.length === 0 && (

@@ -258,14 +258,6 @@ const getStatusIcon = (status) => {
         </p>
       );
 
-    case "discontinued-pharmacist":
-      return (
-        <p className="flex items-center gap-2">
-          <X className="w-4 h-4" />
-          Cancelled By Pharmacist
-        </p>
-      );
-
     case "advised-discontinued":
       return (
         <p className="flex items-center gap-2">
@@ -286,7 +278,7 @@ const getStatusIcon = (status) => {
       return (
         <p className="flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />
-          Verified By Pharmacist
+          Verified By Pharmacist - Pending Dispense
         </p>
       );
 
