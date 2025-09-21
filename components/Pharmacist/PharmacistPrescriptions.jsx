@@ -27,6 +27,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { set } from "date-fns";
@@ -578,7 +579,8 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
     setNotes("");
   };
 
-  const handleAction = (status) => {
+  const handleAction = (e, status) => {
+    e.preventDefault();
     if (status === "pending" && !notes.trim()) {
       toast.error("Notes are required when marking as Pending");
       return;
@@ -612,7 +614,26 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          setNotes("");
+          setForm({
+            medication: "",
+            cost: "",
+            medicineValidity: "",
+            dispensedDuration: "",
+            refillsRemaining: 0,
+            nextRefillDate: "",
+            lastDispensedDate: "",
+            sideEffects: [],
+            interaction: [],
+          });
+        }
+        setOpen(open);
+      }}
+    >
       <DialogTrigger asChild>
         <button
           className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
@@ -898,24 +919,24 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
         </div>
 
         {/* Actions */}
-        <DialogFooter className="flex justify-end gap-3">
-          <Button
+        <DialogFooter className="w-full flex justify-end gap-3">
+          <DialogClose
             variant="secondary"
             onClick={handleClose}
-            className="bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-lg"
+            className="w-full p-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-3xl"
           >
             Cancel
-          </Button>
+          </DialogClose>
           <Button
-            onClick={() => handleAction("pending")}
+            onClick={(e) => handleAction(e, "pending")}
             disabled={!notes.trim()}
-            className="bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg disabled:opacity-50"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 text-white rounded-3xl disabled:opacity-50"
           >
             Mark Pending
           </Button>
           <Button
-            onClick={() => handleAction("dispensed")}
-            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg"
+            onClick={(e) => handleAction(e, "dispensed")}
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-3xl"
           >
             Confirm Dispense
           </Button>
@@ -1264,9 +1285,9 @@ const PharmacistPrescriptions = ({ onBack }) => {
         return (
           <DispensePrescriptionModal
             prescription={prescription}
-            onAction={(id, status, notes) =>
+            onAction={(id, status, notes, form) =>
               // handleUpdateStatus(id, status, notes)
-              console.log(id, status, notes)
+              console.log(id, status, notes, form)
             }
           />
         );
