@@ -719,7 +719,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
 
   const handleRestock = async (medicineId, amount, reason, name) => {
     try {
-      const load = toast.loading("Restocking Medicine...");
+      const load = toast.loading(`Restocking ${name}...`);
 
       const res = await fetch(`/api/medicines/${medicineId}/restock`, {
         method: "POST",
