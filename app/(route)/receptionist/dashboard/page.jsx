@@ -11,6 +11,7 @@ import { ArrowRight, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoginRedirect from "@/components/Onboarding/LoginRedirect";
 import PharmacistDashboardWithSidebar from "@/components/Pharmacist/PharmacistDashboardWithSidebar";
+import ReceptionistDashboardWithSidebar from "@/components/Receptionist/ReceptionistDashboardWithSidebar";
 
 export default function PatientPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function PatientPage() {
 
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
-  const [pharmacistData, setPharmacistData] = useState([]);
+  const [receptionistData, setReceptionistData] = useState([]);
   const [onboardingStatus, setOnboardingStatus] = useState(null);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function PatientPage() {
 
           if (receptionist.length > 0) {
             console.log("Pharmacist data:", receptionist[0]);
-            setPharmacistData(receptionist[0]);
+            setReceptionistData(receptionist[0]);
             setOnboardingStatus(receptionist[0].hasOnboarded);
           }
         }
@@ -116,5 +117,5 @@ export default function PatientPage() {
     );
   }
 
-  return <PharmacistDashboardWithSidebar pharmacistData={pharmacistData} />;
+  return <ReceptionistDashboardWithSidebar receptionistData={receptionistData} />;
 }

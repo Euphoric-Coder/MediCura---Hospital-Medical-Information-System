@@ -3,7 +3,6 @@ import {
   uuid,
   varchar,
   timestamp,
-  text,
   date,
   integer,
   boolean,
@@ -34,7 +33,7 @@ export const Patients = pgTable("patients", {
   phone: varchar("phone"),
   dateOfBirth: date("dateOfBirth"),
   gender: varchar("gender"),
-  address: text("address"),
+  address: varchar("address"),
   occupation: varchar("occupation"),
   emergencyContactName: varchar("emergencyContactName"),
   emergencyPhone: varchar("emergencyPhone"),
@@ -131,8 +130,8 @@ export const Appointments = pgTable("appointments", {
 
   date: date("date").notNull(),
   time: varchar("time").notNull(), // e.g. "10:30 AM"
-  reason: text("reason"),
-  notes: text("notes"),
+  reason: varchar("reason"),
+  notes: varchar("notes"),
 
   status: varchar("status").default("upcoming"), // upcoming, completed, cancelled
 
@@ -252,20 +251,20 @@ export const Pharmacists = pgTable("pharmacists", {
   pharmacyType: varchar("pharmacyType"),
   currentPharmacy: varchar("currentPharmacy"),
   yearsOfExperience: integer("yearsOfExperience"),
-  specializations: text("specializations"),
+  specializations: varchar("specializations"),
 
   // Education
   pharmacySchool: varchar("pharmacySchool"),
   graduationYear: varchar("graduationYear", { length: 4 }),
   residencyProgram: varchar("residencyProgram"),
-  certifications: text("certifications"),
-  continuingEducation: text("continuingEducation"),
+  certifications: varchar("certifications"),
+  continuingEducation: varchar("continuingEducation"),
 
   // Practice Details
   workSchedule: varchar("workSchedule"),
-  languagesSpoken: text("languagesSpoken"),
-  clinicalServices: text("clinicalServices"),
-  insuranceExperience: text("insuranceExperience"),
+  languagesSpoken: varchar("languagesSpoken"),
+  clinicalServices: varchar("clinicalServices"),
+  insuranceExperience: varchar("insuranceExperience"),
 
   // Consent
   practiceConsent: boolean("practiceConsent").default(true),
@@ -331,16 +330,26 @@ export const Receptionists = pgTable("receptionists", {
     .primaryKey()
     .references(() => Users.id, { onDelete: "cascade" }),
 
-  department: varchar("department"),
-  previousExperience: text("previousExperience"),
+  // Profile
+  name: varchar("name"),
+  phone: varchar("phone"),
+  avatar: varchar("avatar"),
+  dateOfBirth: date("dateOfBirth"),
+  gender: varchar("gender"),
+  address: varchar("address"),
+  emergencyContactName: varchar("emergencyContactName"),
+  emergencyPhone: varchar("emergencyPhone"),
+
+  // Professional
+  previousExperience: varchar("previousExperience"),
   yearsOfExperience: integer("yearsOfExperience"),
   currentEmployer: varchar("currentEmployer"),
-  reasonForLeaving: text("reasonForLeaving"),
+  reasonForLeaving: varchar("reasonForLeaving"),
 
   education: varchar("education"),
-  certifications: text("certifications"),
-  softwareSkills: text("softwareSkills"),
-  languagesSpoken: text("languagesSpoken"),
+  certifications: varchar("certifications"),
+  softwareSkills: varchar("softwareSkills"),
+  languagesSpoken: varchar("languagesSpoken"),
   typingSpeed: varchar("typingSpeed", { length: 50 }),
 
   workSchedule: varchar("workSchedule"),
