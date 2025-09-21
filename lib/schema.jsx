@@ -44,10 +44,10 @@ export const Patients = pgTable("patients", {
   insurancePolicyNumber: varchar("insurancePolicyNumber"),
   insurancePolicyDocument: varchar("insurancePolicyDocument"),
   insurancePolicyDocumentId: varchar("insurancePolicyDocumentId"),
-  allergies: jsonb("allergies"),
-  currentMedications: jsonb("currentMedications"),
-  familyMedicalHistory: jsonb("familyMedicalHistory"),
-  pastMedicalHistory: jsonb("pastMedicalHistory"),
+  allergies: jsonb("allergies").default([]),
+  currentMedications: jsonb("currentMedications").default([]),
+  familyMedicalHistory: jsonb("familyMedicalHistory").default([]),
+  pastMedicalHistory: jsonb("pastMedicalHistory").default([]),
 
   identificationType: varchar("identificationType"),
   identificationNumber: varchar("identificationNumber"),
@@ -93,9 +93,9 @@ export const Doctors = pgTable("doctors", {
   // Services
   consultationFee: varchar("consultationFee"),
   rating: numeric("rating").default(0),
-  availableDays: jsonb("availableDays"),
-  availableHours: jsonb("availableHours"),
-  languagesSpoken: jsonb("languagesSpoken"),
+  availableDays: jsonb("availableDays").default([]),
+  availableHours: jsonb("availableHours").default([]),
+  languagesSpoken: jsonb("languagesSpoken").default([]),
 
   // Documents
   cv: varchar("cv"),
@@ -162,11 +162,11 @@ export const Consultations = pgTable("consultations", {
   }),
 
   // Clinical notes
-  chiefComplaint: jsonb("chiefComplaint"),
-  historyOfPresentIllness: jsonb("historyOfPresentIllness"),
-  physicalExamination: jsonb("physicalExamination"),
-  assessment: jsonb("assessment"),
-  plan: jsonb("plan"),
+  chiefComplaint: jsonb("chiefComplaint").default([]),
+  historyOfPresentIllness: jsonb("historyOfPresentIllness").default([]),
+  physicalExamination: jsonb("physicalExamination").default([]),
+  assessment: jsonb("assessment").default([]),
+  plan: jsonb("plan").default([]),
 
   // Admission info
   admissionRequired: boolean("admissionRequired").default(false),
@@ -174,7 +174,7 @@ export const Consultations = pgTable("consultations", {
   admissionReason: varchar("admissionReason"),
 
   // Follow-up
-  followUpInstructions: jsonb("followUpInstructions"),
+  followUpInstructions: jsonb("followUpInstructions").default([]),
   nextAppointment: date("nextAppointment"),
 
   createdAt: timestamp("createdAt").defaultNow(),
@@ -199,7 +199,8 @@ export const Prescriptions = pgTable("prescriptions", {
 
   status: varchar("status").default("recommended"), // ordered, completed, pending, cancelled, request-calcellation, discontinued
   medicineValidity: varchar("medicineValidity"),
-  sideEffects: jsonb("sideEffects"),
+  sideEffects: jsonb("sideEffects").default([]),
+  interaction: jsonb("interaction").default([]),
   cost: numeric("cost"),
 
   billGenerated: boolean("billGenerated").default(false),
@@ -223,7 +224,7 @@ export const LabTests = pgTable("lab_tests", {
   category: varchar("category"),
 
   // optional results/remarks
-  result: jsonb("result"),
+  result: jsonb("result").default([]),
   status: varchar("status").default("recommended"), // recommended, ordered, completed, pending
 
   createdAt: timestamp("createdAt").defaultNow(),
@@ -322,7 +323,6 @@ export const InventoryLogs = pgTable("inventory_logs", {
 
   createdAt: timestamp("createdAt").defaultNow(),
 });
-
 
 // Receptionist Table
 export const Receptionists = pgTable("receptionists", {

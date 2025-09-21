@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Pill,
@@ -15,6 +15,10 @@ import {
   Phone,
 } from "lucide-react";
 import jsPDF from "jspdf";
+import { db } from "@/lib/dbConfig";
+import { Consultations, Doctors, Patients, Prescriptions } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+import { set } from "date-fns";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -106,7 +110,7 @@ const PrescriptionDetailsModal = ({
           {/* Drug Information */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Side Effects */}
-            {prescription.sideEffects.length > 0 && (
+            {prescription.sideEffects.length > 0 ? (
               <div className="bg-yellow-500/10 rounded-2xl p-4 sm:p-6">
                 <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
                   Side Effects
@@ -122,10 +126,21 @@ const PrescriptionDetailsModal = ({
                   ))}
                 </div>
               </div>
+            ) : (
+              <div className="bg-yellow-500/10 rounded-2xl p-4 sm:p-6">
+                <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
+                  Side Effects
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-10-medium sm:text-12-medium text-yellow-400">
+                    None
+                  </span>
+                </div>
+              </div>
             )}
 
             {/* Drug Interactions */}
-            {prescription.interactions.length > 0 && (
+            {prescription.interactions.length > 0 ? (
               <div className="bg-red-500/10 rounded-2xl p-4 sm:p-6">
                 <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
                   Drug Interactions
@@ -139,6 +154,17 @@ const PrescriptionDetailsModal = ({
                       {interaction}
                     </span>
                   ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-red-500/10 rounded-2xl p-4 sm:p-6">
+                <h4 className="text-14-bold sm:text-16-bold text-white mb-3">
+                  Drug Interactions
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-10-medium sm:text-12-medium text-red-400">
+                    None
+                  </span>
                 </div>
               </div>
             )}
@@ -201,74 +227,7 @@ const PrescriptionDetailsModal = ({
 };
 
 const PharmacistPrescriptions = ({ onBack }) => {
-  const [prescriptions, setPrescriptions] = useState([
-    {
-      id: "1",
-      patientName: "John Smith",
-      patientId: "P001",
-      patientPhone: "+1 (555) 123-4567",
-      medication: "Lisinopril",
-      dosage: "10mg",
-      frequency: "Once daily",
-      duration: "90 days",
-      prescribedBy: "Dr. Sarah Safari",
-      prescribedDate: "2024-01-15",
-      status: "pending",
-      priority: "normal",
-      instructions:
-        "Take with food in the morning. Monitor blood pressure regularly. Avoid potassium supplements.",
-      refills: 2,
-      cost: 25.5,
-      sideEffects: ["Dizziness", "Dry cough", "Fatigue", "Headache"],
-      contraindications: ["Pregnancy", "Kidney disease", "Hyperkalemia"],
-      interactions: ["Potassium supplements", "NSAIDs", "Lithium"],
-      reason: "Hypertension management",
-    },
-    {
-      id: "2",
-      patientName: "Emily Johnson",
-      patientId: "P002",
-      patientPhone: "+1 (555) 234-5678",
-      medication: "Amoxicillin",
-      dosage: "500mg",
-      frequency: "Three times daily",
-      duration: "7 days",
-      prescribedBy: "Dr. Ava Williams",
-      prescribedDate: "2024-01-15",
-      status: "verified",
-      priority: "urgent",
-      instructions:
-        "Complete the full course even if feeling better. Take with water.",
-      refills: 0,
-      cost: 15.75,
-      sideEffects: ["Nausea", "Diarrhea", "Rash", "Stomach upset"],
-      contraindications: ["Penicillin allergy", "Mononucleosis"],
-      interactions: ["Warfarin", "Methotrexate", "Oral contraceptives"],
-      reason: "Bacterial infection",
-    },
-    {
-      id: "3",
-      patientName: "Michael Brown",
-      patientId: "P003",
-      patientPhone: "+1 (555) 345-6789",
-      medication: "Metformin",
-      dosage: "500mg",
-      frequency: "Twice daily",
-      duration: "90 days",
-      prescribedBy: "Dr. Adam Smith",
-      prescribedDate: "2024-01-14",
-      status: "dispensed",
-      priority: "normal",
-      instructions:
-        "Take with meals to reduce stomach upset. Monitor blood sugar levels.",
-      refills: 3,
-      cost: 18.0,
-      sideEffects: ["Nausea", "Diarrhea", "Stomach upset", "Metallic taste"],
-      contraindications: ["Kidney disease", "Liver disease", "Heart failure"],
-      interactions: ["Alcohol", "Contrast dye", "Diuretics"],
-      reason: "Type 2 Diabetes",
-    },
-  ]);
+  const [prescriptions, setPrescriptions] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -276,6 +235,75 @@ const PharmacistPrescriptions = ({ onBack }) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  useEffect(() => {
+    getPharmacistPrescriptions();
+  }, []);
+
+  const getPharmacistPrescriptions = async () => {
+    const rows = await db
+      .select({
+        id: Prescriptions.id,
+        medication: Prescriptions.medication,
+        dosage: Prescriptions.dosage,
+        frequency: Prescriptions.frequency,
+        duration: Prescriptions.duration,
+        status: Prescriptions.status,
+        instructions: Prescriptions.instructions,
+        cost: Prescriptions.cost,
+        refills: Prescriptions.refillsRemaining,
+        prescribedDate: Prescriptions.createdAt,
+        chiefComplaint: Consultations.chiefComplaint,
+        historyOfPresentIllness: Consultations.historyOfPresentIllness,
+        physicalExamination: Consultations.physicalExamination,
+        assessment: Consultations.assessment,
+        followUpInstructions: Consultations.followUpInstructions,
+
+        patientId: Patients.userId,
+        patientName: Patients.name,
+        patientPhone: Patients.phone,
+        allergies: Patients.allergies,
+
+        doctorName: Doctors.name,
+      })
+      .from(Prescriptions)
+      .leftJoin(
+        Consultations,
+        eq(Prescriptions.consultationId, Consultations.id)
+      )
+      .leftJoin(Patients, eq(Consultations.patientId, Patients.userId))
+      .leftJoin(Doctors, eq(Consultations.doctorId, Doctors.userId));
+
+    const data = rows.map((row) => ({
+      id: row.id,
+      patientName: row.patientName,
+      patientId: row.patientId,
+      patientPhone: row.patientPhone,
+      allergies: row.allergies,
+      medication: row.medication,
+      dosage: row.dosage,
+      frequency: row.frequency,
+      duration: row.duration,
+      prescribedBy: row.doctorName,
+      prescribedDate: row.prescribedDate?.toISOString().split("T")[0] ?? "",
+      status: row.status,
+      chiefComplaint: row.chiefComplaint,
+      historyOfPresentIllness: row.historyOfPresentIllness,
+      physicalExamination: row.physicalExamination,
+      assessment: row.assessment,
+      followUpInstructions: row.followUpInstructions,
+      instructions: row.instructions,
+      refills: row.refills || 0,
+      cost: row.cost || 0,
+      sideEffects: [], // can hydrate from JSON if available
+      interactions: [],
+      reason: "", // can hydrate from Consultation.assessment or plan
+    }));
+
+    setPrescriptions(data);
+    // Format for frontend
+    console.log(data);
+  };
 
   const filteredPrescriptions = prescriptions.filter((prescription) => {
     const matchesSearch =
@@ -463,7 +491,7 @@ const PharmacistPrescriptions = ({ onBack }) => {
 
   const getActionButtons = (prescription) => {
     switch (prescription.status) {
-      case "pending":
+      case "ordered":
         return (
           <div className="flex gap-2">
             <button
