@@ -504,7 +504,7 @@ const RestockModal = ({ medicine, onRestock }) => {
   );
 };
 
-const DeleteMedicineModal = ({ medicine, onDelete }) => {
+const DeleteMedicineModal = ({ medicine, onDelete, pharmacistId }) => {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [customReason, setCustomReason] = useState("");
@@ -526,19 +526,17 @@ const DeleteMedicineModal = ({ medicine, onDelete }) => {
       reason === "Other"
         ? `Other: ${customReason.trim()}`
         : `${reason}${customReason.trim() ? ` - ${customReason.trim()}` : ""}`;
-
-    console.log("Delete Details:");
-    console.log(medicine);
-    console.log("Reasons:", finalReason);
-    // try {
-    //   setLoading(true);
-    //   await onDelete(medicine.id, finalReason);
+    onDelete(
+      medicine.id,
+      {
+        pharmacistId,
+        reason: finalReason,
+      },
+      medicine.name
+    );
     setOpen(false); // close modal
     setReason("");
     setCustomReason("");
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
   return (
@@ -770,14 +768,12 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
 
   const handleAddMedicine = async (newMedicine) => {
     try {
-      console.log(newMedicine);
+      const load = toast.loading(`Adding ${newMedicine.name}...`);
 
       const data = {
         ...newMedicine,
         pharmacistId: pharmacistData.userId,
       };
-
-      console.log(data);
 
       const res = await fetch("/api/medicines", {
         method: "POST",
@@ -785,11 +781,16 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
         body: JSON.stringify(data),
       });
 
+      toast.dismiss(load);
+
       if (!res.ok) {
-        throw new Error("Failed to add medicine");
+        const error = await res.json();
+        console.error("Error deleting medicine:", error);
+        toast.error("Failed to delete medicine");
       }
 
       refreshMedicine();
+      toast.success(`${newMedicine.name} added successfully to the inventory!`);
       setMessage(`${newMedicine.name} added to inventory`);
       setMessageType("success");
 
@@ -799,6 +800,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       }, 3000);
     } catch (err) {
       console.error("Error adding medicine:", err);
+      toast.error("Unexpected error while adding");
     }
   };
 
@@ -812,6 +814,8 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
 
       console.log(data);
       console.log(reason);
+
+      const load = toast.loading(`Updating ${updatedMedicine.name}...`);
       const res = await fetch(`/api/medicines/${updatedMedicine.id}`, {
         method: "PUT",
         headers: {
@@ -820,13 +824,19 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
         body: JSON.stringify(data),
       });
 
+      toast.dismiss(load);
+
       if (!res.ok) {
         const error = await res.json();
         console.error("Error updating medicine:", error);
+        toast.error("Failed to update medicine");
         return;
       }
 
       refreshMedicine();
+      toast.success(
+        `${updatedMedicine.name} metadata has been updated successfully in the inventory!`
+      );
       setMessage(`${updatedMedicine.name} edited in inventory`);
       setMessageType("success");
 
@@ -836,6 +846,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
       }, 3000);
     } catch (err) {
       console.error("Unexpected error while editing medicine:", err);
+      toast.error("Unexpected error while updating");
     }
   };
 
@@ -874,16 +885,38 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleDeleteMedicine = (medicine, reason) => {
-    // const medicine = medicines.find((m) => m.id === id);
-    // setMedicines((prev) => prev.filter((medicine) => medicine.id !== id));
-    // setMessage(`${medicine?.name} removed from inventory`);
-    // setMessageType("success");
+  const handleDeleteMedicine = async (id, details, name) => {
+    try {
+      const load = toast.loading("Deleting medicine...");
 
-    setTimeout(() => {
-      setMessage("");
-      setMessageType("");
-    }, 3000);
+      const res = await fetch(`/api/medicines/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(details), // includes pharmacistId, reason, unitPrice
+      });
+
+      toast.dismiss(load);
+
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("Error deleting medicine:", error);
+        toast.error("Failed to delete medicine");
+        return;
+      }
+
+      refreshMedicine();
+      toast.success(`${name} deleted successfully!`);
+      setMessage(`${name} deleted successfully!`);
+      setMessageType("success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (err) {
+      console.error("Unexpected error while deleting medicine:", err);
+      toast.error("Unexpected error while deleting");
+    }
   };
 
   const inStockCount = medicines.filter((m) => m.status === "in-stock").length;
@@ -1184,6 +1217,7 @@ const PharmacistInventory = ({ onBack, pharmacistData }) => {
                       <DeleteMedicineModal
                         medicine={medicine}
                         onDelete={handleDeleteMedicine}
+                        pharmacistId={pharmacistData.userId}
                       />
                     </div>
                   </div>

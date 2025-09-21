@@ -66,6 +66,16 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
   const { id } = params;
 
+  // Parse body (pharmacistId, reason, etc.)
+  let body = {};
+  try {
+    body = await req.json();
+  } catch (e) {
+    // no body provided → ignore
+  }
+
+  const { pharmacistId, reason } = body;
+
   // Fetch before delete
   const [oldMed] = await db
     .select()
@@ -76,17 +86,19 @@ export async function DELETE(req, { params }) {
     return NextResponse.json({ error: "Medicine not found" }, { status: 404 });
   }
 
-  await db.delete(Medicines).where(eq(Medicines.id, id));
-
   // Log deletion
   await db.insert(InventoryLogs).values({
     medicineId: id,
+    pharmacistId,
     action: "delete",
     quantityChange: -oldMed.quantity,
     prevQuantity: oldMed.quantity,
     newQuantity: 0,
-    notes: "Medicine deleted",
+    unitPrice: oldMed.unitPrice,
+    notes: reason,
   });
+
+  await db.delete(Medicines).where(eq(Medicines.id, id));
 
   return NextResponse.json({ success: true });
 }

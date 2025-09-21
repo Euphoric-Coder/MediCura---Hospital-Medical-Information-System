@@ -293,9 +293,9 @@ export const Medicines = pgTable("medicines", {
 export const InventoryLogs = pgTable("inventory_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
 
-  medicineId: uuid("medicineId")
-    .notNull()
-    .references(() => Medicines.id),
+  medicineId: uuid("medicineId").references(() => Medicines.id, {
+    onDelete: "set null",
+  }),
 
   pharmacistId: uuid("pharmacistId").references(() => Pharmacists.userId, {
     onDelete: "set null",
