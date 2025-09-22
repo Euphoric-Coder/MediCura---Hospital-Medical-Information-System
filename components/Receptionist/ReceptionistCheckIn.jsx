@@ -9,6 +9,8 @@ import {
   AlertTriangle,
   Search,
   Edit,
+  X,
+  CircleX,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
@@ -198,6 +200,15 @@ const ReceptionistCheckIn = ({ onBack }) => {
             <span className="text-10-medium sm:text-12-medium">Completed</span>
           </div>
         );
+      case "no-show":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
+            <CircleX className="w-3 h-3 text-red-400" />
+            <span className="text-10-medium sm:text-12-medium text-red-400">
+              No Show
+            </span>
+          </div>
+        );
       default:
         return null;
     }
@@ -205,6 +216,15 @@ const ReceptionistCheckIn = ({ onBack }) => {
 
   const getActionButton = (patient) => {
     switch (patient.status) {
+      case "scheduled":
+        return (
+          <button
+            onClick={() => handleStatusUpdate(patient.id, "no-show")}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25"
+          >
+            Mark No Show
+          </button>
+        );
       case "waiting":
         return (
           <button
@@ -450,9 +470,6 @@ const ReceptionistCheckIn = ({ onBack }) => {
                         <div>
                           <span className="text-white">Type:</span>{" "}
                           {patient.type}
-                        </div>
-                        <div>
-                          <span className="text-white">ID:</span> {patient.id}
                         </div>
                       </div>
 
