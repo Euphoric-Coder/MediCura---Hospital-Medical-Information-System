@@ -121,9 +121,9 @@ const LandingPage = ({
               <div className="relative h-[400px] lg:h-[500px] rounded-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-emerald-900/20 to-slate-800/20 rounded-2xl p-8 border border-slate-700/50 h-full">
                   <img
-                    src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    src="/banner.png"
                     alt="Healthcare professionals"
-                    className="w-full h-full object-cover rounded-xl shadow-2xl"
+                    className="w-full h-full object-fit rounded-xl shadow-2xl"
                   />
                 </div>
               </div>
