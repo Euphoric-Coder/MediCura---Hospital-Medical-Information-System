@@ -16,6 +16,8 @@ import { signIn } from "next-auth/react";
 import { signUp } from "@/lib/auth";
 import RedirectPage from "./RedirectPage";
 import { toast } from "sonner";
+import Image from "next/image";
+import Link from "next/link";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -73,12 +75,12 @@ const LoginPage = () => {
         <div className="flex-1 flex items-center justify-center px-8 py-12 bg-dark-300">
           <div className="w-full max-w-md">
             {/* Logo */}
-            <div className="flex items-center gap-2 mb-12">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <Plus className="w-5 h-5 text-white" />
+            <Link href={"/"}>
+              <div className="flex items-center gap-2 mb-12">
+                <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
+                <span className="text-24-bold text-white">MediCura</span>
               </div>
-              <span className="text-24-bold text-white">MediCura</span>
-            </div>
+            </Link>
 
             {/* Welcome Text */}
             <div className="mb-10">

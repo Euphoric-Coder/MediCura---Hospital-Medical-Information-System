@@ -27,6 +27,8 @@ import {
   stats,
   platformFeatures,
 } from "@/data";
+import Image from "next/image";
+import Link from "next/link";
 
 const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
   return (
@@ -35,12 +37,11 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
       <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Plus className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">MediCura</span>
-            </div>
+            <Link href={"/"} className="flex items-center gap-2">
+              <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
+              <span className="text-24-bold text-white">MediCura</span>
+            </Link>
+
             <nav className="hidden md:flex items-center gap-8">
               <a
                 href="#features"
@@ -49,11 +50,11 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
                 Features
               </a>
               {/* <a
-                href="#pricing"
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Pricing
-              </a> */}
+          href="#pricing"
+          className="text-sm text-slate-400 hover:text-white transition-colors"
+        >
+          Pricing
+        </a> */}
               <a
                 href="#testimonials"
                 className="text-sm text-slate-400 hover:text-white transition-colors"
@@ -456,17 +457,24 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
-                  <Plus className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-white">MediCura</span>
+                <Link href={"/"}>
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={"/logo.png"}
+                      alt="Logo"
+                      width={32}
+                      height={32}
+                    />
+                    <span className="text-24-bold text-white">MediCura</span>
+                  </div>
+                </Link>
               </div>
               <p className="text-slate-400 mb-4 max-w-md">
                 Comprehensive healthcare management platform connecting
                 patients, doctors, pharmacists, and healthcare administrators.
               </p>
               <div className="flex items-center gap-4 text-sm text-slate-400">
-                <span>© 2024 MediCura</span>
+                <span>© {new Date().getFullYear()} MediCura</span>
                 <span>•</span>
                 <span>All rights reserved</span>
               </div>
@@ -476,36 +484,35 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
               <h4 className="font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li>
-                  <a
-                    href="#features"
+                  <Link
+                    href={"#features"}
                     className="hover:text-white transition-colors"
                   >
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#pricing"
+                  <Link
+                    href={"#pricing"}
                     className="hover:text-white transition-colors"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#testimonials"
+                  <Link
+                    href={"#testimonials"}
                     className="hover:text-white transition-colors"
                   >
                     Reviews
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <button
-                    onClick={onAdminAccess}
-                    className="hover:text-white transition-colors"
-                  >
-                    Admin Portal
-                  </button>
+                  <Link href={"/admin"}>
+                    <button className="hover:text-white transition-colors">
+                      Admin Portal
+                    </button>
+                  </Link>
                 </li>
               </ul>
             </div>

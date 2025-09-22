@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { Users } from "@/lib/schema";
 import { db } from "@/lib/dbConfig";
 import { eq } from "drizzle-orm";
+import Image from "next/image";
+import Link from "next/link";
 
 const SignInPage = () => {
   const router = useRouter();
@@ -52,7 +54,11 @@ const SignInPage = () => {
         return;
       }
 
-      const UserRole = await db.select().from(Users).where(eq(Users.email, formData.email)).limit(1);
+      const UserRole = await db
+        .select()
+        .from(Users)
+        .where(eq(Users.email, formData.email))
+        .limit(1);
 
       if (formData.role !== UserRole[0].role) {
         setError("Role mismatch. Please select the correct role.");
@@ -76,12 +82,12 @@ const SignInPage = () => {
         <div className="flex-1 flex items-center justify-center px-8 py-12 bg-dark-300">
           <div className="w-full max-w-md">
             {/* Logo */}
-            <div className="flex items-center gap-2 mb-12">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <Plus className="w-5 h-5 text-white" />
+            <Link href={"/"}>
+              <div className="flex items-center gap-2 mb-12">
+                <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
+                <span className="text-24-bold text-white">MediCura</span>
               </div>
-              <span className="text-24-bold text-white">MediCura</span>
-            </div>
+            </Link>
 
             {/* Welcome Text */}
             <div className="mb-10">
@@ -213,7 +219,7 @@ const SignInPage = () => {
         {/* Right Side - Image */}
         <div className="hidden md:flex flex-1 relative overflow-hidden">
           <img
-            src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            src="/login.png"
             alt="Healthcare professional with stethoscope"
             className="side-img max-h-screen w-full"
           />
