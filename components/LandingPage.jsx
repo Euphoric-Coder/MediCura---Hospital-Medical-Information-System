@@ -12,6 +12,11 @@ import {
   Stethoscope,
   Phone,
   Award,
+  Pill,
+  TestTube,
+  FileText,
+  CreditCard,
+  Bell,
 } from "lucide-react";
 import {
   features,
@@ -29,53 +34,47 @@ const LandingPage = ({
   onBookAppointment,
 }) => {
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <header className="bg-dark-200 border-b border-dark-500">
+      <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
                 <Plus className="w-5 h-5 text-white" />
               </div>
-              <span className="text-24-bold text-white">CarePulse</span>
+              <span className="text-xl font-bold text-white">CarePulse</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a
                 href="#features"
-                className="text-14-regular text-dark-700 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Features
               </a>
-              <a
-                href="#about"
-                className="text-14-regular text-dark-700 hover:text-white transition-colors"
+              {/* <a
+                href="#pricing"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
-                About
-              </a>
+                Pricing
+              </a> */}
               <a
-                href="#contact"
-                className="text-14-regular text-dark-700 hover:text-white transition-colors"
+                href="#testimonials"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
-                Contact
+                Reviews
               </a>
               <button
                 onClick={onAdminAccess}
-                className="text-14-regular text-dark-700 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Admin
               </button>
               <button
                 onClick={onGetStarted}
-                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg text-14-medium transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-emerald-500/25"
               >
                 Get Started
-              </button>
-              <button
-                onClick={onBookAppointment}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg text-14-medium transition-colors"
-              >
-                Book Appointment
               </button>
             </nav>
           </div>
@@ -83,46 +82,58 @@ const LandingPage = ({
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-32">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-36-bold md:text-[48px] md:leading-[52px] text-white mb-6">
-                Your Health,{" "}
-                <span className="text-green-500">Our Priority</span>
-              </h1>
-              <p className="text-18-bold text-dark-700 mb-8 leading-relaxed">
-                Experience seamless healthcare management with CarePulse. Book
-                appointments, manage your health records, and connect with
-                healthcare professionals all in one place.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={onGetStarted}
-                  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-16-semibold transition-colors flex items-center gap-2 justify-center"
-                >
-                  Get Started Today
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={onBookAppointment}
-                  className="border border-dark-500 text-white px-8 py-4 rounded-lg text-16-semibold hover:bg-dark-400 transition-colors"
-                >
-                  Book Appointment
-                </button>
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm font-medium">
+                  <Stethoscope className="w-4 h-4 mr-2" />
+                  Healthcare made simple
+                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                  Connect with doctors <br />
+                  <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+                    anytime, anywhere
+                  </span>
+                </h1>
+                <p className="text-slate-400 text-lg md:text-xl max-w-md leading-relaxed">
+                  Book appointments, consult via video, and manage your
+                  healthcare journey all in one secure platform.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={onGetStarted}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2 justify-center"
+                  >
+                    Get Started Today
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={onBookAppointment}
+                    className="border border-slate-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-slate-800 transition-all duration-300"
+                  >
+                    Book Appointment
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="relative">
-              <div className="bg-dark-400 rounded-2xl p-8 border border-dark-500">
-                <img
-                  src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Healthcare professionals"
-                  className="w-full h-80 object-cover rounded-xl"
-                />
+
+              <div className="relative h-[400px] lg:h-[500px] rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-900/20 to-slate-800/20 rounded-2xl p-8 border border-slate-700/50 h-full">
+                  <img
+                    src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Healthcare professionals"
+                    className="w-full h-full object-cover rounded-xl shadow-2xl"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Decorative elements */}
+        <div className="absolute right-0 top-0 w-[300px] h-[300px] bg-emerald-600/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute left-0 bottom-0 w-[200px] h-[200px] bg-emerald-500/10 rounded-full blur-3xl -ml-10 -mb-10"></div>
       </section>
 
       {/* Stats Section */}
@@ -131,15 +142,13 @@ const LandingPage = ({
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-32-bold lg:text-[40px] lg:leading-[44px] text-green-500 mb-2">
+                <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2">
                   {stat.number}
                 </div>
-                <div className="text-16-semibold text-white mb-1">
+                <div className="text-lg font-semibold text-white mb-1">
                   {stat.label}
                 </div>
-                <div className="text-12-regular text-dark-700">
-                  {stat.description}
-                </div>
+                <div className="text-sm text-slate-400">{stat.description}</div>
               </div>
             ))}
           </div>
@@ -147,211 +156,36 @@ const LandingPage = ({
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-dark-400">
+      <section id="features" className="py-20 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-32-bold text-white mb-4">
-              Comprehensive Healthcare Features
-            </h2>
-            <p className="text-16-regular text-dark-700 max-w-2xl mx-auto">
-              Our platform provides everything you need for complete healthcare
-              management, from appointment booking to prescription tracking and
-              medical records.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-dark-300 p-8 rounded-2xl border border-dark-500 hover:border-green-500 transition-colors group"
-              >
-                <div className="text-4xl mb-6">{feature.icon}</div>
-                <h3 className="text-18-bold text-white mb-4 group-hover:text-green-400 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-14-regular text-dark-700">
-                  {feature.description}
-                </p>
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm font-medium mb-4">
+                How It Works
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Platform Features by Role */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-32-bold text-white mb-4">
-              Built for Every Healthcare Role
-            </h2>
-            <p className="text-16-regular text-dark-700 max-w-2xl mx-auto">
-              CarePulse provides specialized dashboards and features tailored
-              for each role in the healthcare ecosystem.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {platformFeatures.map((platform, index) => (
-              <div
-                key={index}
-                className={`bg-gradient-to-r ${platform.color} backdrop-blur-sm border border-opacity-20 rounded-3xl p-8`}
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="text-4xl">{platform.icon}</div>
-                  <div>
-                    <h3 className="text-20-bold text-white">
-                      {platform.title}
-                    </h3>
-                    <p className="text-14-regular text-dark-700">
-                      {platform.description}
-                    </p>
-                  </div>
-                </div>
-                <ul className="space-y-3">
-                  {platform.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span className="text-14-regular text-white">
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Departments Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-dark-400">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-32-bold text-white mb-4">
-              Our Medical Departments
-            </h2>
-            <p className="text-16-regular text-dark-700 max-w-2xl mx-auto">
-              Access specialized care across multiple medical departments with
-              expert healthcare professionals.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {departments.map((dept, index) => (
-              <div
-                key={index}
-                className="bg-dark-300 p-8 rounded-2xl border border-dark-500 hover:border-green-500 transition-colors"
-              >
-                <div className="text-4xl mb-6">{dept.icon}</div>
-                <h3 className="text-18-bold text-white mb-4">{dept.name}</h3>
-                <p className="text-14-regular text-dark-700 mb-4">
-                  {dept.description}
-                </p>
-                <div className="flex items-center gap-4 text-12-regular text-green-400 mb-4">
-                  <span>{dept.doctors} Doctors</span>
-                  <span>•</span>
-                  <span>{dept.specialties.length} Specialties</span>
-                </div>
-                <div className="space-y-1">
-                  {dept.specialties.map((specialty, specIndex) => (
-                    <div
-                      key={specIndex}
-                      className="text-12-regular text-dark-600"
-                    >
-                      • {specialty}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-32-bold text-white mb-4">
-              Choose Your Healthcare Plan
-            </h2>
-            <p className="text-16-regular text-dark-700 max-w-2xl mx-auto">
-              Select the perfect plan that fits your healthcare needs and
-              budget.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div
-                key={index}
-                className={`bg-dark-300 rounded-2xl border p-8 transition-all duration-300 ${
-                  plan.popular
-                    ? "border-green-500 shadow-lg shadow-green-500/25 scale-105"
-                    : "border-dark-500 hover:border-green-500"
-                }`}
-              >
-                {plan.popular && (
-                  <div className="bg-green-500 text-white px-4 py-1 rounded-full text-12-medium text-center mb-6">
-                    Most Popular
-                  </div>
-                )}
-                <div className="text-center mb-8">
-                  <h3 className="text-24-bold text-white mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline justify-center gap-2 mb-4">
-                    <span className="text-36-bold text-green-500">
-                      {plan.price}
-                    </span>
-                    <span className="text-14-regular text-dark-700">
-                      {plan.period}
-                    </span>
-                  </div>
-                  <p className="text-14-regular text-dark-700">
-                    {plan.description}
-                  </p>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span className="text-14-regular text-white">
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={onGetStarted}
-                  className={`w-full py-3 px-6 rounded-lg text-16-semibold transition-colors ${
-                    plan.popular
-                      ? "bg-green-500 hover:bg-green-600 text-white"
-                      : "border border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
-                  }`}
-                >
-                  {plan.buttonText}
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Healthcare Benefits */}
-          <div className="mt-16 bg-dark-300 rounded-2xl p-8 border border-dark-500">
-            <div className="flex items-center gap-3 mb-6">
-              <Stethoscope className="w-8 h-8 text-green-500" />
-              <h3 className="text-24-bold text-white">Why Choose CarePulse?</h3>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Comprehensive Healthcare Features
+              </h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Our platform makes healthcare accessible with just a few clicks
+              </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {healthcareBenefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-1" />
-                  <p
-                    className="text-14-regular text-dark-700"
-                    dangerouslySetInnerHTML={{ __html: benefit }}
-                  />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="bg-slate-800/50 backdrop-blur-sm border border-emerald-900/20 hover:border-emerald-800/40 transition-all duration-300 rounded-xl p-6 group"
+                >
+                  <div className="bg-emerald-900/20 p-3 rounded-lg w-fit mb-4 group-hover:bg-emerald-900/30 transition-colors">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-emerald-400 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-400 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -359,163 +193,352 @@ const LandingPage = ({
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* Platform Features by Role */}
+      <section className="py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <img
-                src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Healthcare consultation"
-                className="w-full h-96 object-cover rounded-2xl"
-              />
-            </div>
-            <div>
-              <h2 className="text-32-bold text-white mb-6">
-                Complete Healthcare Ecosystem
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Built for Every Healthcare Role
               </h2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                  <div>
-                    <h4 className="text-16-semibold text-white mb-1">
-                      Consultation Management
-                    </h4>
-                    <p className="text-14-regular text-dark-700">
-                      Complete consultation workflow from booking to
-                      prescription management with detailed medical records.
-                    </p>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                CarePulse provides specialized dashboards and features tailored
+                for each role in the healthcare ecosystem.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {platformFeatures.map((platform, index) => (
+                <div
+                  key={index}
+                  className={`bg-gradient-to-r ${platform.color} backdrop-blur-sm border border-emerald-900/20 rounded-2xl p-8`}
+                >
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="text-4xl">{platform.icon}</div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">
+                        {platform.title}
+                      </h3>
+                      <p className="text-slate-400">{platform.description}</p>
+                    </div>
                   </div>
+                  <ul className="space-y-3">
+                    {platform.features.map((feature, featureIndex) => (
+                      <li
+                        key={featureIndex}
+                        className="flex items-center gap-3"
+                      >
+                        <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                        <span className="text-sm text-white">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                  <div>
-                    <h4 className="text-16-semibold text-white mb-1">
-                      Prescription Tracking
-                    </h4>
-                    <p className="text-14-regular text-dark-700">
-                      Track all your medications from doctor consultations with
-                      refill management and pharmacy integration.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                  <div>
-                    <h4 className="text-16-semibold text-white mb-1">
-                      Multi-Role Platform
-                    </h4>
-                    <p className="text-14-regular text-dark-700">
-                      Specialized dashboards for patients, doctors, pharmacists,
-                      receptionists, and administrators.
-                    </p>
-                  </div>
-                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      {/* <section id="pricing" className="py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm font-medium mb-4">
+                Affordable Healthcare
               </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Healthcare Plans
+              </h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Choose the perfect plan that fits your healthcare needs and
+                budget
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {pricingPlans.map((plan, index) => (
+                <div
+                  key={index}
+                  className={`bg-slate-800/50 backdrop-blur-sm rounded-2xl border p-8 transition-all duration-300 ${
+                    plan.popular
+                      ? "border-emerald-500 shadow-lg shadow-emerald-500/25 scale-105"
+                      : "border-slate-700/50 hover:border-emerald-700/50"
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-medium text-center mb-6">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {plan.name}
+                    </h3>
+                    <div className="flex items-baseline justify-center gap-2 mb-4">
+                      <span className="text-4xl font-bold text-emerald-400">
+                        {plan.price}
+                      </span>
+                      <span className="text-slate-400">{plan.period}</span>
+                    </div>
+                    <p className="text-slate-400">{plan.description}</p>
+                  </div>
+
+                  <ul className="space-y-4 mb-8">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li
+                        key={featureIndex}
+                        className="flex items-center gap-3"
+                      >
+                        <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                        <span className="text-sm text-white">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={onGetStarted}
+                    className={`w-full py-3 px-6 rounded-lg text-lg font-semibold transition-colors ${
+                      plan.popular
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "border border-emerald-600 text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                    }`}
+                  >
+                    {plan.buttonText}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section> */}
+
+      {/* Departments Section */}
+      <section className="py-20 bg-slate-800/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Our Medical Departments
+              </h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Access specialized care across multiple medical departments with
+                expert healthcare professionals.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {departments.map((dept, index) => (
+                <div
+                  key={index}
+                  className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700/50 hover:border-emerald-700/50 transition-all duration-300 group"
+                >
+                  <div className="text-4xl mb-6">{dept.icon}</div>
+                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-emerald-400 transition-colors">
+                    {dept.name}
+                  </h3>
+                  <p className="text-slate-400 mb-4">{dept.description}</p>
+                  <div className="flex items-center gap-4 text-sm text-emerald-400 mb-4">
+                    <span>{dept.doctors} Doctors</span>
+                    <span>•</span>
+                    <span>{dept.specialties.length} Specialties</span>
+                  </div>
+                  <div className="space-y-1">
+                    {dept.specialties.map((specialty, specIndex) => (
+                      <div key={specIndex} className="text-sm text-slate-500">
+                        • {specialty}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-dark-400">
+      <section id="testimonials" className="py-20 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-32-bold text-white mb-4">What Our Users Say</h2>
-            <p className="text-16-regular text-dark-700 max-w-2xl mx-auto">
-              Hear from patients, doctors, and healthcare professionals who use
-              CarePulse daily.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-dark-300 p-8 rounded-2xl border border-dark-500 hover:border-green-500 transition-colors"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-16-semibold text-white">
-                      {testimonial.initials}
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="text-16-semibold text-white">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-12-regular text-green-400">
-                      {testimonial.role}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, starIndex) => (
-                    <Star
-                      key={starIndex}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <p className="text-14-regular text-dark-700">
-                  "{testimonial.quote}"
-                </p>
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm font-medium mb-4">
+                Success Stories
               </div>
-            ))}
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                What Our Users Say
+              </h2>
+              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                Hear from patients, doctors, and healthcare professionals who
+                use CarePulse daily.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="bg-slate-800/50 backdrop-blur-sm border border-emerald-900/20 hover:border-emerald-800/40 transition-all duration-300 rounded-xl p-6"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-900/20 flex items-center justify-center mr-4">
+                      <span className="text-emerald-400 font-bold">
+                        {testimonial.initials}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">
+                        {testimonial.name}
+                      </h4>
+                      <p className="text-sm text-emerald-400">
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, starIndex) => (
+                      <Star
+                        key={starIndex}
+                        className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                      />
+                    ))}
+                  </div>
+                  <p className="text-slate-400">
+                    &quot;{testimonial.quote}&quot;
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-dark-400">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-32-bold text-white mb-4">
-            Ready to Experience Modern Healthcare?
-          </h2>
-          <p className="text-16-regular text-dark-700 mb-8">
-            Join thousands of patients, doctors, and healthcare professionals
-            who trust CarePulse for comprehensive healthcare management.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={onGetStarted}
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-16-semibold transition-colors inline-flex items-center gap-2"
-            >
-              Start Your Journey
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button
-              onClick={onBookAppointment}
-              className="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-8 py-4 rounded-lg text-16-semibold transition-colors inline-flex items-center gap-2"
-            >
-              Book Appointment
-              <Calendar className="w-5 h-5" />
-            </button>
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="container mx-auto px-4">
+            <div className="bg-gradient-to-r from-emerald-900/30 to-emerald-950/20 border border-emerald-800/20 rounded-2xl p-8 md:p-12 lg:p-16 relative overflow-hidden">
+              <div className="max-w-2xl relative z-10">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                  Ready to take control of your healthcare?
+                </h2>
+                <p className="text-lg text-slate-400 mb-8">
+                  Join thousands of users who have simplified their healthcare
+                  journey with our platform. Get started today and experience
+                  healthcare the way it should be.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={onGetStarted}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2 justify-center"
+                  >
+                    Start Your Journey
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={onBookAppointment}
+                    className="border border-emerald-600 text-emerald-400 hover:bg-emerald-600 hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 flex items-center gap-2 justify-center"
+                  >
+                    Book Appointment
+                    <Calendar className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Decorative healthcare elements */}
+              <div className="absolute right-0 top-0 w-[300px] h-[300px] bg-emerald-800/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+              <div className="absolute left-0 bottom-0 w-[200px] h-[200px] bg-emerald-700/10 rounded-full blur-3xl -ml-10 -mb-10"></div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-dark-200 border-t border-dark-500 py-8">
+      <footer className="bg-slate-900 border-t border-slate-700/50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <Plus className="w-5 h-5 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <Plus className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white">CarePulse</span>
               </div>
-              <span className="text-18-bold text-white">CarePulse</span>
+              <p className="text-slate-400 mb-4 max-w-md">
+                Comprehensive healthcare management platform connecting
+                patients, doctors, pharmacists, and healthcare administrators.
+              </p>
+              <div className="flex items-center gap-4 text-sm text-slate-400">
+                <span>© 2024 CarePulse</span>
+                <span>•</span>
+                <span>All rights reserved</span>
+              </div>
             </div>
-            <div className="flex items-center gap-6 text-14-regular text-dark-700">
-              <span>Privacy Policy</span>
-              <span>Terms of Service</span>
-              <span>Contact Us</span>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Platform</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li>
+                  <a
+                    href="#features"
+                    className="hover:text-white transition-colors"
+                  >
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#pricing"
+                    className="hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#testimonials"
+                    className="hover:text-white transition-colors"
+                  >
+                    Reviews
+                  </a>
+                </li>
+                <li>
+                  <button
+                    onClick={onAdminAccess}
+                    className="hover:text-white transition-colors"
+                  >
+                    Admin Portal
+                  </button>
+                </li>
+              </ul>
             </div>
-          </div>
-          <div className="mt-6 pt-6 border-t border-dark-500 text-center">
-            <p className="copyright">
-              © 2024 CarePulse. All rights reserved. | Healthcare Management
-              Platform
-            </p>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Terms of Service
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </footer>

@@ -1,49 +1,78 @@
+import {
+  Plus,
+  Calendar,
+  Users,
+  Shield,
+  ArrowRight,
+  CheckCircle,
+  Star,
+  TrendingUp,
+  Heart,
+  Stethoscope,
+  Phone,
+  Award,
+  Pill,
+  TestTube,
+  FileText,
+  CreditCard,
+  Bell,
+} from "lucide-react";
+
 export const features = [
   {
-    title: "Easy Appointment Booking",
-    description: "Schedule appointments with your preferred healthcare providers in just a few clicks. No more waiting on hold.",
-    icon: "📅"
+    title: "Smart Appointment Booking",
+    description:
+      "Schedule appointments with your preferred healthcare providers in just a few clicks. Real-time availability and instant confirmations.",
+    icon: <Calendar className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Expert Healthcare Team",
-    description: "Connect with certified healthcare professionals who are dedicated to providing you with the best care possible.",
-    icon: "👨‍⚕️"
+    title: "Certified Healthcare Professionals",
+    description:
+      "Connect with board-certified doctors, specialists, and healthcare professionals dedicated to your wellbeing.",
+    icon: <Stethoscope className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Secure & Private",
-    description: "Your health data is protected with industry-leading security measures. Complete privacy and confidentiality guaranteed.",
-    icon: "🔒"
+    title: "HIPAA-Compliant Security",
+    description:
+      "Your health data is protected with enterprise-grade encryption and industry-leading security measures.",
+    icon: <Shield className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Digital Prescriptions",
-    description: "Receive and manage your prescriptions digitally. Track refills, view instructions, and download prescription records.",
-    icon: "💊"
+    title: "Digital Prescription Management",
+    description:
+      "Receive, track, and manage your prescriptions digitally. Automatic refill reminders and pharmacy integration.",
+    icon: <Pill className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Lab Results Access",
-    description: "View your lab results instantly when they're ready. Download reports and track your health metrics over time.",
-    icon: "🧪"
+    title: "Instant Lab Results",
+    description:
+      "Access your lab results the moment they're available. Track health metrics and download comprehensive reports.",
+    icon: <TestTube className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Medical Records",
-    description: "Keep all your medical history and documents in one secure place. Access them anytime, anywhere.",
-    icon: "📋"
+    title: "Comprehensive Medical Records",
+    description:
+      "Centralized medical history with consultation notes, prescriptions, and health documents in one secure location.",
+    icon: <FileText className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Billing Management",
-    description: "View and manage your medical bills, insurance claims, and payment history all in one convenient location.",
-    icon: "💳"
+    title: "Transparent Billing",
+    description:
+      "Clear, itemized billing with insurance integration. Track payments, claims, and healthcare expenses effortlessly.",
+    icon: <CreditCard className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Multi-Role Support",
-    description: "Designed for patients, doctors, pharmacists, receptionists, and administrators with role-specific dashboards.",
-    icon: "👥"
+    title: "Multi-Role Platform",
+    description:
+      "Specialized dashboards for patients, doctors, pharmacists, receptionists, and administrators with role-based access.",
+    icon: <Users className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Real-time Updates",
-    description: "Get instant notifications for appointment confirmations, prescription updates, and important health information.",
-    icon: "🔔"
-  }
+    title: "Real-time Notifications",
+    description:
+      "Instant alerts for appointment confirmations, prescription updates, lab results, and critical health information.",
+    icon: <Bell className="w-6 h-6 text-emerald-400" />,
+  },
 ];
 
 export const testimonials = [
@@ -51,38 +80,44 @@ export const testimonials = [
     name: "Sarah Johnson",
     role: "Patient",
     initials: "SJ",
-    quote: "CarePulse has made managing my healthcare so much easier. I can book appointments, view my prescriptions, and access my lab results all in one place."
+    quote:
+      "CarePulse has made managing my healthcare so much easier. I can book appointments, view my prescriptions, and access my lab results all in one place.",
   },
   {
     name: "Dr. Michael Chen",
     role: "Cardiologist",
     initials: "MC",
-    quote: "The doctor dashboard is incredibly intuitive. I can manage my patients, write prescriptions, and track consultations efficiently."
+    quote:
+      "The doctor dashboard is incredibly intuitive. I can manage my patients, write prescriptions, and track consultations efficiently.",
   },
   {
     name: "Emily Rodriguez",
     role: "Pharmacist",
     initials: "ER",
-    quote: "The prescription management system has streamlined our pharmacy operations. Drug interaction checking and inventory management are seamless."
+    quote:
+      "The prescription management system has streamlined our pharmacy operations. Drug interaction checking and inventory management are seamless.",
   },
   {
     name: "James Wilson",
     role: "Patient",
     initials: "JW",
-    quote: "I love how I can see all my consultation history and prescriptions organized by doctor visits. It's like having my complete medical record at my fingertips."
+    quote:
+      "I love how I can see all my consultation history and prescriptions organized by doctor visits. It's like having my complete medical record at my fingertips.",
   },
   {
     name: "Dr. Lisa Park",
     role: "General Medicine",
     initials: "LP",
-    quote: "The consultation notes feature with voice-to-text has saved me so much time. I can focus more on patient care rather than documentation."
+    quote:
+      "The consultation notes feature with voice-to-text has saved me so much time. I can focus more on patient care rather than documentation.",
   },
   {
     name: "Maria Garcia",
     role: "Receptionist",
     initials: "MG",
-    quote: "Patient registration and appointment scheduling has never been easier. The insurance verification system is a game-changer."
-  }
+    quote:
+      "Patient registration and appointment scheduling has never been easier. The insurance verification system is a game-changer.",
+  },
 ];
 
 export const pricingPlans = [
@@ -96,11 +131,11 @@ export const pricingPlans = [
       "Basic appointment booking",
       "Prescription management",
       "Medical records access",
-      "Email support"
+      "Email support",
     ],
     popular: false,
     buttonText: "Get Started",
-    buttonVariant: "outline"
+    buttonVariant: "outline",
   },
   {
     name: "Family Care",
@@ -114,11 +149,11 @@ export const pricingPlans = [
       "Lab results integration",
       "Family member management",
       "24/7 phone support",
-      "Telemedicine access"
+      "Telemedicine access",
     ],
     popular: true,
     buttonText: "Most Popular",
-    buttonVariant: "default"
+    buttonVariant: "default",
   },
   {
     name: "Premium Care",
@@ -133,12 +168,12 @@ export const pricingPlans = [
       "Specialist referrals",
       "Emergency consultation access",
       "Personalized health insights",
-      "Priority lab processing"
+      "Priority lab processing",
     ],
     popular: false,
     buttonText: "Go Premium",
-    buttonVariant: "outline"
-  }
+    buttonVariant: "outline",
+  },
 ];
 
 export const healthcareBenefits = [
@@ -149,7 +184,7 @@ export const healthcareBenefits = [
   "Instant access to <strong>lab results and diagnostic reports</strong> as soon as they're available",
   "Seamless <strong>insurance verification</strong> and billing management for hassle-free payments",
   "Multi-device access with <strong>responsive design</strong> for desktop, tablet, and mobile devices",
-  "24/7 platform availability with <strong>emergency consultation</strong> options when needed"
+  "24/7 platform availability with <strong>emergency consultation</strong> options when needed",
 ];
 
 export const departments = [
@@ -158,66 +193,74 @@ export const departments = [
     description: "Comprehensive primary care for adults and families",
     icon: "🩺",
     doctors: 12,
-    specialties: ["Family Medicine", "Internal Medicine", "Preventive Care"]
+    specialties: ["Family Medicine", "Internal Medicine", "Preventive Care"],
   },
   {
     name: "Cardiology",
     description: "Heart and cardiovascular system specialists",
     icon: "❤️",
     doctors: 8,
-    specialties: ["Interventional Cardiology", "Electrophysiology", "Heart Surgery"]
+    specialties: [
+      "Interventional Cardiology",
+      "Electrophysiology",
+      "Heart Surgery",
+    ],
   },
   {
     name: "Pediatrics",
     description: "Specialized care for infants, children, and adolescents",
     icon: "👶",
     doctors: 10,
-    specialties: ["Neonatology", "Pediatric Surgery", "Child Development"]
+    specialties: ["Neonatology", "Pediatric Surgery", "Child Development"],
   },
   {
     name: "Emergency Medicine",
     description: "24/7 emergency care and critical treatment",
     icon: "🚨",
     doctors: 15,
-    specialties: ["Trauma Care", "Critical Care", "Emergency Surgery"]
+    specialties: ["Trauma Care", "Critical Care", "Emergency Surgery"],
   },
   {
     name: "Pharmacy Services",
     description: "Comprehensive medication management and consultation",
     icon: "💊",
     doctors: 6,
-    specialties: ["Clinical Pharmacy", "Drug Interaction Checking", "Medication Therapy"]
+    specialties: [
+      "Clinical Pharmacy",
+      "Drug Interaction Checking",
+      "Medication Therapy",
+    ],
   },
   {
     name: "Laboratory Services",
     description: "Advanced diagnostic testing and analysis",
     icon: "🧪",
     doctors: 5,
-    specialties: ["Clinical Chemistry", "Hematology", "Microbiology"]
-  }
+    specialties: ["Clinical Chemistry", "Hematology", "Microbiology"],
+  },
 ];
 
 export const stats = [
   {
     number: "10,000+",
     label: "Patients Served",
-    description: "Trusted by thousands of patients"
+    description: "Trusted by thousands of patients",
   },
   {
     number: "150+",
     label: "Healthcare Professionals",
-    description: "Certified doctors and specialists"
+    description: "Certified doctors and specialists",
   },
   {
     number: "50,000+",
     label: "Consultations Completed",
-    description: "Successful medical consultations"
+    description: "Successful medical consultations",
   },
   {
     number: "99.9%",
     label: "Platform Uptime",
-    description: "Reliable healthcare access"
-  }
+    description: "Reliable healthcare access",
+  },
 ];
 
 export const platformFeatures = [
@@ -231,10 +274,10 @@ export const platformFeatures = [
       "Access lab results instantly",
       "Manage medical records",
       "Handle billing and payments",
-      "Emergency contact access"
+      "Emergency contact access",
     ],
     color: "from-green-500/10 to-green-600/5",
-    icon: "👤"
+    icon: "👤",
   },
   {
     title: "For Doctors",
@@ -246,10 +289,10 @@ export const platformFeatures = [
       "Track patient history",
       "Schedule management",
       "Generate medical reports",
-      "Hospital admission management"
+      "Hospital admission management",
     ],
     color: "from-blue-500/10 to-blue-600/5",
-    icon: "👨‍⚕️"
+    icon: "👨‍⚕️",
   },
   {
     title: "For Pharmacists",
@@ -261,10 +304,10 @@ export const platformFeatures = [
       "Generate pharmacy bills",
       "Track patient medication history",
       "Monitor stock levels",
-      "Generate pharmacy reports"
+      "Generate pharmacy reports",
     ],
     color: "from-purple-500/10 to-purple-600/5",
-    icon: "💊"
+    icon: "💊",
   },
   {
     title: "For Receptionists",
@@ -276,9 +319,9 @@ export const platformFeatures = [
       "Verify insurance coverage",
       "Process payments",
       "Handle patient inquiries",
-      "Generate reception reports"
+      "Generate reception reports",
     ],
     color: "from-pink-500/10 to-pink-600/5",
-    icon: "📞"
-  }
+    icon: "📞",
+  },
 ];
