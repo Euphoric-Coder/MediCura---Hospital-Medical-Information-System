@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   CheckCircle,
@@ -10,68 +10,70 @@ import {
   Search,
   Edit,
 } from "lucide-react";
+import { db } from "@/lib/dbConfig";
+import { Appointments, Doctors, Patients } from "@/lib/schema";
+import { and, eq, notInArray } from "drizzle-orm";
 
 const ReceptionistCheckIn = ({ onBack }) => {
-  const [patients, setPatients] = useState([
-    {
-      id: "P001",
-      name: "John Smith",
-      appointmentTime: "09:00 AM",
-      doctor: "Dr. Sarah Safari",
-      type: "Consultation",
-      status: "scheduled",
-      phone: "+1 (555) 123-4567",
-      isNewPatient: false,
-      insuranceVerified: true,
-      reason: "Annual check-up",
-    },
-    {
-      id: "P002",
-      name: "Emily Johnson",
-      appointmentTime: "09:30 AM",
-      doctor: "Dr. Ava Williams",
-      type: "Follow-up",
-      status: "arrived",
-      phone: "+1 (555) 234-5678",
-      isNewPatient: false,
-      insuranceVerified: true,
-      reason: "Heart consultation follow-up",
-      arrivalTime: "09:25 AM",
-    },
-    {
-      id: "P003",
-      name: "Michael Brown",
-      appointmentTime: "10:00 AM",
-      doctor: "Dr. Adam Smith",
-      type: "Consultation",
-      status: "checked-in",
-      phone: "+1 (555) 345-6789",
-      isNewPatient: true,
-      insuranceVerified: false,
-      reason: "New patient consultation",
-      arrivalTime: "09:55 AM",
-      waitTime: 15,
-    },
-    {
-      id: "P004",
-      name: "Sarah Davis",
-      appointmentTime: "10:30 AM",
-      doctor: "Dr. Sarah Safari",
-      type: "Check-up",
-      status: "in-consultation",
-      phone: "+1 (555) 456-7890",
-      isNewPatient: false,
-      insuranceVerified: true,
-      reason: "Routine examination",
-      arrivalTime: "10:25 AM",
-      waitTime: 35,
-    },
-  ]);
+  const [patients, setPatients] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  // Fetch patients + appointments + doctors
+  const fetchAppointments = async () => {
+    try {
+      const data = await db
+        .select({
+          id: Appointments.id,
+          workflow: Appointments.workflow,
+          type: Appointments.type,
+          reason: Appointments.notes,
+          appointmentTime: Appointments.time,
+          arrivalTime: Appointments.time, // arrival is appointment time initially
+          patientName: Patients.name,
+          patientPhone: Patients.phone,
+          patientAvatar: Patients.avatar,
+          doctorName: Doctors.name,
+        })
+        .from(Appointments)
+        .leftJoin(Patients, eq(Appointments.patientId, Patients.userId))
+        .leftJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
+        .where(
+          and(
+            notInArray(Appointments.status, ["cancelled", "no-show"]),
+            notInArray(Appointments.workflow, ["cancelled", "no-show"])
+          )
+        );
+
+      const mapped = data.map((row) => ({
+        id: row.id,
+        name: row.patientName,
+        phone: row.patientPhone,
+        avatar: row.patientAvatar,
+        doctor: row.doctorName,
+        type: row.type,
+        reason: row.reason,
+        appointmentTime: row.appointmentTime,
+        arrivalTime: row.arrivalTime.toUpperCase(), // can later update dynamically
+        status: row.workflow, // 👈 status comes from workflow
+      }));
+
+      console.log(mapped);
+
+      setPatients(mapped);
+
+      // setPatients(mapped);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
 
   const filteredPatients = patients.filter((patient) => {
     const matchesSearch =
@@ -162,33 +164,21 @@ const ReceptionistCheckIn = ({ onBack }) => {
         );
       case "arrived":
         return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+          <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-full">
             <CheckCircle className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-blue-400">
-              Arrived
-            </span>
+            <span className="text-10-medium sm:text-12-medium">Arrived</span>
           </div>
         );
       case "checked-in":
         return (
           <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-full ${
-              isLongWait
-                ? "bg-red-500/20 border border-red-500/30"
-                : "bg-green-500/20 border border-green-500/30"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30`}
           >
             <div
-              className={`w-2 h-2 rounded-full animate-pulse ${
-                isLongWait ? "bg-red-500" : "bg-green-500"
-              }`}
+              className={`w-2 h-2 rounded-full animate-pulse bg-green-500`}
             ></div>
-            <span
-              className={`text-10-medium sm:text-12-medium ${
-                isLongWait ? "text-red-400" : "text-green-400"
-              }`}
-            >
-              Checked In {waitTime && `(${waitTime}m)`}
+            <span className={`text-10-medium sm:text-12-medium text-green-400`}>
+              Checked In
             </span>
           </div>
         );
@@ -203,11 +193,9 @@ const ReceptionistCheckIn = ({ onBack }) => {
         );
       case "completed":
         return (
-          <div className="flex items-center gap-2 px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-full">
+          <div className="flex items-center gap-2 px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-full text-gray-400">
             <CheckCircle className="w-3 h-3" />
-            <span className="text-10-medium sm:text-12-medium text-gray-400">
-              Completed
-            </span>
+            <span className="text-10-medium sm:text-12-medium">Completed</span>
           </div>
         );
       default:
@@ -475,7 +463,8 @@ const ReceptionistCheckIn = ({ onBack }) => {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      {/* Todo: add insurance verification */}
+                      {/* <div className="flex items-center gap-4">
                         {patient.isNewPatient && (
                           <span className="px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-10-medium text-blue-400">
                             New Patient
@@ -486,7 +475,7 @@ const ReceptionistCheckIn = ({ onBack }) => {
                             Insurance Pending
                           </span>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
