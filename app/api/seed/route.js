@@ -197,39 +197,39 @@ export async function GET() {
     //   },
     // ];
 
-    // const patient = [
-    //   {
-    //     userId: "f4e9e1a8-c823-422a-b8f3-103640a99943",
-    //     name: "Sagnik Dey",
-    //     email: "deydsagnik48@gmail.com",
-    //     phone: "+91-9876543210",
-    //     dateOfBirth: "1985-04-15",
-    //     gender: "Male",
-    //     address: "23 MG Road, Indiranagar, Bengaluru, Karnataka",
-    //     occupation: "Software Engineer",
-    //     emergencyContactName: "Rohit Sharma",
-    //     emergencyPhone: "+91-9123456789",
+    const patient = [
+      {
+        userId: "f4e9e1a8-c823-422a-b8f3-103640a99943",
+        name: "Sagnik Dey",
+        email: "deydsagnik48@gmail.com",
+        phone: "+91-9876543210",
+        dateOfBirth: "1985-04-15",
+        gender: "Male",
+        address: "23 MG Road, Indiranagar, Bengaluru, Karnataka",
+        occupation: "Software Engineer",
+        emergencyContactName: "Rohit Sharma",
+        emergencyPhone: "+91-9123456789",
 
-    //     primaryPhysician: "Dr. Neha Verma",
-    //     insuranceProvider: "LIC Health Insurance",
-    //     insurancePolicyNumber: "LIC-HI-2025-45879",
-    //     insurancePolicyDocument: null,
-    //     insurancePolicyDocumentId: null,
-    //     allergies: ["Peanuts", "Dust"],
-    //     currentMedications: ["Metformin", "Atorvastatin"],
-    //     familyMedicalHistory: ["Diabetes", "Hypertension"],
-    //     pastMedicalHistory: ["Appendectomy (2010)"],
+        primaryPhysician: "Dr. Neha Verma",
+        insuranceProvider: "LIC Health Insurance",
+        insurancePolicyNumber: "LIC-HI-2025-45879",
+        insurancePolicyDocument: null,
+        insurancePolicyDocumentId: null,
+        allergies: ["Peanuts", "Dust"],
+        currentMedications: ["Metformin", "Atorvastatin"],
+        familyMedicalHistory: ["Diabetes", "Hypertension"],
+        pastMedicalHistory: ["Appendectomy (2010)"],
 
-    //     identificationType: "Aadhaar Card",
-    //     identificationNumber: "5678-1234-9012",
-    //     identificationDocument: null,
-    //     identificationDocumentId: null,
+        identificationType: "Aadhaar Card",
+        identificationNumber: "5678-1234-9012",
+        identificationDocument: null,
+        identificationDocumentId: null,
 
-    //     treatmentConsent: true,
-    //     disclosureConsent: true,
-    //     privacyConsent: true,
-    //   },
-    // ];
+        treatmentConsent: true,
+        disclosureConsent: true,
+        privacyConsent: true,
+      },
+    ];
 
     // const pharmacist = [
     //   {

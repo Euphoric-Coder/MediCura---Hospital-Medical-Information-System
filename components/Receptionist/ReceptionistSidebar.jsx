@@ -41,16 +41,16 @@ const ReceptionistSidebar = ({
       description: "Register New Patients",
     },
     {
-      id: "appointments",
-      label: "Appointments",
-      icon: Calendar,
-      description: "Schedule & Manage Appointments",
-    },
-    {
       id: "check-in",
       label: "Patient Check-In",
       icon: CheckCircle,
       description: "Check-In Arriving Patients",
+    },
+    {
+      id: "appointments",
+      label: "Appointments",
+      icon: Calendar,
+      description: "Schedule & Manage Appointments",
     },
     {
       id: "patients",

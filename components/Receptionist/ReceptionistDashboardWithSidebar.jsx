@@ -32,15 +32,15 @@ const ReceptionistDashboardWithSidebar = ({ receptionistData }) => {
             onBack={() => setCurrentPage("dashboard")}
           />
         );
+      case "check-in":
+        return (
+          <ReceptionistCheckIn onBack={() => setCurrentPage("dashboard")} />
+        );
       case "appointments":
         return (
           <ReceptionistAppointments
             onBack={() => setCurrentPage("dashboard")}
           />
-        );
-      case "check-in":
-        return (
-          <ReceptionistCheckIn onBack={() => setCurrentPage("dashboard")} />
         );
       case "patients":
         return (
