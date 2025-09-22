@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { toast } from "sonner";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -424,7 +425,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       const data = await db
         .select()
         .from(Appointments)
-        .where(eq(Appointments.patientId, patientData.userId));
+        .where(eq(Appointments.patientId, patientData.userId))
+        .orderBy(desc(Appointments.date));
 
       const all = await db.select().from(Appointments);
       setExistingAppointments(data);
@@ -436,14 +438,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const refreshAppointment = async () => {
     await fetchAppointments();
-  };
-
-  const formatTime12Hour = (date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
   };
 
   // Generate week schedule for selected doctor
@@ -539,7 +533,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     return schedule;
   };
 
-
   const [weekSchedule, setWeekSchedule] = useState([]);
 
   const filteredDoctors = doctors.filter((doctor) => {
@@ -555,6 +548,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     "all",
     ...Array.from(new Set(doctors.map((d) => d.speciality))),
   ];
+
+  const patientAlreadyAppointed = (date) => {
+    // Check if the patient has any appointment on the given date
+    return existingAppointments.some(
+      (apt) => apt.date === date && apt.status === "upcoming"
+    );
+  };
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
@@ -666,6 +666,38 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     }
   };
 
+  const handleMarkAsWaiting = async (appointment) => {
+    try {
+      const loading = toast.loading("Marking as waiting...");
+      await db
+        .update(Appointments)
+        .set({
+          workflow: "waiting",
+          updatedAt: new Date(),
+        })
+        .where(eq(Appointments.id, appointment.id));
+
+      refreshAppointment(); // reload appointment list
+
+      toast.dismiss(loading);
+      setMessage(
+        `Appointment with ${appointment.doctor.name} marked as waiting in the lobby`
+      );
+      setMessageType("success");
+
+      toast.success("Appointment marked as waiting");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (error) {
+      console.error("Error marking waiting:", error);
+      setMessage("Failed to mark patient as waiting");
+      setMessageType("error");
+    }
+  };
+
   const handleCancelClick = (appointment) => {
     setSelectedAppointment(appointment);
     setShowCancelModal(true);
@@ -676,7 +708,31 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     setShowRescheduleModal(true);
   };
 
-  const getStatusBadge = (status) => {
+  // Utility: check if appointment is today in IST
+  const isTodayIST = (date) => {
+    const todayIST = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+    return date === todayIST;
+  };
+
+  const getStatusBadge = (status, workflow, date) => {
+    // Convert today's date to IST yyyy-mm-dd
+    const todayIST = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+
+    if (workflow === "scheduled" && date === todayIST) {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full">
+          <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>
+          <span className="text-10-medium lg:text-12-medium text-cyan-400">
+            Today
+          </span>
+        </div>
+      );
+    }
+
     switch (status) {
       case "upcoming":
         return (
@@ -1050,23 +1106,41 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
                         <div className="space-y-1 lg:space-y-2 max-h-48 lg:max-h-96 overflow-y-auto">
                           {day.slots.length > 0 ? (
-                            day.slots.map((slot, slotIndex) => (
-                              <button
-                                key={slotIndex}
-                                onClick={() =>
-                                  handleTimeSelect(day.fullDate, slot.time)
-                                }
-                                disabled={!slot.available}
-                                className={`w-full p-2 rounded border transition-colors
-    ${
-      slot.available
-        ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
-        : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
-    }`}
-                              >
-                                {slot.time}
-                              </button>
-                            ))
+                            day.slots.map((slot, slotIndex) => {
+                              const patientHasAppointment =
+                                patientAlreadyAppointed(day.fullDate);
+
+                              return (
+                                <button
+                                  key={slotIndex}
+                                  onClick={() =>
+                                    !patientHasAppointment &&
+                                    slot.available &&
+                                    handleTimeSelect(day.fullDate, slot.time)
+                                  }
+                                  disabled={
+                                    !slot.available || patientHasAppointment
+                                  }
+                                  className={`w-full p-2 rounded border transition-colors
+                  ${
+                    patientHasAppointment
+                      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 cursor-not-allowed"
+                      : slot.available
+                      ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
+                  }`}
+                                  title={
+                                    patientHasAppointment
+                                      ? `You already have an appointment on this date`
+                                      : !slot.available
+                                      ? "Slot unavailable"
+                                      : "Select this slot"
+                                  }
+                                >
+                                  {slot.time}
+                                </button>
+                              );
+                            })
                           ) : (
                             <p className="text-center text-red-400 text-sm">
                               Not Available
@@ -1122,15 +1196,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                         </div>
                       </div>
                       <div className="space-y-2 text-12-regular lg:text-14-regular text-dark-700">
-                        {/* <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-green-400" />
-                          <span className="hidden sm:inline">
-                            {selectedDoctor.location}
-                          </span>
-                          <span className="sm:hidden">
-                            {selectedDoctor.location.split(",")[0]}
-                          </span>
-                        </div> */}
                         <div className="items-center gap-2 hidden sm:flex">
                           <Phone className="w-4 h-4 text-blue-400" />
                           <span>{selectedDoctor.phone}</span>
@@ -1327,115 +1392,157 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             </div>
 
             <div className="space-y-4 lg:space-y-6">
-              {existingAppointments.map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 lg:gap-6">
-                      <div className="relative">
-                        <img
-                          src={
-                            appointment?.doctor?.avatar || "/doctor-avatar.jpg"
-                          }
-                          alt={appointment.doctor.name}
-                          className="w-12 h-12 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-dark-500/50"
-                        />
-                        <div className="absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center border-2 border-dark-400">
-                          <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
-                        </div>
-                      </div>
+              {existingAppointments.map((appointment) => {
+                const appointmentToday = isTodayIST(appointment.date);
 
-                      <div className="space-y-2 lg:space-y-3">
-                        <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
-                            {appointment.doctor.name}
-                          </h3>
-                          <p className="text-12-regular lg:text-14-regular text-green-400">
-                            {appointment.doctor.speciality}
-                          </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6 text-12-regular lg:text-14-regular text-dark-700">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-blue-400" />
-                            <span>{appointment.date}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-purple-400" />
-                            <span>{appointment.time}</span>
+                return (
+                  <div
+                    key={appointment.id}
+                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 lg:gap-6">
+                        <div className="relative">
+                          <img
+                            src={
+                              appointment?.doctor?.avatar ||
+                              "/doctor-avatar.jpg"
+                            }
+                            alt={appointment.doctor.name}
+                            className="w-12 h-12 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-dark-500/50"
+                          />
+                          <div className="absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center border-2 border-dark-400">
+                            <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
                           </div>
                         </div>
 
-                        <div
-                          className={`rounded-lg px-3 py-2 inline-block ${
-                            appointment.status === "cancelled"
-                              ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                              : "bg-dark-500/30"
-                          }`}
-                        >
-                          <p
-                            className={`text-10-regular lg:text-12-regular ${
+                        <div className="space-y-2 lg:space-y-3">
+                          <div>
+                            <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
+                              {appointment.doctor.name}
+                            </h3>
+                            <p className="text-12-regular lg:text-14-regular text-green-400">
+                              {appointment.doctor.speciality}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6 text-12-regular lg:text-14-regular text-dark-700">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-blue-400" />
+                              <span>{appointment.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-purple-400" />
+                              <span>{appointment.time}</span>
+                            </div>
+                          </div>
+
+                          <div
+                            className={`rounded-lg px-3 py-2 inline-block ${
                               appointment.status === "cancelled"
-                                ? "text-red-400"
-                                : "text-dark-600"
+                                ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                                : "bg-dark-500/30"
                             }`}
                           >
-                            <span
-                              className={
+                            <p
+                              className={`text-10-regular lg:text-12-regular ${
                                 appointment.status === "cancelled"
-                                  ? "text-red-300"
-                                  : "text-white"
-                              }
+                                  ? "text-red-400"
+                                  : "text-dark-600"
+                              }`}
                             >
-                              {appointment.status === "cancelled" &&
-                                "Cancellation"}{" "}
-                              Reason:
-                            </span>{" "}
-                            {appointment.reason}
-                          </p>
-                        </div>
+                              <span
+                                className={
+                                  appointment.status === "cancelled"
+                                    ? "text-red-300"
+                                    : "text-white"
+                                }
+                              >
+                                {appointment.status === "cancelled" &&
+                                  "Cancellation"}{" "}
+                                Reason:
+                              </span>{" "}
+                              {appointment.reason}
+                            </p>
+                          </div>
 
-                        {appointment.notes &&
-                          appointment.status !== "cancelled" && (
-                            <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
-                              <p className="text-10-regular lg:text-12-regular text-blue-400">
-                                <span className="text-white">Notes:</span>{" "}
-                                {appointment.notes}
-                              </p>
+                          {appointment.notes &&
+                            appointment.status !== "cancelled" && (
+                              <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
+                                <p className="text-10-regular lg:text-12-regular text-blue-400">
+                                  <span className="text-white">Notes:</span>{" "}
+                                  {appointment.notes}
+                                </p>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-start lg:items-end gap-3 lg:gap-4">
+                        {getStatusBadge(
+                          appointment.status,
+                          appointment.workflow,
+                          appointment.date
+                        )}
+
+                        {appointment.status === "upcoming" &&
+                          !appointmentToday && (
+                            <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
+                              <button
+                                onClick={() =>
+                                  handleRescheduleClick(appointment)
+                                }
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                              >
+                                <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
+                                <span className="hidden sm:inline">
+                                  Reschedule
+                                </span>
+                                <span className="sm:hidden">Edit</span>
+                              </button>
+                              <button
+                                onClick={() => handleCancelClick(appointment)}
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25 flex items-center justify-center gap-2"
+                              >
+                                <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
+                                <span className="hidden sm:inline">Cancel</span>
+                                <span className="sm:hidden">Cancel</span>
+                              </button>
                             </div>
                           )}
+
+                        {appointmentToday && (
+                          <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
+                            {/* Reschedule Button */}
+                            <button
+                              onClick={() => handleRescheduleClick(appointment)}
+                              className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                            >
+                              <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
+                              <span className="hidden sm:inline">
+                                Reschedule
+                              </span>
+                              <span className="sm:hidden">Edit</span>
+                            </button>
+
+                            {/* Mark as Waiting Button */}
+                            <button
+                              onClick={() => handleMarkAsWaiting(appointment)}
+                              className="flex-1 lg:flex-none bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2"
+                            >
+                              <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
+                              <span className="hidden sm:inline">
+                                Mark Waiting
+                              </span>
+                              <span className="sm:hidden">Wait</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
-
-                    <div className="flex flex-col items-start lg:items-end gap-3 lg:gap-4">
-                      {getStatusBadge(appointment.status)}
-
-                      {appointment.status === "upcoming" && (
-                        <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
-                          <button
-                            onClick={() => handleRescheduleClick(appointment)}
-                            className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
-                          >
-                            <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
-                            <span className="hidden sm:inline">Reschedule</span>
-                            <span className="sm:hidden">Edit</span>
-                          </button>
-                          <button
-                            onClick={() => handleCancelClick(appointment)}
-                            className="flex-1 lg:flex-none bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25 flex items-center justify-center gap-2"
-                          >
-                            <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
-                            <span className="hidden sm:inline">Cancel</span>
-                            <span className="sm:hidden">Cancel</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {existingAppointments.filter((apt) => apt.status === "upcoming")
