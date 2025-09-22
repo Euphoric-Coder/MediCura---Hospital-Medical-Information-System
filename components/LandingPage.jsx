@@ -28,11 +28,7 @@ import {
   platformFeatures,
 } from "@/data";
 
-const LandingPage = ({
-  onGetStarted,
-  onAdminAccess,
-  onBookAppointment,
-}) => {
+const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -43,7 +39,7 @@ const LandingPage = ({
               <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
                 <Plus className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">CarePulse</span>
+              <span className="text-xl font-bold text-white">MediCura</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a
@@ -202,7 +198,7 @@ const LandingPage = ({
                 Built for Every Healthcare Role
               </h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                CarePulse provides specialized dashboards and features tailored
+                MediCura provides specialized dashboards and features tailored
                 for each role in the healthcare ecosystem.
               </p>
             </div>
@@ -371,7 +367,7 @@ const LandingPage = ({
               </h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
                 Hear from patients, doctors, and healthcare professionals who
-                use CarePulse daily.
+                use MediCura daily.
               </p>
             </div>
 
@@ -463,14 +459,14 @@ const LandingPage = ({
                 <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
                   <Plus className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">CarePulse</span>
+                <span className="text-xl font-bold text-white">MediCura</span>
               </div>
               <p className="text-slate-400 mb-4 max-w-md">
                 Comprehensive healthcare management platform connecting
                 patients, doctors, pharmacists, and healthcare administrators.
               </p>
               <div className="flex items-center gap-4 text-sm text-slate-400">
-                <span>© 2024 CarePulse</span>
+                <span>© 2024 MediCura</span>
                 <span>•</span>
                 <span>All rights reserved</span>
               </div>

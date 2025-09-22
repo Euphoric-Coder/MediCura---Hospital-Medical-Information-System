@@ -81,7 +81,7 @@ export const testimonials = [
     role: "Patient",
     initials: "SJ",
     quote:
-      "CarePulse has made managing my healthcare so much easier. I can book appointments, view my prescriptions, and access my lab results all in one place.",
+      "MediCura has made managing my healthcare so much easier. I can book appointments, view my prescriptions, and access my lab results all in one place.",
   },
   {
     name: "Dr. Michael Chen",
