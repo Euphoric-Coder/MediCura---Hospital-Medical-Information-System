@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Calendar,
-  Users,
+  UsersIcon as UsersIcon,
   Shield,
   ArrowRight,
   CheckCircle,
@@ -29,50 +29,108 @@ import {
 } from "@/data";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { db } from "@/lib/dbConfig";
+import { Users } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
-const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
+const LandingPage = ({ onGetStarted, onBookAppointment }) => {
+  const [role, setRole] = useState("patient");
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    if (user) {
+      fetchUserRole();
+    }
+  }, [user]);
+
+  const fetchUserRole = async () => {
+    try {
+      const data = await db
+        .select()
+        .from(Users)
+        .where(eq(Users.email, user?.email));
+
+      if (data.length > 0) {
+        setRole(data[0].role);
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
       <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
+            {/* Logo */}
             <Link href={"/"} className="flex items-center gap-2">
               <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
-              <span className="text-24-bold text-white">MediCura</span>
+              <span className="text-24-bold bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+                MediCura
+              </span>
             </Link>
 
+            {/* Navbar */}
             <nav className="hidden md:flex items-center gap-8">
-              <a
-                href="#features"
+              <Link
+                href={"#features"}
                 className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Features
-              </a>
-              {/* <a
-          href="#pricing"
-          className="text-sm text-slate-400 hover:text-white transition-colors"
-        >
-          Pricing
-        </a> */}
-              <a
-                href="#testimonials"
+              </Link>
+              <Link
+                href={"#testimonials"}
                 className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Reviews
-              </a>
-              <button
-                onClick={onAdminAccess}
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Admin
-              </button>
-              <button
-                onClick={onGetStarted}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-emerald-500/25"
-              >
-                Get Started
-              </button>
+              </Link>
+              <Link href={"/admin"}>
+                <button className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Admin
+                </button>
+              </Link>
+
+              {/* Auth state buttons */}
+              {user ? (
+                <div className="flex items-center gap-4">
+                  {/* Welcome Message */}
+                  <span className="text-sm text-slate-300">
+                    Welcome, <span className="font-semibold">{user.name}</span>
+                  </span>
+
+                  {/* Dashboard */}
+                  <Link href={`/${role}/dashboard`}>
+                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-3xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-emerald-500/25">
+                      Dashboard
+                    </button>
+                  </Link>
+
+                  {/* Logout */}
+                  <button
+                    onClick={() => signOut()}
+                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-3xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Link href={"/sign-up"}>
+                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-3xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-emerald-500/25">
+                      Get Started
+                    </button>
+                  </Link>
+                  <Link href={"/sign-in"}>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white px-6 py-2 rounded-3xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
+                      Login
+                    </button>
+                  </Link>
+                </div>
+              )}
             </nav>
           </div>
         </div>
@@ -121,6 +179,7 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
                     src="/banner.png"
                     alt="Healthcare professionals"
                     className="w-full h-full object-fit rounded-xl shadow-2xl"
+                    draggable={false}
                   />
                 </div>
               </div>
@@ -364,7 +423,7 @@ const LandingPage = ({ onGetStarted, onAdminAccess, onBookAppointment }) => {
                 Success Stories
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                What Our Users Say
+                What Our UsersIcon Say
               </h2>
               <p className="text-slate-400 text-lg max-w-2xl mx-auto">
                 Hear from patients, doctors, and healthcare professionals who
