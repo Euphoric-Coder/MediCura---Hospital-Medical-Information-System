@@ -1,5 +1,6 @@
-import { db } from "@/db";
-import { Appointments } from "@/db/schema";
+import { db } from "@/lib/dbConfig";
+import { Appointments } from "@/lib/schema";
+
 
 export async function POST(req) {
   try {

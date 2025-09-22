@@ -117,5 +117,7 @@ export default function PatientPage() {
     );
   }
 
-  return <ReceptionistDashboardWithSidebar receptionistData={receptionistData} />;
+  return (
+    <ReceptionistDashboardWithSidebar receptionistData={receptionistData} />
+  );
 }

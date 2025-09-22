@@ -50,65 +50,65 @@ const ReceptionistDashboardWithSidebar = ({ receptionistData }) => {
         return (
           <ReceptionistBilling onBack={() => setCurrentPage("dashboard")} />
         );
-      case "insurance":
-        return (
-          <ReceptionistInsurance onBack={() => setCurrentPage("dashboard")} />
-        );
-      case "reports":
-        return (
-          <ReceptionistReports onBack={() => setCurrentPage("dashboard")} />
-        );
-      case "emergency-calls":
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-red-500/20">
-                <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-red-400" />
-              </div>
-              <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
-                Emergency Call Management
-              </h3>
-              <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
-                Emergency call handling protocols and quick access to emergency
-                contacts will be available here.
-              </p>
-            </div>
-          </div>
-        );
-      case "waiting-patients":
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-yellow-500/20">
-                <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-yellow-400" />
-              </div>
-              <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
-                Waiting Room Management
-              </h3>
-              <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
-                Real-time waiting room status and patient queue management will
-                be displayed here.
-              </p>
-            </div>
-          </div>
-        );
-      case "daily-summary":
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-blue-500/20">
-                <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-blue-400" />
-              </div>
-              <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
-                Daily Summary
-              </h3>
-              <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
-                Comprehensive daily statistics and performance summary will be
-                available here.
-              </p>
-            </div>
-          </div>
-        );
+      // case "insurance":
+      //   return (
+      //     <ReceptionistInsurance onBack={() => setCurrentPage("dashboard")} />
+      //   );
+      // case "reports":
+      //   return (
+      //     <ReceptionistReports onBack={() => setCurrentPage("dashboard")} />
+      //   );
+      // case "emergency-calls":
+      //   return (
+      //     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
+      //       <div className="text-center">
+      //         <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-red-500/20">
+      //           <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-red-400" />
+      //         </div>
+      //         <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+      //           Emergency Call Management
+      //         </h3>
+      //         <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
+      //           Emergency call handling protocols and quick access to emergency
+      //           contacts will be available here.
+      //         </p>
+      //       </div>
+      //     </div>
+      //   );
+      // case "waiting-patients":
+      //   return (
+      //     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
+      //       <div className="text-center">
+      //         <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-yellow-500/20">
+      //           <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-yellow-400" />
+      //         </div>
+      //         <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+      //           Waiting Room Management
+      //         </h3>
+      //         <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
+      //           Real-time waiting room status and patient queue management will
+      //           be displayed here.
+      //         </p>
+      //       </div>
+      //     </div>
+      //   );
+      // case "daily-summary":
+      //   return (
+      //     <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">
+      //       <div className="text-center">
+      //         <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-blue-500/20">
+      //           <Plus className="w-8 h-8 lg:w-12 lg:h-12 text-blue-400" />
+      //         </div>
+      //         <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+      //           Daily Summary
+      //         </h3>
+      //         <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
+      //           Comprehensive daily statistics and performance summary will be
+      //           available here.
+      //         </p>
+      //       </div>
+      //     </div>
+      //   );
       case "settings":
         return (
           <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 flex items-center justify-center p-4">

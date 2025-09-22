@@ -64,18 +64,18 @@ const ReceptionistSidebar = ({
       icon: Receipt,
       description: "Process Payments & Bills",
     },
-    {
-      id: "insurance",
-      label: "Insurance Verification",
-      icon: CreditCard,
-      description: "Verify Insurance Coverage",
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: FileText,
-      description: "Daily & Monthly Reports",
-    },
+    // {
+    //   id: "insurance",
+    //   label: "Insurance Verification",
+    //   icon: CreditCard,
+    //   description: "Verify Insurance Coverage",
+    // },
+    // {
+    //   id: "reports",
+    //   label: "Reports",
+    //   icon: FileText,
+    //   description: "Daily & Monthly Reports",
+    // },
   ];
 
   const quickActions = [
@@ -232,7 +232,7 @@ const ReceptionistSidebar = ({
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8 space-y-2">
+          {/* <div className="mt-8 space-y-2">
             <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">
               Quick Actions
             </div>
@@ -258,7 +258,7 @@ const ReceptionistSidebar = ({
                 </div>
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Footer Actions */}

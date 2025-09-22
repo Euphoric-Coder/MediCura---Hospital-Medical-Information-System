@@ -1,55 +1,102 @@
-import React, { useState } from 'react';
-import { Plus, UserPlus, User, Mail, Phone, Calendar, MapPin, Upload, Shield, FileText, CheckCircle, AlertCircle, Save } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Plus,
+  UserPlus,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Upload,
+  Shield,
+  FileText,
+  CheckCircle,
+  AlertCircle,
+  Save,
+  ChevronDown,
+} from "lucide-react";
 
 const ReceptionistPatientRegistration = ({ onBack }) => {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    address: '',
-    emergencyContactName: '',
-    emergencyPhone: '',
-    insuranceProvider: '',
-    insurancePolicyNumber: '',
-    insuranceGroupNumber: '',
-    allergies: '',
-    currentMedications: '',
-    medicalHistory: '',
-    primaryPhysician: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    emergencyContactName: "",
+    emergencyPhone: "",
+    insuranceProvider: "",
+    insurancePolicyNumber: "",
+    insuranceGroupNumber: "",
+    allergies: "",
+    currentMedications: "",
+    medicalHistory: "",
+    primaryPhysician: "",
     insuranceCard: null,
-    idDocument: null
+    idDocument: null,
   });
+
+  const countryCodes = [
+    { code: "+1", country: "United States", flag: "🇺🇸" },
+    { code: "+1", country: "Canada", flag: "🇨🇦" },
+    { code: "+44", country: "United Kingdom", flag: "🇬🇧" },
+    { code: "+91", country: "India", flag: "🇮🇳" },
+    { code: "+86", country: "China", flag: "🇨🇳" },
+    { code: "+81", country: "Japan", flag: "🇯🇵" },
+    { code: "+49", country: "Germany", flag: "🇩🇪" },
+    { code: "+33", country: "France", flag: "🇫🇷" },
+    { code: "+39", country: "Italy", flag: "🇮🇹" },
+    { code: "+34", country: "Spain", flag: "🇪🇸" },
+    { code: "+61", country: "Australia", flag: "🇦🇺" },
+    { code: "+55", country: "Brazil", flag: "🇧🇷" },
+    { code: "+52", country: "Mexico", flag: "🇲🇽" },
+    { code: "+7", country: "Russia", flag: "🇷🇺" },
+  ];
 
   const [uploadedFiles, setUploadedFiles] = useState({
     insuranceCard: null,
-    idDocument: null
+    idDocument: null,
   });
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+91");
+  const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] =
+    useState(false);
+  const [showEmergencyCountryDropdown, setShowEmergencyCountryDropdown] =
+    useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Phone number handlers
+  const handlePhoneNumberChange = (value) => {
+    setPhoneNumber(value);
+    setFormData((prev) => ({
+      ...prev,
+      phone: `${phoneCountryCode} ${value}`,
+    }));
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleFileUpload = (e, fieldName) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFiles(prev => ({
+      setUploadedFiles((prev) => ({
         ...prev,
-        [fieldName]: file.name
+        [fieldName]: file.name,
       }));
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [fieldName]: file
+        [fieldName]: file,
       }));
     }
   };
@@ -69,42 +116,42 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setMessage('');
+    setMessage("");
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setMessage('Patient registered successfully!');
-      setMessageType('success');
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setMessage("Patient registered successfully!");
+      setMessageType("success");
+
       // Reset form after successful registration
       setTimeout(() => {
         setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          dateOfBirth: '',
-          gender: '',
-          address: '',
-          emergencyContactName: '',
-          emergencyPhone: '',
-          insuranceProvider: '',
-          insurancePolicyNumber: '',
-          insuranceGroupNumber: '',
-          allergies: '',
-          currentMedications: '',
-          medicalHistory: '',
-          primaryPhysician: '',
+          fullName: "",
+          email: "",
+          phone: "",
+          dateOfBirth: "",
+          gender: "",
+          address: "",
+          emergencyContactName: "",
+          emergencyPhone: "",
+          insuranceProvider: "",
+          insurancePolicyNumber: "",
+          insuranceGroupNumber: "",
+          allergies: "",
+          currentMedications: "",
+          medicalHistory: "",
+          primaryPhysician: "",
           insuranceCard: null,
-          idDocument: null
+          idDocument: null,
         });
         setUploadedFiles({ insuranceCard: null, idDocument: null });
         setCurrentStep(1);
       }, 2000);
     } catch (error) {
-      setMessage('Failed to register patient. Please try again.');
-      setMessageType('error');
+      setMessage("Failed to register patient. Please try again.");
+      setMessageType("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -115,11 +162,15 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
       case 1:
         return (
           <div className="space-y-6">
-            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">Personal Information</h3>
-            
+            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">
+              Personal Information
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               <div className="md:col-span-2">
-                <label className="shad-input-label block mb-2">Full name *</label>
+                <label className="shad-input-label block mb-2">
+                  Full name *
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <User className="w-5 h-5 text-dark-600" />
@@ -137,7 +188,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Email address *</label>
+                <label className="shad-input-label block mb-2">
+                  Email address *
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="w-5 h-5 text-dark-600" />
@@ -155,25 +208,79 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Phone number *</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Phone className="w-5 h-5 text-dark-600" />
+                <label className="shad-input-label block mb-2">
+                  Phone number
+                </label>
+                <div className="flex gap-2">
+                  {/* Country Code Dropdown */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPhoneCountryDropdown(!showPhoneCountryDropdown)
+                      }
+                      className="bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 text-white flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                    >
+                      <span>
+                        {
+                          countryCodes.find((c) => c.code === phoneCountryCode)
+                            ?.flag
+                        }
+                      </span>
+                      <span className="text-14-regular">
+                        {phoneCountryCode}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-dark-600 transition-transform ${
+                          showPhoneCountryDropdown ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {showPhoneCountryDropdown && (
+                      <div className="absolute top-full left-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                        <div className="max-h-60 overflow-y-auto">
+                          {countryCodes.map((country, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() =>
+                                handlePhoneCountrySelect(country.code)
+                              }
+                              className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                            >
+                              <span className="text-lg">{country.flag}</span>
+                              <div>
+                                <div className="text-14-medium text-white">
+                                  {country.code}
+                                </div>
+                                <div className="text-12-regular text-dark-600">
+                                  {country.country}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Phone Number Input */}
                   <input
                     type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="+1 (555) 123-4567"
-                    className="shad-input pl-10 w-full text-white"
+                    value={phoneNumber}
+                    onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                    placeholder="123 456 7890"
+                    className="shad-input flex-1 text-white"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Date of birth *</label>
+                <label className="shad-input-label block mb-2">
+                  Date of birth *
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Calendar className="w-5 h-5 text-dark-600" />
@@ -192,7 +299,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               <div>
                 <label className="shad-input-label block mb-2">Gender *</label>
                 <div className="flex gap-4">
-                  {['Male', 'Female', 'Other'].map((gender) => (
+                  {["Male", "Female", "Other"].map((gender) => (
                     <label key={gender} className="flex items-center gap-2">
                       <input
                         type="radio"
@@ -203,7 +310,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                         className="w-4 h-4 text-purple-500 bg-dark-400 border-dark-500 focus:ring-purple-500"
                         required
                       />
-                      <span className="text-14-regular text-white">{gender}</span>
+                      <span className="text-14-regular text-white">
+                        {gender}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -228,7 +337,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Emergency contact name *</label>
+                <label className="shad-input-label block mb-2">
+                  Emergency contact name *
+                </label>
                 <input
                   type="text"
                   name="emergencyContactName"
@@ -241,7 +352,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Emergency phone *</label>
+                <label className="shad-input-label block mb-2">
+                  Emergency phone *
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Phone className="w-5 h-5 text-dark-600" />
@@ -264,11 +377,15 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
       case 2:
         return (
           <div className="space-y-6">
-            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">Insurance Information</h3>
-            
+            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">
+              Insurance Information
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               <div>
-                <label className="shad-input-label block mb-2">Insurance provider *</label>
+                <label className="shad-input-label block mb-2">
+                  Insurance provider *
+                </label>
                 <input
                   type="text"
                   name="insuranceProvider"
@@ -281,7 +398,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Policy number *</label>
+                <label className="shad-input-label block mb-2">
+                  Policy number *
+                </label>
                 <input
                   type="text"
                   name="insurancePolicyNumber"
@@ -294,7 +413,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="shad-input-label block mb-2">Group number</label>
+                <label className="shad-input-label block mb-2">
+                  Group number
+                </label>
                 <input
                   type="text"
                   name="insuranceGroupNumber"
@@ -311,11 +432,15 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
       case 3:
         return (
           <div className="space-y-6">
-            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">Medical Information</h3>
-            
+            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">
+              Medical Information
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               <div>
-                <label className="shad-input-label block mb-2">Primary physician</label>
+                <label className="shad-input-label block mb-2">
+                  Primary physician
+                </label>
                 <input
                   type="text"
                   name="primaryPhysician"
@@ -339,7 +464,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Current medications</label>
+                <label className="shad-input-label block mb-2">
+                  Current medications
+                </label>
                 <textarea
                   name="currentMedications"
                   value={formData.currentMedications}
@@ -351,7 +478,9 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">Medical history</label>
+                <label className="shad-input-label block mb-2">
+                  Medical history
+                </label>
                 <textarea
                   name="medicalHistory"
                   value={formData.medicalHistory}
@@ -368,17 +497,21 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">Document Upload</h3>
-            
+            <h3 className="text-20-bold lg:text-24-bold text-white mb-6">
+              Document Upload
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
               <div>
-                <label className="shad-input-label block mb-2">Insurance card *</label>
+                <label className="shad-input-label block mb-2">
+                  Insurance card *
+                </label>
                 <div className="file-upload">
                   <input
                     type="file"
                     id="insuranceCard"
                     name="insuranceCard"
-                    onChange={(e) => handleFileUpload(e, 'insuranceCard')}
+                    onChange={(e) => handleFileUpload(e, "insuranceCard")}
                     accept=".jpg,.jpeg,.png,.pdf"
                     className="hidden"
                     required
@@ -390,9 +523,12 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                       </div>
                       <div className="file-upload_label">
                         <p className="text-14-regular text-green-500">
-                          {uploadedFiles.insuranceCard || 'Upload insurance card'}
+                          {uploadedFiles.insuranceCard ||
+                            "Upload insurance card"}
                         </p>
-                        <p className="text-12-regular text-dark-600">JPG, PNG, PDF (max 5MB)</p>
+                        <p className="text-12-regular text-dark-600">
+                          JPG, PNG, PDF (max 5MB)
+                        </p>
                       </div>
                     </div>
                   </label>
@@ -400,13 +536,15 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="shad-input-label block mb-2">ID document *</label>
+                <label className="shad-input-label block mb-2">
+                  ID document *
+                </label>
                 <div className="file-upload">
                   <input
                     type="file"
                     id="idDocument"
                     name="idDocument"
-                    onChange={(e) => handleFileUpload(e, 'idDocument')}
+                    onChange={(e) => handleFileUpload(e, "idDocument")}
                     accept=".jpg,.jpeg,.png,.pdf"
                     className="hidden"
                     required
@@ -418,9 +556,11 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                       </div>
                       <div className="file-upload_label">
                         <p className="text-14-regular text-blue-500">
-                          {uploadedFiles.idDocument || 'Upload ID document'}
+                          {uploadedFiles.idDocument || "Upload ID document"}
                         </p>
-                        <p className="text-12-regular text-dark-600">JPG, PNG, PDF (max 5MB)</p>
+                        <p className="text-12-regular text-dark-600">
+                          JPG, PNG, PDF (max 5MB)
+                        </p>
                       </div>
                     </div>
                   </label>
@@ -445,8 +585,12 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
               <UserPlus className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
             <div>
-              <span className="text-20-bold lg:text-24-bold text-white">Patient Registration</span>
-              <p className="text-12-regular lg:text-14-regular text-dark-700">Register new patients</p>
+              <span className="text-20-bold lg:text-24-bold text-white">
+                Patient Registration
+              </span>
+              <p className="text-12-regular lg:text-14-regular text-dark-700">
+                Register new patients
+              </p>
             </div>
           </div>
         </div>
@@ -458,42 +602,58 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
           <div className="flex items-center justify-between mb-4">
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-14-medium lg:text-16-medium font-semibold ${
-                  step <= currentStep
-                    ? 'bg-purple-500 text-white'
-                    : 'bg-dark-400 text-dark-600'
-                }`}>
+                <div
+                  className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-14-medium lg:text-16-medium font-semibold ${
+                    step <= currentStep
+                      ? "bg-purple-500 text-white"
+                      : "bg-dark-400 text-dark-600"
+                  }`}
+                >
                   {step}
                 </div>
                 {step < 4 && (
-                  <div className={`w-12 lg:w-24 h-1 mx-2 ${
-                    step < currentStep ? 'bg-purple-500' : 'bg-dark-400'
-                  }`} />
+                  <div
+                    className={`w-12 lg:w-24 h-1 mx-2 ${
+                      step < currentStep ? "bg-purple-500" : "bg-dark-400"
+                    }`}
+                  />
                 )}
               </div>
             ))}
           </div>
           <div className="flex justify-between text-12-regular lg:text-14-regular text-dark-700">
-            <span className={currentStep >= 1 ? 'text-purple-400' : ''}>Personal Info</span>
-            <span className={currentStep >= 2 ? 'text-purple-400' : ''}>Insurance</span>
-            <span className={currentStep >= 3 ? 'text-purple-400' : ''}>Medical Info</span>
-            <span className={currentStep >= 4 ? 'text-purple-400' : ''}>Documents</span>
+            <span className={currentStep >= 1 ? "text-purple-400" : ""}>
+              Personal Info
+            </span>
+            <span className={currentStep >= 2 ? "text-purple-400" : ""}>
+              Insurance
+            </span>
+            <span className={currentStep >= 3 ? "text-purple-400" : ""}>
+              Medical Info
+            </span>
+            <span className={currentStep >= 4 ? "text-purple-400" : ""}>
+              Documents
+            </span>
           </div>
         </div>
 
         {/* Message */}
         {message && (
-          <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
-            messageType === 'success' 
-              ? 'bg-green-500/10 border-green-500/30 text-green-400' 
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
-          }`}>
-            {messageType === 'success' ? (
+          <div
+            className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
+              messageType === "success"
+                ? "bg-green-500/10 border-green-500/30 text-green-400"
+                : "bg-red-500/10 border-red-500/30 text-red-400"
+            }`}
+          >
+            {messageType === "success" ? (
               <CheckCircle className="w-5 h-5 flex-shrink-0" />
             ) : (
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
             )}
-            <span className="text-14-regular lg:text-16-regular">{message}</span>
+            <span className="text-14-regular lg:text-16-regular">
+              {message}
+            </span>
           </div>
         )}
 
@@ -509,7 +669,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                 onClick={currentStep === 1 ? onBack : handlePrevStep}
                 className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
               >
-                {currentStep === 1 ? '← Back' : 'Previous'}
+                {currentStep === 1 ? "← Back" : "Previous"}
               </button>
 
               {currentStep < 4 ? (
