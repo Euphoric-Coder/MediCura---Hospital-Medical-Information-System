@@ -320,6 +320,9 @@ const ReceptionistAppointments = ({ onBack }) => {
               <div className="mt-6 lg:mt-8">
                 <ReceptionistBookManageAppointment
                   patientData={selectedPatient}
+                  message={message}
+                  setMessage={setMessage}
+                  setMessageType={setMessageType}
                 />
               </div>
             )}

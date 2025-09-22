@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -379,7 +379,12 @@ const appointmentTypes = [
   "Surgery",
 ];
 
-const ReceptionistBookManageAppointment = ({ patientData }) => {
+const ReceptionistBookManageAppointment = ({
+  patientData,
+  message,
+  setMessage,
+  setMessageType,
+}) => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
@@ -400,8 +405,6 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -424,9 +427,13 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
       const data = await db
         .select()
         .from(Appointments)
-        .where(eq(Appointments.patientId, patientData.userId));
+        .where(eq(Appointments.patientId, patientData.userId))
+        .orderBy(desc(Appointments.date));
 
       const all = await db.select().from(Appointments);
+
+      console.log("Existing Appointments: ", data);
+      console.log("All Appointments: ", all);
       setExistingAppointments(data);
       setAllAppointments(all);
     } catch (error) {
@@ -436,14 +443,6 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
 
   const refreshAppointment = async () => {
     await fetchAppointments();
-  };
-
-  const formatTime12Hour = (date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
   };
 
   // Generate week schedule for selected doctor
@@ -554,6 +553,13 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
     "all",
     ...Array.from(new Set(doctors.map((d) => d.speciality))),
   ];
+
+  const patientAlreadyAppointed = (date) => {
+    // Check if the patient has any appointment on the given date
+    return existingAppointments.some(
+      (apt) => apt.date === date && apt.status === "upcoming"
+    );
+  };
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
@@ -739,27 +745,6 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
         {/* Header */}
         <div className="mb-8">
-
-          {/* Message */}
-          {message && (
-            <div
-              className={`flex items-center gap-3 p-3 lg:p-4 rounded-xl border backdrop-blur-sm mb-6 ${
-                messageType === "success"
-                  ? "bg-green-500/10 border-green-500/30 text-green-400"
-                  : "bg-red-500/10 border-red-500/30 text-red-400"
-              }`}
-            >
-              {messageType === "success" ? (
-                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
-              )}
-              <span className="text-14-regular lg:text-16-regular">
-                {message}
-              </span>
-            </div>
-          )}
-
           {/* Tab Navigation */}
           <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-8">
             <div className="flex gap-2">
@@ -799,8 +784,8 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
               <div
                 className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
                   step === "select-doctor"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
+                    ? "bg-purple-500 text-white"
+                    : "bg-dark-600/50 text-dark-700"
                 }`}
               >
                 <User className="w-4 h-4" />
@@ -813,8 +798,8 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
               <div
                 className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
                   step === "select-time"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
+                    ? "bg-purple-500 text-white"
+                    : "bg-dark-600/50 text-dark-700"
                 }`}
               >
                 <Calendar className="w-4 h-4" />
@@ -827,8 +812,8 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
               <div
                 className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
                   step === "confirm"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
+                    ? "bg-purple-500 text-white"
+                    : "bg-dark-600/50 text-dark-700"
                 }`}
               >
                 <Check className="w-4 h-4" />
@@ -887,7 +872,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                     {filteredDoctors.map((doctor) => (
                       <div
                         key={doctor.userId}
-                        className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-green-500/50 transition-all duration-300 cursor-pointer group"
+                        className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group"
                         onClick={() => handleDoctorSelect(doctor)}
                       >
                         <div className="flex items-start gap-4">
@@ -904,7 +889,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
 
                           <div className="flex-1 space-y-3">
                             <div>
-                              <h3 className="text-16-bold lg:text-20-bold text-white group-hover:text-green-400 transition-colors">
+                              <h3 className="text-16-bold lg:text-20-bold text-white group-hover:text-purple-400 transition-colors">
                                 {doctor.name}
                               </h3>
                               <p className="text-14-regular text-blue-400">
@@ -930,17 +915,17 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                              <div className="bg-green-500/20 rounded-lg px-3 py-2">
-                                <span className="text-12-medium lg:text-14-medium text-green-400">
+                              <div className="bg-purple-500/20 rounded-lg px-3 py-2">
+                                <span className="text-12-medium lg:text-14-medium text-purple-400">
                                   <span className="hidden sm:inline">
-                                    ${doctor.consultationFee} consultation
+                                    ₹ {doctor.consultationFee} consultation
                                   </span>
                                   <span className="sm:hidden">
-                                    ${doctor.consultationFee}
+                                    ₹ {doctor.consultationFee}
                                   </span>
                                 </span>
                               </div>
-                              <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 lg:px-6 py-2 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25 opacity-0 group-hover:opacity-100">
+                              <button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 lg:px-6 py-2 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-purple-500/25 opacity-0 group-hover:opacity-100">
                                 <span className="hidden sm:inline">
                                   Select Doctor
                                 </span>
@@ -960,7 +945,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
             {step === "select-time" && selectedDoctor && (
               <>
                 {/* Selected Doctor Info */}
-                <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
+                <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-4 lg:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <img
                       src={selectedDoctor.avatar}
@@ -971,7 +956,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                       <h3 className="text-16-bold lg:text-20-bold text-white">
                         {selectedDoctor.name}
                       </h3>
-                      <p className="text-14-regular text-green-400">
+                      <p className="text-14-regular text-purple-400">
                         {selectedDoctor.speciality}
                       </p>
                       <p className="text-12-regular lg:text-14-regular text-dark-700 hidden sm:block">
@@ -980,7 +965,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                     </div>
                     <button
                       onClick={() => setStep("select-doctor")}
-                      className="text-12-medium lg:text-14-medium text-green-400 hover:text-green-300 px-3 lg:px-4 py-2 border border-green-500/30 rounded-lg bg-green-500/10 hover:bg-green-500/20 transition-colors"
+                      className="text-12-medium lg:text-14-medium text-purple-400 hover:text-purple-300 px-3 lg:px-4 py-2 border border-purple-500/30 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 transition-colors"
                     >
                       <span className="hidden sm:inline">Change Doctor</span>
                       <span className="sm:hidden">Change</span>
@@ -1036,23 +1021,41 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
 
                         <div className="space-y-1 lg:space-y-2 max-h-48 lg:max-h-96 overflow-y-auto">
                           {day.slots.length > 0 ? (
-                            day.slots.map((slot, slotIndex) => (
-                              <button
-                                key={slotIndex}
-                                onClick={() =>
-                                  handleTimeSelect(day.fullDate, slot.time)
-                                }
-                                disabled={!slot.available}
-                                className={`w-full p-2 rounded border transition-colors
-    ${
-      slot.available
-        ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
-        : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
-    }`}
-                              >
-                                {slot.time}
-                              </button>
-                            ))
+                            day.slots.map((slot, slotIndex) => {
+                              const patientHasAppointment =
+                                patientAlreadyAppointed(day.fullDate);
+
+                              return (
+                                <button
+                                  key={slotIndex}
+                                  onClick={() =>
+                                    !patientHasAppointment &&
+                                    slot.available &&
+                                    handleTimeSelect(day.fullDate, slot.time)
+                                  }
+                                  disabled={
+                                    !slot.available || patientHasAppointment
+                                  }
+                                  className={`w-full p-2 rounded border transition-colors
+                  ${
+                    patientHasAppointment
+                      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 cursor-not-allowed"
+                      : slot.available
+                      ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border-purple-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
+                  }`}
+                                  title={
+                                    patientHasAppointment
+                                      ? `Patient ${patientData.name} already have an appointment on this date`
+                                      : !slot.available
+                                      ? "Slot unavailable"
+                                      : "Select this slot"
+                                  }
+                                >
+                                  {slot.time}
+                                </button>
+                              );
+                            })
                           ) : (
                             <p className="text-center text-red-400 text-sm">
                               Not Available
@@ -1131,7 +1134,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                       </h3>
                       <div className="space-y-4">
                         <div className="flex items-center gap-4">
-                          <Calendar className="w-5 h-5 text-green-400" />
+                          <Calendar className="w-5 h-5 text-purple-400" />
                           <div>
                             <div className="text-14-semibold lg:text-16-semibold text-white">
                               {new Date(selectedDate).toLocaleDateString(
@@ -1162,11 +1165,11 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                           </div>
                         </div>
 
-                        <div className="bg-green-500/20 rounded-lg px-4 py-3">
-                          <div className="text-14-semibold lg:text-16-semibold text-green-400">
-                            Consultation Fee: ${selectedDoctor.consultationFee}
+                        <div className="bg-purple-500/20 rounded-2xl px-4 py-3">
+                          <div className="text-14-semibold lg:text-16-semibold text-purple-400">
+                            Consultation Fee: ₹ {selectedDoctor.consultationFee}
                           </div>
-                          <div className="text-12-regular text-green-300">
+                          <div className="text-12-regular text-purple-300">
                             Payment due after service
                           </div>
                         </div>
@@ -1290,7 +1293,7 @@ const ReceptionistBookManageAppointment = ({ patientData }) => {
                       handleConfirmBooking();
                     }}
                     disabled={!appointmentReason.trim()}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
                   >
                     Confirm Appointment
                   </button>
