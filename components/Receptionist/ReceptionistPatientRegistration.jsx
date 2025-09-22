@@ -62,6 +62,8 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
   const [phoneCountryCode, setPhoneCountryCode] = useState("+91");
   const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] =
     useState(false);
+  const [emergencyNumber, setEmergencyNumber] = useState("");
+  const [emergencyCountryCode, setEmergencyCountryCode] = useState("+91");
   const [showEmergencyCountryDropdown, setShowEmergencyCountryDropdown] =
     useState(false);
 
@@ -77,6 +79,35 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
       ...prev,
       phone: `${phoneCountryCode} ${value}`,
     }));
+  };
+
+  const handleEmergencyNumberChange = (value) => {
+    setEmergencyNumber(value);
+    setFormData((prev) => ({
+      ...prev,
+      emergencyPhone: `${emergencyCountryCode} ${value}`,
+    }));
+    console.log("Emergency phone:", {
+      emergencyPhone: `${emergencyCountryCode} ${value}`,
+    });
+  };
+
+  const handlePhoneCountrySelect = (code) => {
+    setPhoneCountryCode(code);
+    setFormData((prev) => ({
+      ...prev,
+      phone: `${code} ${phoneNumber}`,
+    }));
+    setShowPhoneCountryDropdown(false);
+  };
+
+  const handleEmergencyCountrySelect = (code) => {
+    setEmergencyCountryCode(code);
+    setFormData((prev) => ({
+      ...prev,
+      emergencyPhone: `${code} ${emergencyNumber}`,
+    }));
+    setShowEmergencyCountryDropdown(false);
   };
 
   const handleInputChange = (e) => {
@@ -103,6 +134,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
 
   const handleNextStep = () => {
     if (currentStep < 4) {
+      console.log(formData);
       setCurrentStep(currentStep + 1);
     }
   };
@@ -271,7 +303,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                     value={phoneNumber}
                     onChange={(e) => handlePhoneNumberChange(e.target.value)}
                     placeholder="123 456 7890"
-                    className="shad-input flex-1 text-white"
+                    className="shad-input flex-1 text-white p-2"
                     required
                   />
                 </div>
@@ -346,26 +378,81 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                   value={formData.emergencyContactName}
                   onChange={handleInputChange}
                   placeholder="Jane Smith"
-                  className="shad-input w-full text-white"
+                  className="shad-input w-full text-white p-2"
                   required
                 />
               </div>
 
               <div>
                 <label className="shad-input-label block mb-2">
-                  Emergency phone *
+                  Emergency Phone number
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Phone className="w-5 h-5 text-dark-600" />
+                <div className="flex gap-2">
+                  {/* Country Code Dropdown */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowEmergencyCountryDropdown(
+                          !showEmergencyCountryDropdown
+                        )
+                      }
+                      className="bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 text-white flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                    >
+                      <span>
+                        {
+                          countryCodes.find(
+                            (c) => c.code === emergencyCountryCode
+                          )?.flag
+                        }
+                      </span>
+                      <span className="text-14-regular">
+                        {emergencyCountryCode}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-dark-600 transition-transform ${
+                          showEmergencyCountryDropdown ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {showEmergencyCountryDropdown && (
+                      <div className="absolute top-full left-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                        <div className="max-h-60 overflow-y-auto">
+                          {countryCodes.map((country, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() =>
+                                handleEmergencyCountrySelect(country.code)
+                              }
+                              className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                            >
+                              <span className="text-lg">{country.flag}</span>
+                              <div>
+                                <div className="text-14-medium text-white">
+                                  {country.code}
+                                </div>
+                                <div className="text-12-regular text-dark-600">
+                                  {country.country}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Emergency Phone Number Input */}
                   <input
                     type="tel"
-                    name="emergencyPhone"
-                    value={formData.emergencyPhone}
-                    onChange={handleInputChange}
-                    placeholder="+1 (555) 987-6543"
-                    className="shad-input pl-10 w-full text-white"
+                    value={emergencyNumber}
+                    onChange={(e) =>
+                      handleEmergencyNumberChange(e.target.value)
+                    }
+                    placeholder="123 456 7890"
+                    className="shad-input flex-1 text-white p-2"
                     required
                   />
                 </div>
