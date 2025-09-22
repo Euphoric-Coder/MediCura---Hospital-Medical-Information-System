@@ -733,6 +733,18 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       );
     }
 
+    // Workflow badge: Waiting in lobby
+    if (workflow === "waiting") {
+      return (
+        <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
+          <Clock className="w-3 h-3 text-yellow-400" />
+          <span className="text-10-medium lg:text-12-medium text-yellow-400">
+            Waiting in Lobby
+          </span>
+        </div>
+      );
+    }
+
     switch (status) {
       case "upcoming":
         return (
@@ -1486,7 +1498,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                         )}
 
                         {appointment.status === "upcoming" &&
-                          !appointmentToday && (
+                          !appointmentToday &&
+                          appointment.workflow !== "waiting" && (
                             <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
                               <button
                                 onClick={() =>
@@ -1511,33 +1524,36 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                             </div>
                           )}
 
-                        {appointmentToday && (
-                          <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
-                            {/* Reschedule Button */}
-                            <button
-                              onClick={() => handleRescheduleClick(appointment)}
-                              className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
-                            >
-                              <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
-                              <span className="hidden sm:inline">
-                                Reschedule
-                              </span>
-                              <span className="sm:hidden">Edit</span>
-                            </button>
+                        {appointmentToday &&
+                          appointment.workflow !== "waiting" && (
+                            <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
+                              {/* Reschedule Button */}
+                              <button
+                                onClick={() =>
+                                  handleRescheduleClick(appointment)
+                                }
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                              >
+                                <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
+                                <span className="hidden sm:inline">
+                                  Reschedule
+                                </span>
+                                <span className="sm:hidden">Edit</span>
+                              </button>
 
-                            {/* Mark as Waiting Button */}
-                            <button
-                              onClick={() => handleMarkAsWaiting(appointment)}
-                              className="flex-1 lg:flex-none bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2"
-                            >
-                              <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
-                              <span className="hidden sm:inline">
-                                Mark Waiting
-                              </span>
-                              <span className="sm:hidden">Wait</span>
-                            </button>
-                          </div>
-                        )}
+                              {/* Mark as Waiting Button */}
+                              <button
+                                onClick={() => handleMarkAsWaiting(appointment)}
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2"
+                              >
+                                <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
+                                <span className="hidden sm:inline">
+                                  Mark Waiting
+                                </span>
+                                <span className="sm:hidden">Wait</span>
+                              </button>
+                            </div>
+                          )}
                       </div>
                     </div>
                   </div>
