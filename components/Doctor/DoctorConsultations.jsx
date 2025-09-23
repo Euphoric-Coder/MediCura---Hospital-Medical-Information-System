@@ -837,6 +837,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       });
 
       refreshPatientAppointment(selectedPatient.appointmentId);
+      
     } catch (error) {
       setMessage("Error saving consultation");
       setMessageType("error");

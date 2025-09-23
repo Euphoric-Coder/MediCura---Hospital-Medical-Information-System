@@ -1596,7 +1596,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           )}
 
                         {appointmentToday &&
-                          appointment.workflow !== "waiting" && (
+                          appointment.workflow !== "waiting" && appointment.status !== "cancelled" && (
                             <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
                               {/* Reschedule Button */}
                               <button
