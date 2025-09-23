@@ -20,7 +20,13 @@ import {
   Check,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
-import { Appointments, Consultations, LabTests, Patients, Prescriptions } from "@/lib/schema";
+import {
+  Appointments,
+  Consultations,
+  LabTests,
+  Patients,
+  Prescriptions,
+} from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
 
@@ -580,6 +586,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
           type: Appointments.type,
           bookingDate: Appointments.bookingDate,
           updatedAt: Appointments.updatedAt,
+          notes: Appointments.notes,
 
           // patient data
           patient: {
@@ -620,6 +627,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
           gender: apt.patient.gender,
           avatar: apt.patient.avatar,
           reason: apt.reason,
+          notes: apt.notes,
+          workflow: apt.workflow,
           appointmentTime: apt.time,
           appointmentId: apt.id,
         };
@@ -675,7 +684,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
   const handleSaveConsultation = async () => {
     setIsSaving(true);
     try {
-
       const consultation = await db
         .insert(Consultations)
         .values({
@@ -732,42 +740,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
         })
         .where(eq(Appointments.id, selectedPatient.appointmentId));
 
-      // console.log({
-      //   doctorId: doctorData.userId,
-      //   patientId: consultationData.patientId,
-      //   appointmentId: selectedPatient.appointmentId || null,
-
-      //   chiefComplaint: consultationData.chiefComplaint,
-      //   historyOfPresentIllness: consultationData.historyOfPresentIllness,
-      //   physicalExamination: consultationData.physicalExamination,
-      //   assessment: consultationData.assessment,
-      //   plan: consultationData.plan,
-
-      //   admissionRequired: consultationData.admissionRequired,
-      //   admissionType: consultationData.admissionType,
-      //   admissionReason: consultationData.admissionReason,
-
-      //   followUpInstructions: consultationData.followUpInstructions,
-      //   nextAppointment: consultationData.nextAppointment || null,
-      // });
-      // console.log(
-      //   consultationData.prescriptions.map((pres) => ({
-      //     consultationId: "consultationId",
-      //     medication: pres.medication,
-      //     dosage: pres.dosage,
-      //     frequency: pres.frequency,
-      //     duration: pres.duration,
-      //     instructions: pres.instructions,
-      //   }))
-      // );
-      // console.log(
-      //   consultationData.labTests.map((test) => ({
-      //     consultationId: "consultationId",
-      //     testName: test.name,
-      //     category: test.category,
-      //   }))
-      // );
-      // console.log(consultationData);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setMessage("Consultation saved successfully");
       setMessageType("success");
@@ -794,6 +766,108 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       setMessageType("error");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Function to get status badge
+  const getStatusBadge = (status, isUrgent) => {
+    const baseClasses =
+      "flex items-center gap-1 px-2 py-1 rounded-full text-10-medium sm:text-12-medium";
+
+    if (isUrgent) {
+      return (
+        <div
+          className={`${baseClasses} bg-red-500/20 border border-red-500/30`}
+        >
+          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+          <span className="text-red-400">Urgent</span>
+        </div>
+      );
+    }
+
+    switch (status) {
+      case "scheduled":
+        return (
+          <div
+            className={`${baseClasses} bg-blue-500/20 border border-blue-500/30`}
+          >
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span className="text-blue-400">Scheduled</span>
+          </div>
+        );
+
+      case "waiting":
+        return (
+          <div
+            className={`${baseClasses} bg-orange-500/20 border border-orange-500/30`}
+          >
+            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+            <span className="text-orange-400">Waiting</span>
+          </div>
+        );
+
+      case "arrived":
+        return (
+          <div
+            className={`${baseClasses} bg-yellow-500/20 border border-yellow-500/30`}
+          >
+            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+            <span className="text-yellow-400">Arrived</span>
+          </div>
+        );
+
+      case "checked-in":
+        return (
+          <div
+            className={`${baseClasses} bg-teal-500/20 border border-teal-500/30`}
+          >
+            <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
+            <span className="text-teal-400">Checked-In</span>
+          </div>
+        );
+
+      case "in-consultation":
+        return (
+          <div
+            className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
+          >
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-green-400">In Consultation</span>
+          </div>
+        );
+
+      case "completed":
+        return (
+          <div
+            className={`${baseClasses} bg-gray-500/20 border border-gray-500/30`}
+          >
+            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+            <span className="text-gray-400">Completed</span>
+          </div>
+        );
+
+      case "cancelled":
+        return (
+          <div
+            className={`${baseClasses} bg-red-500/20 border border-red-500/30`}
+          >
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            <span className="text-red-400">Cancelled</span>
+          </div>
+        );
+
+      case "no-show":
+        return (
+          <div
+            className={`${baseClasses} bg-pink-500/20 border border-pink-500/30`}
+          >
+            <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+            <span className="text-pink-400">No Show</span>
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -895,8 +969,12 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl object-cover border-2 border-dark-500/50"
                     />
                     <div>
-                      <h1 className="text-20-bold lg:text-32-bold text-white mb-2">
+                      <h1 className="text-20-bold lg:text-32-bold text-white mb-2 flex items-center gap-3">
                         {selectedPatient.name}
+                        {getStatusBadge(
+                          selectedPatient.workflow,
+                          selectedPatient.isUrgent
+                        )}
                       </h1>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-14-regular lg:text-16-regular text-dark-700">
                         <span>
@@ -909,260 +987,266 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-                  {/* Main Consultation Form */}
-                  <div className="lg:col-span-2 space-y-6 lg:space-y-8">
-                    {/* Clinical Notes */}
-                    <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
-                      <div className="flex items-center gap-3 mb-6 lg:mb-8">
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                          <FileText className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
-                        </div>
-                        <h2 className="text-18-bold lg:text-24-bold text-white">
-                          Clinical Notes
-                        </h2>
-                      </div>
 
-                      <div className="space-y-6">
-                        {/* Chief Complaint */}
-                        <DynamicListSection
-                          field="chiefComplaint"
-                          label="Chief Complaint"
-                          placeholder="ex: Severe headache since morning"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="blue"
-                        />
 
-                        {/* History of Present Illness */}
-                        <DynamicListSection
-                          field="historyOfPresentIllness"
-                          label="History of Present Illness"
-                          placeholder="ex: Symptoms started 2 weeks ago"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="green"
-                        />
-
-                        {/* Physical Examination */}
-                        <DynamicListSection
-                          field="physicalExamination"
-                          label="Physical Examination"
-                          placeholder="ex: Elevated heart rate observed"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="yellow"
-                        />
-
-                        {/* Assessment */}
-                        <DynamicListSection
-                          field="assessment"
-                          label="Assessment & Diagnosis"
-                          placeholder="ex: Hypertension"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="purple"
-                        />
-
-                        {/* Treatment Plan */}
-                        <DynamicListSection
-                          field="plan"
-                          label="Treatment Plan"
-                          placeholder="ex: Start antihypertensive medication"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="teal"
-                        />
-
-                        {/* Follow-up Instructions */}
-                        <DynamicListSection
-                          field="followUpInstructions"
-                          label="Follow-up Instructions"
-                          placeholder="ex: Monitor BP daily, reduce salt, follow up in 2 weeks"
-                          consultationData={consultationData}
-                          handleInputChange={handleInputChange}
-                          color="orange"
-                        />
-
-                        {/* Next Appointment */}
-                        <div>
-                          <label className="shad-input-label block mb-2">
-                            Next Appointment
-                          </label>
-                          <input
-                            type="date"
-                            value={consultationData.nextAppointment}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "nextAppointment",
-                                e.target.value
-                              )
-                            }
-                            className="shad-input w-full text-white"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Side Panel */}
-                  <div className="space-y-6 lg:space-y-8">
-                    {/* Prescriptions */}
-                    <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-4 lg:p-6">
-                      <div className="flex items-center gap-3 mb-4 lg:mb-6">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                          <Pill className="w-4 h-4 text-white" />
-                        </div>
-                        <h3 className="text-16-bold lg:text-18-bold text-white">
-                          Prescriptions
-                        </h3>
-                      </div>
-
-                      {/* Add New Prescription */}
-                      <div className="space-y-3 mb-4">
-                        {/* Medication Dropdown */}
-                        <MedicineDropdown
-                          selectedMedicine={newPrescription.medication}
-                          setSelectedMedicine={(value) =>
-                            setNewPrescription((prev) => ({
-                              ...prev,
-                              medication: value,
-                            }))
-                          }
-                        />
-
-                        {/* Dosage & Frequency */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="shad-input-label block mb-1">
-                              Dosage
-                            </label>
-                            <input
-                              type="text"
-                              value={newPrescription.dosage}
-                              onChange={(e) =>
-                                setNewPrescription((prev) => ({
-                                  ...prev,
-                                  dosage: e.target.value,
-                                }))
-                              }
-                              placeholder="Ex: 500mg"
-                              className="shad-input w-full text-white text-10-regular lg:text-12-regular"
-                            />
-                          </div>
-                          <div>
-                            <label className="shad-input-label block mb-1">
-                              Frequency
-                            </label>
-                            <input
-                              type="text"
-                              value={newPrescription.frequency}
-                              onChange={(e) =>
-                                setNewPrescription((prev) => ({
-                                  ...prev,
-                                  frequency: e.target.value,
-                                }))
-                              }
-                              placeholder="Ex: 2 times a day"
-                              className="shad-input w-full text-white text-10-regular lg:text-12-regular"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Duration */}
-                        <div>
-                          <label className="shad-input-label block mb-1">
-                            Duration
-                          </label>
-                          <input
-                            type="text"
-                            value={newPrescription.duration}
-                            onChange={(e) =>
-                              setNewPrescription((prev) => ({
-                                ...prev,
-                                duration: e.target.value,
-                              }))
-                            }
-                            placeholder="Ex: 5 days"
-                            className="shad-input w-full text-white text-12-regular lg:text-14-regular"
-                          />
-                        </div>
-
-                        {/* Instructions */}
-                        <div>
-                          <label className="shad-input-label block mb-1">
-                            Special Instructions
-                          </label>
-                          <textarea
-                            value={newPrescription.instructions}
-                            onChange={(e) =>
-                              setNewPrescription((prev) => ({
-                                ...prev,
-                                instructions: e.target.value,
-                              }))
-                            }
-                            placeholder="Ex: Take after meals"
-                            className="shad-textArea w-full text-white min-h-[60px] resize-none text-10-regular lg:text-12-regular"
-                            rows={2}
-                          />
-                        </div>
-
-                        {/* Add Button */}
-                        <button
-                          onClick={handleAddPrescription}
-                          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg text-12-medium lg:text-14-medium transition-colors"
-                        >
-                          Add Prescription
-                        </button>
-                      </div>
-
-                      {/* Prescription List */}
-                      <div className="space-y-3">
-                        {consultationData.prescriptions.map(
-                          (prescription, index) => (
-                            <div
-                              key={index}
-                              className="bg-purple-500/20 rounded-lg p-3 border border-purple-500/30"
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="text-14-medium text-white">
-                                  {prescription.medication}
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    handleRemovePrescription(index)
-                                  }
-                                  className="text-red-400 hover:text-red-300 text-10-regular lg:text-12-regular"
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                              <div className="text-10-regular lg:text-12-regular text-purple-300">
-                                {prescription.dosage} - {prescription.frequency}
-                              </div>
-                              <div className="text-10-regular lg:text-12-regular text-purple-300">
-                                Duration: {prescription.duration}
-                              </div>
-                              {prescription.instructions && (
-                                <div className="text-10-regular lg:text-12-regular text-purple-300 mt-1">
-                                  Instructions: {prescription.instructions}
-                                </div>
-                              )}
+                {/* Made Consultation Form Visible Only for In-Consultation */} 
+                {selectedPatient.workflow === "in-consultation" && (
+                  <div>
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+                      {/* Main Consultation Form */}
+                      <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+                        {/* Clinical Notes */}
+                        <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
+                          <div className="flex items-center gap-3 mb-6 lg:mb-8">
+                            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                              <FileText className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
                             </div>
-                          )
-                        )}
+                            <h2 className="text-18-bold lg:text-24-bold text-white">
+                              Clinical Notes
+                            </h2>
+                          </div>
+
+                          <div className="space-y-6">
+                            {/* Chief Complaint */}
+                            <DynamicListSection
+                              field="chiefComplaint"
+                              label="Chief Complaint"
+                              placeholder="ex: Severe headache since morning"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="blue"
+                            />
+
+                            {/* History of Present Illness */}
+                            <DynamicListSection
+                              field="historyOfPresentIllness"
+                              label="History of Present Illness"
+                              placeholder="ex: Symptoms started 2 weeks ago"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="green"
+                            />
+
+                            {/* Physical Examination */}
+                            <DynamicListSection
+                              field="physicalExamination"
+                              label="Physical Examination"
+                              placeholder="ex: Elevated heart rate observed"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="yellow"
+                            />
+
+                            {/* Assessment */}
+                            <DynamicListSection
+                              field="assessment"
+                              label="Assessment & Diagnosis"
+                              placeholder="ex: Hypertension"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="purple"
+                            />
+
+                            {/* Treatment Plan */}
+                            <DynamicListSection
+                              field="plan"
+                              label="Treatment Plan"
+                              placeholder="ex: Start antihypertensive medication"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="teal"
+                            />
+
+                            {/* Follow-up Instructions */}
+                            <DynamicListSection
+                              field="followUpInstructions"
+                              label="Follow-up Instructions"
+                              placeholder="ex: Monitor BP daily, reduce salt, follow up in 2 weeks"
+                              consultationData={consultationData}
+                              handleInputChange={handleInputChange}
+                              color="orange"
+                            />
+
+                            {/* Next Appointment */}
+                            <div>
+                              <label className="shad-input-label block mb-2">
+                                Next Appointment
+                              </label>
+                              <input
+                                type="date"
+                                value={consultationData.nextAppointment}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "nextAppointment",
+                                    e.target.value
+                                  )
+                                }
+                                className="shad-input w-full text-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Lab Tests */}
-                    <LabTestsSection
-                      consultationData={consultationData}
-                      setConsultationData={setConsultationData}
-                    />
+                      {/* Side Panel */}
+                      <div className="space-y-6 lg:space-y-8">
+                        {/* Prescriptions */}
+                        <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-4 lg:p-6">
+                          <div className="flex items-center gap-3 mb-4 lg:mb-6">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                              <Pill className="w-4 h-4 text-white" />
+                            </div>
+                            <h3 className="text-16-bold lg:text-18-bold text-white">
+                              Prescriptions
+                            </h3>
+                          </div>
 
-                    {/* TODO: Later on  */}
-                    {/* Hospital Admission */}
-                    {/* <div className="bg-gradient-to-r from-red-500/10 to-red-600/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-4 lg:p-6">
+                          {/* Add New Prescription */}
+                          <div className="space-y-3 mb-4">
+                            {/* Medication Dropdown */}
+                            <MedicineDropdown
+                              selectedMedicine={newPrescription.medication}
+                              setSelectedMedicine={(value) =>
+                                setNewPrescription((prev) => ({
+                                  ...prev,
+                                  medication: value,
+                                }))
+                              }
+                            />
+
+                            {/* Dosage & Frequency */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="shad-input-label block mb-1">
+                                  Dosage
+                                </label>
+                                <input
+                                  type="text"
+                                  value={newPrescription.dosage}
+                                  onChange={(e) =>
+                                    setNewPrescription((prev) => ({
+                                      ...prev,
+                                      dosage: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Ex: 500mg"
+                                  className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                                />
+                              </div>
+                              <div>
+                                <label className="shad-input-label block mb-1">
+                                  Frequency
+                                </label>
+                                <input
+                                  type="text"
+                                  value={newPrescription.frequency}
+                                  onChange={(e) =>
+                                    setNewPrescription((prev) => ({
+                                      ...prev,
+                                      frequency: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Ex: 2 times a day"
+                                  className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Duration */}
+                            <div>
+                              <label className="shad-input-label block mb-1">
+                                Duration
+                              </label>
+                              <input
+                                type="text"
+                                value={newPrescription.duration}
+                                onChange={(e) =>
+                                  setNewPrescription((prev) => ({
+                                    ...prev,
+                                    duration: e.target.value,
+                                  }))
+                                }
+                                placeholder="Ex: 5 days"
+                                className="shad-input w-full text-white text-12-regular lg:text-14-regular"
+                              />
+                            </div>
+
+                            {/* Instructions */}
+                            <div>
+                              <label className="shad-input-label block mb-1">
+                                Special Instructions
+                              </label>
+                              <textarea
+                                value={newPrescription.instructions}
+                                onChange={(e) =>
+                                  setNewPrescription((prev) => ({
+                                    ...prev,
+                                    instructions: e.target.value,
+                                  }))
+                                }
+                                placeholder="Ex: Take after meals"
+                                className="shad-textArea w-full text-white min-h-[60px] resize-none text-10-regular lg:text-12-regular"
+                                rows={2}
+                              />
+                            </div>
+
+                            {/* Add Button */}
+                            <button
+                              onClick={handleAddPrescription}
+                              className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg text-12-medium lg:text-14-medium transition-colors"
+                            >
+                              Add Prescription
+                            </button>
+                          </div>
+
+                          {/* Prescription List */}
+                          <div className="space-y-3">
+                            {consultationData.prescriptions.map(
+                              (prescription, index) => (
+                                <div
+                                  key={index}
+                                  className="bg-purple-500/20 rounded-lg p-3 border border-purple-500/30"
+                                >
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="text-14-medium text-white">
+                                      {prescription.medication}
+                                    </div>
+                                    <button
+                                      onClick={() =>
+                                        handleRemovePrescription(index)
+                                      }
+                                      className="text-red-400 hover:text-red-300 text-10-regular lg:text-12-regular"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                  <div className="text-10-regular lg:text-12-regular text-purple-300">
+                                    {prescription.dosage} -{" "}
+                                    {prescription.frequency}
+                                  </div>
+                                  <div className="text-10-regular lg:text-12-regular text-purple-300">
+                                    Duration: {prescription.duration}
+                                  </div>
+                                  {prescription.instructions && (
+                                    <div className="text-10-regular lg:text-12-regular text-purple-300 mt-1">
+                                      Instructions: {prescription.instructions}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Lab Tests */}
+                        <LabTestsSection
+                          consultationData={consultationData}
+                          setConsultationData={setConsultationData}
+                        />
+
+                        {/* TODO: Later on  */}
+                        {/* Hospital Admission */}
+                        {/* <div className="bg-gradient-to-r from-red-500/10 to-red-600/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-4 lg:p-6">
                       <div className="flex items-center gap-3 mb-4 lg:mb-6">
                         <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
                           <Bed className="w-4 h-4 text-white" />
@@ -1225,36 +1309,40 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                         )}
                       </div>
                     </div> */}
+                      </div>
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={onBack}
+                        className="text-14-regular lg:text-16-regular text-dark-600 hover:text-white transition-colors"
+                      >
+                        ← Back to Dashboard
+                      </button>
+
+                      <button
+                        onClick={handleSaveConsultation}
+                        disabled={isSaving}
+                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
+                      >
+                        {isSaving ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-5 h-5" />
+                            Save Consultation
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Save Button */}
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={onBack}
-                    className="text-14-regular lg:text-16-regular text-dark-600 hover:text-white transition-colors"
-                  >
-                    ← Back to Dashboard
-                  </button>
 
-                  <button
-                    onClick={handleSaveConsultation}
-                    disabled={isSaving}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
-                  >
-                    {isSaving ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-5 h-5" />
-                        Save Consultation
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">

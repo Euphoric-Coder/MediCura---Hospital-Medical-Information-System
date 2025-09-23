@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Appointments, Patients } from "@/lib/schema";
 import { db } from "@/lib/dbConfig";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 
@@ -382,7 +382,8 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
         })
         .from(Appointments)
         .innerJoin(Patients, eq(Appointments.patientId, Patients.userId))
-        .where(eq(Appointments.doctorId, doctorData.userId));
+        .where(eq(Appointments.doctorId, doctorData.userId))
+        .orderBy(desc(Appointments.date));
 
       // console.log("Appointments with patient data:", data);
       setAllAppointments(data);
