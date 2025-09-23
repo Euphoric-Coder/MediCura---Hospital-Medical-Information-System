@@ -38,7 +38,7 @@ const ReceptionistCheckIn = ({ onBack }) => {
           type: Appointments.type,
           reason: Appointments.notes,
           appointmentTime: Appointments.time,
-          arrivalTime: Appointments.time, // arrival is appointment time initially
+          arrivalTime: Appointments.arrivalTime,
           patientName: Patients.name,
           patientPhone: Patients.phone,
           patientAvatar: Patients.avatar,
@@ -63,7 +63,7 @@ const ReceptionistCheckIn = ({ onBack }) => {
         type: row.type,
         reason: row.reason,
         appointmentTime: row.appointmentTime,
-        arrivalTime: row.arrivalTime.toUpperCase(), // can later update dynamically
+        arrivalTime: row.arrivalTime?.toUpperCase(), // can later update dynamically
         status: row.workflow, // 👈 status comes from workflow
       }));
 

@@ -669,10 +669,20 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const handleMarkAsWaiting = async (appointment) => {
     try {
       const loading = toast.loading("Marking as waiting...");
+
+      // Fetches IST time in hh:mm AM/PM
+      const istTime = new Date().toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Kolkata",
+      });
+
       await db
         .update(Appointments)
         .set({
           workflow: "waiting",
+          arrivalTime: istTime,
           updatedAt: new Date(),
         })
         .where(eq(Appointments.id, appointment.id));
@@ -823,7 +833,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         return null;
     }
   };
-
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }).map((_, index) => (

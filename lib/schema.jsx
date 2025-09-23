@@ -130,6 +130,7 @@ export const Appointments = pgTable("appointments", {
 
   date: date("date").notNull(),
   time: varchar("time").notNull(), // e.g. "10:30 AM"
+  arrivalTime: varchar("arrivalTime"), // e.g. "10:30 AM"
   reason: varchar("reason"),
   notes: varchar("notes"),
 
