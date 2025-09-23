@@ -722,6 +722,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       timeZone: "Asia/Kolkata",
     });
 
+    // Scheduled for today
     if (workflow === "scheduled" && date === todayIST) {
       return (
         <div className="flex items-center gap-2 px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full">
@@ -733,18 +734,60 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       );
     }
 
-    // Workflow badge: Waiting in lobby
-    if (workflow === "waiting") {
-      return (
-        <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
-          <Clock className="w-3 h-3 text-yellow-400" />
-          <span className="text-10-medium lg:text-12-medium text-yellow-400">
-            Waiting in Lobby
-          </span>
-        </div>
-      );
+    // Workflow states
+    switch (workflow) {
+      case "waiting":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
+            <Clock className="w-3 h-3 text-yellow-400" />
+            <span className="text-10-medium lg:text-12-medium text-yellow-400">
+              Waiting in Lobby
+            </span>
+          </div>
+        );
+
+      case "arrived":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+            <CheckCircle className="w-3 h-3 text-blue-400" />
+            <span className="text-10-medium lg:text-12-medium text-blue-400">
+              Arrived
+            </span>
+          </div>
+        );
+
+      case "checked-in":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-10-medium lg:text-12-medium text-green-400">
+              Checked In
+            </span>
+          </div>
+        );
+
+      case "in-consultation":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full">
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            <span className="text-10-medium lg:text-12-medium text-purple-400">
+              In Consultation
+            </span>
+          </div>
+        );
+
+      case "no-show":
+        return (
+          <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
+            <X className="w-3 h-3 text-red-400" />
+            <span className="text-10-medium lg:text-12-medium text-red-400">
+              No Show
+            </span>
+          </div>
+        );
     }
 
+    // Appointment status (fallback)
     switch (status) {
       case "upcoming":
         return (
@@ -755,28 +798,32 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             </span>
           </div>
         );
+
       case "completed":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
-            <CheckCircle className="w-3 h-3" />
+            <CheckCircle className="w-3 h-3 text-green-400" />
             <span className="text-10-medium lg:text-12-medium text-green-400">
               Completed
             </span>
           </div>
         );
+
       case "cancelled":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 text-red-400" />
             <span className="text-10-medium lg:text-12-medium text-red-400">
               Cancelled
             </span>
           </div>
         );
+
       default:
         return null;
     }
   };
+
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }).map((_, index) => (
