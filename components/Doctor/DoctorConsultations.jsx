@@ -536,40 +536,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     fetchPatients();
   }, []);
 
-  // Mock patients for today's consultations
-  const todayPatients = [
-    {
-      id: "P001",
-      name: "John Smith",
-      age: 45,
-      gender: "Male",
-      avatar:
-        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      reason: "Annual check-up",
-      appointmentTime: "10:00 AM",
-    },
-    {
-      id: "P002",
-      name: "Emily Johnson",
-      age: 32,
-      gender: "Female",
-      avatar:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      reason: "Follow-up visit",
-      appointmentTime: "11:30 AM",
-    },
-    {
-      id: "P003",
-      name: "Michael Brown",
-      age: 67,
-      gender: "Male",
-      avatar:
-        "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      reason: "Chest pain evaluation",
-      appointmentTime: "2:00 PM",
-    },
-  ];
-
   const fetchPatients = async () => {
     try {
       const todayStr = new Date().toLocaleDateString("en-CA", {
@@ -630,6 +596,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
           reason: apt.reason,
           notes: apt.notes,
           workflow: apt.workflow,
+          appointmentType: apt.type,
           appointmentTime: apt.time,
           appointmentId: apt.id,
         };
@@ -649,7 +616,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       const updatedPatients = await fetchPatients();
 
       if (appointmentId) {
-        // console.log("Refresh Id: ", appointmentId);
         const updatedPatient = updatedPatients.find(
           (p) => p.appointmentId === appointmentId
         );
@@ -1057,7 +1023,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             {patient.appointmentTime}
                           </p>
                           <p className="text-10-regular lg:text-12-regular text-dark-600 truncate">
-                            {patient.reason}
+                            {patient.appointmentType}
                           </p>
                         </div>
                       </div>
