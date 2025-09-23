@@ -607,12 +607,11 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
   });
 
   const scheduledCount = allAppointments.filter(
-    (apt) => apt.status === "scheduled"
+    (apt) => apt.workflow === "scheduled"
   ).length;
   const completedCount = allAppointments.filter(
     (apt) => apt.status === "completed"
   ).length;
-  const urgentCount = allAppointments.filter((apt) => apt.isUrgent).length;
   const totalRevenue = allAppointments
     .filter((apt) => apt.status === "completed")
     .reduce((sum, apt) => sum + apt.consultationFee, 0);
@@ -661,7 +660,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+          <div className="grid grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
             <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-4 lg:p-6">
               <div className="flex items-center gap-3 lg:gap-4">
                 <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -689,38 +688,6 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                   </div>
                   <div className="text-10-regular lg:text-14-regular text-green-400">
                     Completed
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 backdrop-blur-sm border border-red-500/20 rounded-2xl p-4 lg:p-6">
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <AlertTriangle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
-                </div>
-                <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">
-                    {urgentCount}
-                  </div>
-                  <div className="text-10-regular lg:text-14-regular text-red-400">
-                    Urgent
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-4 lg:p-6">
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Plus className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
-                </div>
-                <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">
-                    ${totalRevenue.toFixed(0)}
-                  </div>
-                  <div className="text-10-regular lg:text-14-regular text-purple-400">
-                    Revenue
                   </div>
                 </div>
               </div>

@@ -28,7 +28,7 @@ const ReceptionistCheckIn = ({ onBack }) => {
     fetchAppointments();
   }, []);
 
-  // Fetch patients + appointments + doctors
+  // Fetches patients + appointments + doctors
   const fetchAppointments = async () => {
     try {
       const data = await db
@@ -75,6 +75,10 @@ const ReceptionistCheckIn = ({ onBack }) => {
     } catch (error) {
       console.error("Error fetching appointments:", error);
     }
+  };
+
+  const refreshAppointments = () => {
+    fetchAppointments();
   };
 
   const filteredPatients = patients.filter((patient) => {
