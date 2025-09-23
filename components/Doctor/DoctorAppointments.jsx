@@ -612,6 +612,12 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
   const completedCount = allAppointments.filter(
     (apt) => apt.status === "completed"
   ).length;
+  const waitingCount = allAppointments.filter(
+    (apt) => apt.workflow === "waiting"
+  ).length;
+  const cancelledCount = allAppointments.filter(
+    (apt) => apt.status === "cancelled"
+  ).length;
   const totalRevenue = allAppointments
     .filter((apt) => apt.status === "completed")
     .reduce((sum, apt) => sum + apt.consultationFee, 0);
@@ -688,6 +694,38 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                   </div>
                   <div className="text-10-regular lg:text-14-regular text-green-400">
                     Completed
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Clock className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
+                </div>
+                <div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {waitingCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-yellow-400">
+                    Waiting
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 backdrop-blur-sm border border-red-500/20 rounded-2xl p-4 lg:p-6">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <AlertTriangle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
+                </div>
+                <div>
+                  <div className="text-20-bold lg:text-32-bold text-white">
+                    {cancelledCount}
+                  </div>
+                  <div className="text-10-regular lg:text-14-regular text-red-400">
+                    Cancelled
                   </div>
                 </div>
               </div>
