@@ -17,8 +17,6 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        console.log(credentials);
-
         const result = await db
           .select()
           .from(Users)
