@@ -30,6 +30,7 @@ import {
 } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 const admissionTypes = [
   "General Ward",
@@ -755,6 +756,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
   const handleSaveConsultation = async () => {
     setIsSaving(true);
     try {
+      const loading = toast.loading("Saving consultation...");
+
       const consultation = await db
         .insert(Consultations)
         .values({
@@ -811,7 +814,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
         })
         .where(eq(Appointments.id, selectedPatient.appointmentId));
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      toast.dismiss(loading);
+      toast.success("Consultation saved successfully");
       setMessage("Consultation saved successfully");
       setMessageType("success");
 
@@ -831,7 +835,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
         followUpInstructions: "",
         nextAppointment: "",
       });
-      setSelectedPatient(null);
+
+      refreshPatientAppointment(selectedPatient.appointmentId);
     } catch (error) {
       setMessage("Error saving consultation");
       setMessageType("error");

@@ -11,11 +11,13 @@ import {
   Edit,
   X,
   CircleX,
+  RefreshCcw,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { and, eq, notInArray } from "drizzle-orm";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 
 const ReceptionistCheckIn = ({ onBack }) => {
   const [patients, setPatients] = useState([]);
@@ -426,13 +428,20 @@ const ReceptionistCheckIn = ({ onBack }) => {
 
         {/* Patient Check-In List */}
         <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
-          <div className="flex items-center gap-3 mb-6 lg:mb-8">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+          <div className="flex items-center justify-between mb-6 lg:mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+              </div>
+              <h2 className="text-18-bold lg:text-24-bold text-white">
+                Today's Check-Ins
+              </h2>
             </div>
-            <h2 className="text-18-bold lg:text-24-bold text-white">
-              Today's Check-Ins
-            </h2>
+            <div>
+              <Button onClick={() => refreshAppointments()} className="btn2">
+                <RefreshCcw /> Refresh
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4">
