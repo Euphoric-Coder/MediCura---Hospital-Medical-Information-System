@@ -430,6 +430,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
       const all = await db.select().from(Appointments);
       setExistingAppointments(data);
+
+      console.log(data);
       setAllAppointments(all);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -509,7 +511,9 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
               apt.status === "upcoming"
           );
 
-          console.log(isBooked && `Booked on ${fullDate} at ${timeStr}`);
+          console.log(
+            isBooked && `Booked on ${fullDate} at ${timeStr} for ${doctor.name}`
+          );
 
           // Consistent IST-based time check
           const timePassed =
@@ -549,10 +553,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     ...Array.from(new Set(doctors.map((d) => d.speciality))),
   ];
 
-  const patientAlreadyAppointed = (date) => {
+  const patientAlreadyAppointed = (date, doctorId) => {
     // Check if the patient has any appointment on the given date
     return existingAppointments.some(
-      (apt) => apt.date === date && apt.status === "upcoming"
+      (apt) =>
+        apt.date === date &&
+        apt.status === "upcoming" &&
+        apt.doctorId === doctorId
     );
   };
 
@@ -575,6 +582,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   };
 
   const handleConfirmBooking = async () => {
+    const loading = toast.loading("Booking appointment...");
+
     const appointmentData = {
       patientId: patientData.userId,
 
@@ -601,8 +610,11 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
     console.log("Booking appointment:", appointmentData);
 
-    // Refresh existing appointments data
-    // setExistingAppointments((prev) => [...prev, newAppointment]);
+    toast.dismiss(loading);
+    toast.success(
+      `Appointment with ${selectedDoctor.name} on ${selectedDate} at ${selectedTime} booked successfully`
+    );
+
     setMessage("Appointment booked successfully!");
     setMessageType("success");
 
@@ -1176,7 +1188,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           {day.slots.length > 0 ? (
                             day.slots.map((slot, slotIndex) => {
                               const patientHasAppointment =
-                                patientAlreadyAppointed(day.fullDate);
+                                patientAlreadyAppointed(
+                                  day.fullDate,
+                                  selectedDoctor.userId
+                                );
 
                               return (
                                 <button

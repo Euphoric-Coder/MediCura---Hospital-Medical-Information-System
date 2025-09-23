@@ -643,6 +643,93 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     }
   };
 
+  const getStatusTracker = (workflow, patientName) => {
+    const steps = [
+      { key: "scheduled", label: "Scheduled" },
+      { key: "waiting", label: "Waiting" },
+      { key: "arrived", label: "Arrived" },
+      { key: "checked-in", label: "Checked In" },
+      { key: "completed", label: "Completed" },
+    ];
+
+    const currentIndex = steps.findIndex((s) => s.key === workflow);
+
+    return (
+      <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">
+        <div className="text-center py-12 lg:py-20">
+          <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-blue-500/20">
+            <Clock className="w-8 h-8 lg:w-12 lg:h-12 text-blue-400" />
+          </div>
+          <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+            Appointment Status
+          </h3>
+          <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto mb-8">
+            Tracking status for{" "}
+            <span className="text-white font-semibold">{patientName}</span>’s
+            appointment.
+          </p>
+
+          {/* Status Tracker */}
+          <div className="flex justify-center gap-4 lg:gap-8 flex-wrap">
+            {steps.map((step, index) => {
+              const isCompleted = index < currentIndex;
+              const isActive = index === currentIndex;
+
+              return (
+                <div
+                  key={step.key}
+                  className={`flex flex-col items-center ${
+                    isActive
+                      ? "text-green-400"
+                      : isCompleted
+                      ? "text-green-500"
+                      : "text-dark-600"
+                  }`}
+                >
+                  {/* Step Circle */}
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${
+                      isActive
+                        ? "border-green-400 bg-green-500/20 animate-pulse"
+                        : isCompleted
+                        ? "border-green-500 bg-green-500/20"
+                        : "border-dark-500 bg-dark-500/20"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                    ) : isActive ? (
+                      <Clock className="w-5 h-5 text-green-400 animate-pulse" />
+                    ) : (
+                      <Clock className="w-5 h-5 text-dark-600" />
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <span className="mt-2 text-12-medium">{step.label}</span>
+
+                  {/* Connector Line */}
+                  {index < steps.length - 1 && (
+                    <div
+                      className={`hidden lg:block h-1 w-12 my-2 ${
+                        isCompleted
+                          ? "bg-green-500"
+                          : isActive
+                          ? "bg-green-400 animate-pulse"
+                          : "bg-dark-500/50"
+                      }`}
+                    ></div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
   const handlePatientSelect = (patient) => {
     setSelectedPatient(patient);
     setConsultationData((prev) => ({
@@ -922,36 +1009,42 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
               </h2>
 
               <div className="space-y-3">
-                {patients.map((patient) => (
-                  <button
-                    key={patient.id}
-                    onClick={() => handlePatientSelect(patient)}
-                    className={`w-full p-3 lg:p-4 rounded-2xl border-2 transition-all duration-300 text-left ${
-                      selectedPatient?.id === patient.id
-                        ? "border-green-500 bg-green-500/10"
-                        : "border-dark-500 hover:border-dark-400 bg-dark-400/30"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={patient.avatar}
-                        alt={patient.name}
-                        className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl object-cover"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-14-semibold lg:text-16-semibold text-white truncate">
-                          {patient.name}
-                        </h3>
-                        <p className="text-12-regular text-dark-700">
-                          {patient.appointmentTime}
-                        </p>
-                        <p className="text-10-regular lg:text-12-regular text-dark-600 truncate">
-                          {patient.reason}
-                        </p>
+                {patients
+                  .filter(
+                    (patient) =>
+                      patient.workflow !== "cancelled" &&
+                      patient.workflow !== "no-show"
+                  )
+                  .map((patient) => (
+                    <button
+                      key={patient.id}
+                      onClick={() => handlePatientSelect(patient)}
+                      className={`w-full p-3 lg:p-4 rounded-2xl border-2 transition-all duration-300 text-left ${
+                        selectedPatient?.id === patient.id
+                          ? "border-green-500 bg-green-500/10"
+                          : "border-dark-500 hover:border-dark-400 bg-dark-400/30"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={patient.avatar}
+                          alt={patient.name}
+                          className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl object-cover"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-14-semibold lg:text-16-semibold text-white truncate">
+                            {patient.name}
+                          </h3>
+                          <p className="text-12-regular text-dark-700">
+                            {patient.appointmentTime}
+                          </p>
+                          <p className="text-10-regular lg:text-12-regular text-dark-600 truncate">
+                            {patient.reason}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
               </div>
             </div>
           </div>
@@ -987,9 +1080,14 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                   </div>
                 </div>
 
+                {selectedPatient &&
+                  selectedPatient.workflow !== "in-consultation" &&
+                  getStatusTracker(
+                    selectedPatient.workflow,
+                    selectedPatient.name
+                  )}
 
-
-                {/* Made Consultation Form Visible Only for In-Consultation */} 
+                {/* Made Consultation Form Visible Only for In-Consultation */}
                 {selectedPatient.workflow === "in-consultation" && (
                   <div>
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
@@ -1341,8 +1439,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                     </div>
                   </div>
                 )}
-
-
               </div>
             ) : (
               <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">
