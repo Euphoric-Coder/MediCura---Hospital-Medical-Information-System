@@ -15,6 +15,7 @@ import {
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { and, eq, notInArray } from "drizzle-orm";
+import { toast } from "sonner";
 
 const ReceptionistCheckIn = ({ onBack }) => {
   const [patients, setPatients] = useState([]);
@@ -31,6 +32,11 @@ const ReceptionistCheckIn = ({ onBack }) => {
   // Fetches patients + appointments + doctors
   const fetchAppointments = async () => {
     try {
+      // Get current date in IST, formatted as yyyy-mm-dd
+      const todayIST = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
+
       const data = await db
         .select({
           id: Appointments.id,
@@ -49,6 +55,7 @@ const ReceptionistCheckIn = ({ onBack }) => {
         .leftJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
         .where(
           and(
+            eq(Appointments.date, todayIST),
             notInArray(Appointments.status, ["cancelled", "no-show"]),
             notInArray(Appointments.workflow, ["cancelled", "no-show"])
           )
@@ -92,51 +99,38 @@ const ReceptionistCheckIn = ({ onBack }) => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusUpdate = (patientId, newStatus) => {
-    setPatients((prev) =>
-      prev.map((patient) => {
-        if (patient.id === patientId) {
-          const updatedPatient = { ...patient, status: newStatus };
+  const handleStatusUpdate = async (appointmentId, newStatus, name) => {
+    const loading = toast.loading("Updating status...");
 
-          if (newStatus === "arrived") {
-            updatedPatient.arrivalTime = new Date().toLocaleTimeString(
-              "en-US",
-              {
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-              }
-            );
-          }
+    await db
+      .update(Appointments)
+      .set({ workflow: newStatus })
+      .where(eq(Appointments.id, appointmentId));
 
-          if (newStatus === "checked-in") {
-            updatedPatient.waitTime = Math.floor(Math.random() * 20) + 5; // Random wait time
-          }
-
-          return updatedPatient;
-        }
-        return patient;
-      })
-    );
-
-    const patient = patients.find((p) => p.id === patientId);
+    console.log("Appointment ID:", appointmentId);
+    console.log("New Status:", newStatus);
     let statusMessage = "";
 
     switch (newStatus) {
       case "arrived":
-        statusMessage = `${patient?.name} marked as arrived`;
+        statusMessage = `${name} marked as arrived`;
         break;
       case "checked-in":
-        statusMessage = `${patient?.name} checked in successfully`;
+        statusMessage = `${name} checked in successfully`;
         break;
       case "in-consultation":
-        statusMessage = `${patient?.name} sent to consultation`;
+        statusMessage = `${name} sent to consultation`;
         break;
       case "completed":
-        statusMessage = `${patient?.name} consultation completed`;
+        statusMessage = `${name} consultation completed`;
         break;
     }
 
+    toast.dismiss(loading);
+
+    refreshAppointments();
+
+    toast.success(statusMessage);
     setMessage(statusMessage);
     setMessageType("success");
 
@@ -223,7 +217,9 @@ const ReceptionistCheckIn = ({ onBack }) => {
       case "scheduled":
         return (
           <button
-            onClick={() => handleStatusUpdate(patient.id, "no-show")}
+            onClick={() =>
+              handleStatusUpdate(patient.id, "no-show", patient.name)
+            }
             className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25"
           >
             Mark No Show
@@ -232,7 +228,9 @@ const ReceptionistCheckIn = ({ onBack }) => {
       case "waiting":
         return (
           <button
-            onClick={() => handleStatusUpdate(patient.id, "arrived")}
+            onClick={() =>
+              handleStatusUpdate(patient.id, "arrived", patient.name)
+            }
             className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
           >
             Mark Arrived
@@ -241,7 +239,9 @@ const ReceptionistCheckIn = ({ onBack }) => {
       case "arrived":
         return (
           <button
-            onClick={() => handleStatusUpdate(patient.id, "checked-in")}
+            onClick={() =>
+              handleStatusUpdate(patient.id, "checked-in", patient.name)
+            }
             className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
           >
             Check In
@@ -250,7 +250,9 @@ const ReceptionistCheckIn = ({ onBack }) => {
       case "checked-in":
         return (
           <button
-            onClick={() => handleStatusUpdate(patient.id, "in-consultation")}
+            onClick={() =>
+              handleStatusUpdate(patient.id, "in-consultation", patient.name)
+            }
             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
           >
             Send to Doctor

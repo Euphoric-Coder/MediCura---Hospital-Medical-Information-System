@@ -18,6 +18,7 @@ import {
   X,
   ChevronDown,
   Check,
+  RefreshCcw,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import {
@@ -643,6 +644,24 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     }
   };
 
+  const refreshPatientAppointment = async (appointmentId) => {
+    try {
+      const updatedPatients = await fetchPatients();
+
+      if (appointmentId) {
+        // console.log("Refresh Id: ", appointmentId);
+        const updatedPatient = updatedPatients.find(
+          (p) => p.appointmentId === appointmentId
+        );
+        if (updatedPatient) {
+          setSelectedPatient(updatedPatient);
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing patient appointment:", error);
+    }
+  };
+
   const getStatusTracker = (workflow, patientName) => {
     const steps = [
       { key: "scheduled", label: "Scheduled" },
@@ -728,7 +747,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       </div>
     );
   };
-
 
   const handlePatientSelect = (patient) => {
     setSelectedPatient(patient);
@@ -1078,6 +1096,18 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex justify-center md:justify-end">
+                  <Button
+                    className="w-full md:w-auto btn2"
+                    onClick={() =>
+                      refreshPatientAppointment(selectedPatient.appointmentId)
+                    }
+                  >
+                    <RefreshCcw />
+                    Refresh Status
+                  </Button>
                 </div>
 
                 {selectedPatient &&
