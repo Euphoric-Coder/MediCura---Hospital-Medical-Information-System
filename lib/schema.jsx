@@ -197,7 +197,7 @@ export const Prescriptions = pgTable("prescriptions", {
   startDate: varchar("startDate"),
   endDate: varchar("endDate"),
 
-  status: varchar("status").default("recommended"), // ordered, completed, pending, cancelled, request-calcellation, discontinued
+  status: varchar("status").default("recommended"), // ordered, completed, pending, cancelled, request-calcellation, discontinued, active
   medicineValidity: varchar("medicineValidity"),
   sideEffects: jsonb("sideEffects").default([]),
   interaction: jsonb("interaction").default([]),

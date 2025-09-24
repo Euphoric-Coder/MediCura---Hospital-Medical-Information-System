@@ -6,7 +6,7 @@ import { db } from "@/lib/dbConfig";
 // POST /api/medicines/[id]/dispense
 export async function POST(req, { params }) {
   const { id } = params;
-  const { quantity, prescriptionId } = await req.json();
+  const { quantity, unitPrice, pharmacistId, medication } = await req.json();
 
   if (!quantity || quantity <= 0) {
     return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
@@ -37,11 +37,13 @@ export async function POST(req, { params }) {
   // Log dispense action
   await db.insert(InventoryLogs).values({
     medicineId: id,
+    pharmacistId,
     action: "dispense",
     quantityChange: -quantity,
     prevQuantity: med.quantity,
     newQuantity: newQty,
-    notes: `Dispensed for prescription ${prescriptionId || "N/A"}`,
+    unitPrice,
+    notes: `Dispensed ${quantity} units of ${medication || "N/A"}`,
   });
 
   return NextResponse.json(updated);

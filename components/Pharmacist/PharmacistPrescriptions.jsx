@@ -524,7 +524,11 @@ const DiscontinuePrescriptionModal = ({ prescription, onDiscontinue }) => {
   );
 };
 
-const DispensePrescriptionModal = ({ prescription, onAction }) => {
+const DispensePrescriptionModal = ({
+  prescription,
+  onAction,
+  pharmacistId,
+}) => {
   const [open, setOpen] = useState(false);
   const [medicines, setMedicines] = useState([]);
   const [notes, setNotes] = useState("");
@@ -538,7 +542,8 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
     cost: "",
     medicineValidity: "",
     dispensedDuration: "",
-    refillsRemaining: 0,
+    refillsRemaining: "0",
+    quantity: "0",
     nextRefillDate: "",
     lastDispensedDate: "",
     sideEffects: [],
@@ -586,12 +591,26 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
       return;
     }
 
-    onAction(
-      prescription.id,
-      status,
-      notes.trim(),
-      form // pass updated form details
-    );
+    const forDispense = {
+      quantity: form.quantity,
+      unitPrice: form.cost,
+      pharmacistId,
+      medication: form.medication,
+    };
+
+    const forPrescription = {
+      refillsRemaining: form.refillsRemaining,
+      nextRefillDate: form.nextRefillDate,
+      lastDispensedDate: form.lastDispensedDate,
+      dispensedDuration: form.dispensedDuration,
+      medicineValidity: form.medicineValidity,
+      sideEffects: form.sideEffects,
+      interaction: form.interaction,
+      cost: form.cost,
+      pharmacistNotes: notes,
+    };
+
+    onAction(prescription.id, forDispense, forPrescription);
 
     setNotes("");
     setForm({
@@ -599,7 +618,8 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
       cost: "",
       medicineValidity: "",
       dispensedDuration: "",
-      refillsRemaining: 0,
+      refillsRemaining: "0",
+      quantity: "0",
       nextRefillDate: "",
       lastDispensedDate: "",
       sideEffects: [],
@@ -638,7 +658,8 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
             cost: "",
             medicineValidity: "",
             dispensedDuration: "",
-            refillsRemaining: 0,
+            refillsRemaining: "0",
+            quantity: "0",
             nextRefillDate: "",
             lastDispensedDate: "",
             sideEffects: [],
@@ -792,7 +813,19 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
             onChange={(e) =>
               setForm((prev) => ({
                 ...prev,
-                refillsRemaining: parseInt(e.target.value, 10),
+                refillsRemaining: e.target.value,
+              }))
+            }
+          />
+
+          <FormInput
+            label="Quantity (for Inventory Management)"
+            type="number"
+            value={form.quantity}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                quantity: e.target.value,
               }))
             }
           />
@@ -961,7 +994,7 @@ const DispensePrescriptionModal = ({ prescription, onAction }) => {
   );
 };
 
-const PharmacistPrescriptions = ({ onBack }) => {
+const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
   const [prescriptions, setPrescriptions] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -1300,10 +1333,16 @@ const PharmacistPrescriptions = ({ onBack }) => {
         return (
           <DispensePrescriptionModal
             prescription={prescription}
-            onAction={(id, status, notes, form) =>
-              // handleUpdateStatus(id, status, notes)
-              console.log(id, status, notes, form)
-            }
+            onAction={(id, dispenseData, prescriptionData) => {
+              console.log("Prescription Id: ", id);
+              console.log(
+                "Dispense data:",
+                dispenseData,
+                "Prescription data:",
+                prescriptionData
+              );
+            }}
+            pharmacistId={pharmacistData.userId}
           />
         );
       case "dispensed":
