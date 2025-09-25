@@ -14,10 +14,11 @@ import {
   Download,
   Phone,
   ChevronDown,
+  RefreshCcw,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
-import { Consultations, Doctors, Patients, Prescriptions } from "@/lib/schema";
+import { Consultations, Doctors, Medicines, Patients, Prescriptions } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import {
   Dialog,
@@ -34,6 +35,7 @@ import { set } from "date-fns";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import FormInput from "../FormUI/FormInput";
+import { getTodayIST } from "@/lib/utils";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -990,6 +992,189 @@ const DispensePrescriptionModal = ({
   );
 };
 
+const RefillModal = ({ prescription, onRefill }) => {
+  const [open, setOpen] = useState(false);
+  const [quantity, setQuantity] = useState("");
+  const [nextRefillDate, setNextRefillDate] = useState("");
+  const [notes, setNotes] = useState("");
+  const [lastCourse, setLastCourse] = useState(false);
+  const [medicineId, setMedicineId] = useState(null);
+
+  if (!prescription) return null;
+
+  // Fetch medicineId whenever modal opens
+  useEffect(() => {
+    const fetchMedicineId = async () => {
+      try {
+        const rows = await db
+          .select({ id: Medicines.id })
+          .from(Medicines)
+          .where(eq(Medicines.name, prescription.medication));
+
+        if (rows.length > 0) {
+          setMedicineId(rows[0].id);
+        } else {
+          console.warn("No medicine found for", prescription.medication);
+          setMedicineId(null);
+        }
+      } catch (err) {
+        console.error("Error fetching medicine ID:", err);
+        setMedicineId(null);
+      }
+    };
+
+    if (open && prescription?.medication) {
+      fetchMedicineId();
+    }
+  }, [open, prescription]);
+
+  // Reset fields when opening
+  useEffect(() => {
+    if (open) {
+      setQuantity("");
+      setNextRefillDate("");
+      setNotes("");
+      setLastCourse(false);
+    }
+  }, [open]);
+
+  const handleSubmit = () => {
+    if (!medicineId) {
+      console.error("Cannot refill: medicineId not found.");
+      return;
+    }
+
+    onRefill(prescription.id, {
+      medicineId,
+      medication: prescription.medication,
+      quantity,
+      nextRefillDate,
+      notes,
+      lastCourse,
+    });
+
+    setOpen(false);
+  };
+
+  return (
+    <>
+      {/* Trigger */}
+      <Button
+        onClick={() => setOpen(true)}
+        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+                   text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium 
+                   transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+      >
+        Refill
+      </Button>
+
+      {/* Modal */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="bg-dark-300 text-white rounded-2xl max-w-lg w-full">
+          <DialogHeader>
+            <DialogTitle className="text-18-bold lg:text-20-bold text-white">
+              Refill Prescription
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Prescription Details Block */}
+            <div className="p-4 rounded-xl bg-dark-500/40 border border-dark-600">
+              <h4 className="text-white text-sm font-semibold mb-2">
+                Prescription Details
+              </h4>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Medication:</span>{" "}
+                {prescription.medication}
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Dosage:</span>{" "}
+                {prescription.dosage}{" "}
+                {prescription.frequency ? ` — ${prescription.frequency}` : ""}
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Patient:</span>{" "}
+                {prescription.patientName} ({prescription.patientId})
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Refills Left:</span>{" "}
+                {prescription.refills ?? 0}
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Last Dispensed:</span>{" "}
+                {prescription.lastDispensedDate || "N/A"}
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Next Refill Date:</span>{" "}
+                {prescription.nextRefillDate || "N/A"}
+              </p>
+            </div>
+
+            {/* Refill Form */}
+            <FormInput
+              label="Quantity"
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              placeholder="Enter quantity"
+            />
+
+            <FormInput
+              label="Next Refill Date"
+              type="date"
+              value={nextRefillDate}
+              onChange={(e) => setNextRefillDate(e.target.value)}
+            />
+
+            <FormInput
+              label="Notes"
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Optional notes"
+            />
+
+            {/* Checkbox for Last Course */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="lastCourse"
+                checked={lastCourse}
+                onChange={(e) => setLastCourse(e.target.checked)}
+                className="w-4 h-4 accent-green-500 cursor-pointer"
+              />
+              <label
+                htmlFor="lastCourse"
+                className="text-sm text-white cursor-pointer"
+              >
+                Last course of medicine
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="ghost"
+                onClick={() => setOpen(false)}
+                className="text-dark-600 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={!quantity || !medicineId}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+              >
+                Confirm Refill
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
 const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
   const [prescriptions, setPrescriptions] = useState([]);
 
@@ -1272,6 +1457,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       toast.error("Failed to dispense medicine", error);
     }
   };
+
+  const handleRefill = async () => {};
 
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);
@@ -1688,6 +1875,12 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           <button className="flex gap-1 items-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
                             <Phone className="w-4 h-4" /> Phone
                           </button>
+                          {prescription.nextRefillDate === getTodayIST() && (
+                            <RefillModal
+                              prescription={prescription}
+                              onRefill={handleRefill}
+                            />
+                          )}
                         </div>
                         {getActionButtons(prescription)}
                       </div>
