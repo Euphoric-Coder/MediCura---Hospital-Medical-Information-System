@@ -188,6 +188,10 @@ export const Prescriptions = pgTable("prescriptions", {
     .notNull()
     .references(() => Consultations.id, { onDelete: "cascade" }),
 
+  medicationId: uuid("medicationId") // Optional reference to Medicines
+    .references(() => Medicines.id, { onDelete: "set null" })
+    .default(null),
+
   medication: varchar("medication").notNull(),
   dosage: varchar("dosage"),
   frequency: varchar("frequency"),

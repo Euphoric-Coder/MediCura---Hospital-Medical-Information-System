@@ -18,7 +18,13 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
-import { Consultations, Doctors, Medicines, Patients, Prescriptions } from "@/lib/schema";
+import {
+  Consultations,
+  Doctors,
+  Medicines,
+  Patients,
+  Prescriptions,
+} from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import {
   Dialog,
@@ -31,7 +37,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { set } from "date-fns";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import FormInput from "../FormUI/FormInput";
@@ -537,6 +542,7 @@ const DispensePrescriptionModal = ({
 
   // Editable state for prescription fields
   const [form, setForm] = useState({
+    medicationId: "",
     medication: "",
     cost: "",
     medicineValidity: "",
@@ -595,6 +601,8 @@ const DispensePrescriptionModal = ({
     };
 
     const forPrescription = {
+      medicationId: form.medicationId,
+      medication: form.medication,
       refillsRemaining: parseInt(form.refillsRemaining),
       nextRefillDate: form.nextRefillDate,
       lastDispensedDate: form.lastDispensedDate,
@@ -1002,32 +1010,6 @@ const RefillModal = ({ prescription, onRefill }) => {
 
   if (!prescription) return null;
 
-  // Fetch medicineId whenever modal opens
-  useEffect(() => {
-    const fetchMedicineId = async () => {
-      try {
-        const rows = await db
-          .select({ id: Medicines.id })
-          .from(Medicines)
-          .where(eq(Medicines.name, prescription.medication));
-
-        if (rows.length > 0) {
-          setMedicineId(rows[0].id);
-        } else {
-          console.warn("No medicine found for", prescription.medication);
-          setMedicineId(null);
-        }
-      } catch (err) {
-        console.error("Error fetching medicine ID:", err);
-        setMedicineId(null);
-      }
-    };
-
-    if (open && prescription?.medication) {
-      fetchMedicineId();
-    }
-  }, [open, prescription]);
-
   // Reset fields when opening
   useEffect(() => {
     if (open) {
@@ -1039,19 +1021,28 @@ const RefillModal = ({ prescription, onRefill }) => {
   }, [open]);
 
   const handleSubmit = () => {
-    if (!medicineId) {
-      console.error("Cannot refill: medicineId not found.");
-      return;
-    }
 
-    onRefill(prescription.id, {
-      medicineId,
+    const status = lastCourse ? "completed" : "active";
+
+    console.log(prescription.id, {
+      medicattionId: prescription.medicationId,
       medication: prescription.medication,
       quantity,
-      nextRefillDate,
+      nextRefillDate: lastCourse ? null : nextRefillDate,
       notes,
       lastCourse,
+      status,
     });
+
+    // onRefill(prescription.id, {
+    //   medicineId,
+    //   medication: prescription.medication,
+    //   quantity,
+    //   nextRefillDate: lastCourse ? null : nextRefillDate,
+    //   notes,
+    //   lastCourse,
+    //   status,
+    // });
 
     setOpen(false);
   };
@@ -1094,7 +1085,7 @@ const RefillModal = ({ prescription, onRefill }) => {
               </p>
               <p className="text-dark-600 text-sm">
                 <span className="text-white">Patient:</span>{" "}
-                {prescription.patientName} ({prescription.patientId})
+                {prescription.patientName}
               </p>
               <p className="text-dark-600 text-sm">
                 <span className="text-white">Refills Left:</span>{" "}
@@ -1124,14 +1115,7 @@ const RefillModal = ({ prescription, onRefill }) => {
               type="date"
               value={nextRefillDate}
               onChange={(e) => setNextRefillDate(e.target.value)}
-            />
-
-            <FormInput
-              label="Notes"
-              type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional notes"
+              disabled={lastCourse}
             />
 
             {/* Checkbox for Last Course */}
@@ -1151,6 +1135,14 @@ const RefillModal = ({ prescription, onRefill }) => {
               </label>
             </div>
 
+            <FormInput
+              label="Notes"
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Optional notes"
+            />
+
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
               <Button
@@ -1162,7 +1154,7 @@ const RefillModal = ({ prescription, onRefill }) => {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!quantity || !medicineId}
+                disabled={!quantity}
                 className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
               >
                 Confirm Refill
@@ -1193,6 +1185,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     const rows = await db
       .select({
         id: Prescriptions.id,
+        medicationId: Prescriptions.medicationId,
         medication: Prescriptions.medication,
         dosage: Prescriptions.dosage,
         frequency: Prescriptions.frequency,
@@ -1202,6 +1195,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         cost: Prescriptions.cost,
         refills: Prescriptions.refillsRemaining,
         nextRefillDate: Prescriptions.nextRefillDate,
+        lastDispensedDate: Prescriptions.lastDispensedDate,
         prescribedDate: Prescriptions.createdAt,
         chiefComplaint: Consultations.chiefComplaint,
         historyOfPresentIllness: Consultations.historyOfPresentIllness,
@@ -1233,6 +1227,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       patientId: row.patientId,
       patientPhone: row.patientPhone,
       allergies: row.allergies,
+      medicationId: row.medicationId,
       medication: row.medication,
       dosage: row.dosage,
       frequency: row.frequency,
@@ -1248,6 +1243,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       instructions: row.instructions,
       refills: row.refills || 0,
       nextRefillDate: row.nextRefillDate,
+      lastDispensedDate: row.lastDispensedDate,
       cost: row.cost || 0,
       sideEffects: row.sideEffects || [],
       interactions: row.interactions || [],
@@ -1418,7 +1414,11 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         prescriptionData,
       });
 
-      const updatedPrescriptionData = { ...prescriptionData, status: "active" };
+      const updatedPrescriptionData = {
+        ...prescriptionData,
+        status: "active",
+        lastDispensedDate: getTodayIST(),
+      };
 
       const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
         method: "POST",
@@ -1779,7 +1779,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                 .filter(
                   (prescription) =>
                     prescription.status !== "discontinued" &&
-                    prescription.status !== "request-cancellation"
+                    prescription.status !== "request-cancellation" &&
+                    prescription.status !== "recommended"
                 )
                 .map((prescription) => (
                   <div
