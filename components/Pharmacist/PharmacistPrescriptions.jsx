@@ -1034,10 +1034,20 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
     });
 
     console.log("Refill Data: ", {
-      quantity,
+      quantity: parseInt(quantity),
       unitPrice: prescription.cost,
       pharmacistId,
       medication: prescription.medication,
+    });
+
+    console.log("Prescription ID: ", prescription.id);
+
+    console.log("Prescription Data: ", {
+      pharmacistNotes: notes,
+      refillsRemaining: prescription.refills - 1,
+      nextRefillDate: lastCourse ? null : nextRefillDate,
+      lastDispensedDate: getTodayIST(),
+      status,
     });
 
     // onRefill(prescription.id, {
@@ -1096,6 +1106,10 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
               <p className="text-dark-600 text-sm">
                 <span className="text-white">Refills Left:</span>{" "}
                 {prescription.refills ?? 0}
+              </p>
+              <p className="text-dark-600 text-sm">
+                <span className="text-white">Dispense Duration:</span>{" "}
+                {prescription.dispensedDuration}
               </p>
               <p className="text-dark-600 text-sm">
                 <span className="text-white">Last Dispensed:</span>{" "}
@@ -1201,6 +1215,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         cost: Prescriptions.cost,
         refills: Prescriptions.refillsRemaining,
         nextRefillDate: Prescriptions.nextRefillDate,
+        dispensedDuration: Prescriptions.dispensedDuration,
         lastDispensedDate: Prescriptions.lastDispensedDate,
         prescribedDate: Prescriptions.createdAt,
         chiefComplaint: Consultations.chiefComplaint,
@@ -1249,6 +1264,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       instructions: row.instructions,
       refills: row.refills || 0,
       nextRefillDate: row.nextRefillDate,
+      dispensedDuration: row.dispensedDuration,
       lastDispensedDate: row.lastDispensedDate,
       cost: row.cost || 0,
       sideEffects: row.sideEffects || [],
