@@ -1033,22 +1033,33 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
       status,
     });
 
-    console.log("Refill Data: ", {
+    const refillData = {
       quantity: parseInt(quantity),
       unitPrice: prescription.cost,
       pharmacistId,
       medication: prescription.medication,
-    });
+    };
 
-    console.log("Prescription ID: ", prescription.id);
-
-    console.log("Prescription Data: ", {
+    const prescriptionData = {
       pharmacistNotes: notes,
       refillsRemaining: prescription.refills - 1,
       nextRefillDate: lastCourse ? null : nextRefillDate,
       lastDispensedDate: getTodayIST(),
       status,
-    });
+    };
+
+    console.log("Refill Data: ", refillData);
+
+    console.log("Prescription ID: ", prescription.id);
+
+    console.log("Prescription Data: ", prescriptionData);
+
+    onRefill(
+      prescription.id,
+      refillData,
+      prescriptionData,
+      prescription.medicationId
+    );
 
     // onRefill(prescription.id, {
     //   medicineId,
@@ -1473,12 +1484,49 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleRefill = async (
-    id,
-    refillData,
-    prescriptionData,
-    medicineId
-  ) => {};
+  const handleRefill = async (id, refillData, prescriptionData, medicineId) => {
+    try {
+      const load = toast.loading(`Refilling ${refillData.medication}...`);
+
+      // Call Refill API route for Medicine Inventory
+      const res = await fetch(`/api/medicines/${medicineId}/refill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(refillData),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to refill medicine");
+      }
+
+      // Update Prescription Record
+      if (prescriptionData) {
+        await fetch(`/api/prescriptions/${id}/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(prescriptionData),
+        });
+      }
+
+      toast.dismiss(load);
+
+      refreshPrescriptions();
+
+      toast.success(`Medicine ${refillData.medication} refilled successfully!`);
+
+      setMessage(`Medicine ${refillData.medication} refilled successfully!`);
+      setMessageType("success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to refill medicine", error);
+    }
+  };
 
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);

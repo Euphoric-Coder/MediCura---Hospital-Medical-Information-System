@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { Medicines, InventoryLogs } from "@/lib/schema";
 import { db } from "@/lib/dbConfig";
 
-// POST /api/medicines/[id]/dispense
+// POST /api/medicines/[id]/refill
 export async function POST(req, { params }) {
   const { id } = params;
   const { quantity, unitPrice, pharmacistId, medication } = await req.json();
@@ -38,12 +38,12 @@ export async function POST(req, { params }) {
   await db.insert(InventoryLogs).values({
     medicineId: id,
     pharmacistId,
-    action: "dispense",
+    action: "refill",
     quantityChange: -quantity,
     prevQuantity: med.quantity,
     newQuantity: newQty,
     unitPrice,
-    notes: `Dispensed ${quantity} units of ${medication || "N/A"}`,
+    notes: `Refilled ${quantity} units of ${medication || "N/A"}`,
   });
 
   return NextResponse.json(updated);
