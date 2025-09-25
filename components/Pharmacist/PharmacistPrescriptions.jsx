@@ -532,7 +532,6 @@ const DispensePrescriptionModal = ({
   const [open, setOpen] = useState(false);
   const [medicines, setMedicines] = useState([]);
   const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
 
@@ -558,7 +557,6 @@ const DispensePrescriptionModal = ({
 
   const fetchMedicines = async () => {
     try {
-      setLoading(true);
       const res = await fetch("/api/medicines");
       if (!res.ok) throw new Error("Failed to fetch medicines");
       const data = await res.json();
@@ -566,8 +564,6 @@ const DispensePrescriptionModal = ({
     } catch (err) {
       console.error("Error fetching medicines:", err);
       toast.error("Unable to load medicines");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -592,28 +588,29 @@ const DispensePrescriptionModal = ({
     }
 
     const forDispense = {
-      quantity: form.quantity,
-      unitPrice: form.cost,
+      quantity: parseInt(form.quantity),
+      unitPrice: parseInt(form.cost),
       pharmacistId,
       medication: form.medication,
     };
 
     const forPrescription = {
-      refillsRemaining: form.refillsRemaining,
+      refillsRemaining: parseInt(form.refillsRemaining),
       nextRefillDate: form.nextRefillDate,
       lastDispensedDate: form.lastDispensedDate,
       dispensedDuration: form.dispensedDuration,
       medicineValidity: form.medicineValidity,
       sideEffects: form.sideEffects,
       interaction: form.interaction,
-      cost: form.cost,
+      cost: parseInt(form.cost),
       pharmacistNotes: notes,
     };
 
-    onAction(prescription.id, forDispense, forPrescription);
+    onAction(prescription.id, forDispense, forPrescription, form.medicationId);
 
     setNotes("");
     setForm({
+      medicationId: "",
       medication: "",
       cost: "",
       medicineValidity: "",
@@ -746,6 +743,7 @@ const DispensePrescriptionModal = ({
                         onClick={() => {
                           setForm((prev) => ({
                             ...prev,
+                            medicationId: m.id,
                             medication: m.name,
                             cost: m.unitPrice || "",
                             medicineValidity: m.expiryDate || "",
@@ -1216,6 +1214,62 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     }
   };
 
+  const handleDispenseMedicine = async (
+    id,
+    dispenseData,
+    prescriptionData,
+    medicineId
+  ) => {
+    try {
+      const load = toast.loading("Dispensing Medicine...");
+
+      console.log({
+        medicineId: medicineId,
+        pharmacistId: id,
+        dispenseData,
+        prescriptionData,
+      });
+
+      const updatedPrescriptionData = { ...prescriptionData, status: "active" };
+
+      const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dispenseData),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to dispense medicine");
+      }
+
+      if (prescriptionData) {
+        await db
+          .update(Prescriptions)
+          .set(updatedPrescriptionData)
+          .where(eq(Prescriptions.id, id));
+      }
+
+      toast.dismiss(load);
+
+      refreshPrescriptions();
+
+      toast.success(
+        `Medicine ${dispenseData.medication} dispensed successfully!`
+      );
+
+      setMessage(`Medicine ${dispenseData.medication} dispensed successfully!`);
+      setMessageType("success");
+
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+    } catch (error) {
+      toast.error("Failed to dispense medicine", error);
+    }
+  };
+
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);
     setShowDetailsModal(true);
@@ -1333,13 +1387,20 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         return (
           <DispensePrescriptionModal
             prescription={prescription}
-            onAction={(id, dispenseData, prescriptionData) => {
+            onAction={(id, dispenseData, prescriptionData, medicineId) => {
               console.log("Prescription Id: ", id);
               console.log(
                 "Dispense data:",
                 dispenseData,
                 "Prescription data:",
                 prescriptionData
+              );
+              console.log("Medicine Id:", medicineId);
+              handleDispenseMedicine(
+                id,
+                dispenseData,
+                prescriptionData,
+                medicineId
               );
             }}
             pharmacistId={pharmacistData.userId}
@@ -1591,7 +1652,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                             </div>
                             <div>
                               <span className="text-white">Cost:</span> $
-                              {prescription.cost.toFixed(2)}
+                              {prescription.cost}
                             </div>
                           </div>
 
