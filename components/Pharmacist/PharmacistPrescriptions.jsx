@@ -614,7 +614,14 @@ const DispensePrescriptionModal = ({
       pharmacistNotes: notes,
     };
 
-    onAction(prescription.id, forDispense, forPrescription, form.medicationId);
+    // Pass status along
+    onAction(
+      prescription.id,
+      forDispense,
+      forPrescription,
+      form.medicationId,
+      status
+    );
 
     setNotes("");
     setForm({
@@ -634,6 +641,7 @@ const DispensePrescriptionModal = ({
 
     handleClose();
   };
+
 
   const handleAddItem = (field, value) => {
     if (!value.trim()) return;
@@ -1006,7 +1014,6 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
   const [nextRefillDate, setNextRefillDate] = useState("");
   const [notes, setNotes] = useState("");
   const [lastCourse, setLastCourse] = useState(false);
-  const [medicineId, setMedicineId] = useState(null);
 
   if (!prescription) return null;
 
@@ -1488,26 +1495,32 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     try {
       const load = toast.loading(`Refilling ${refillData.medication}...`);
 
-      // Call Refill API route for Medicine Inventory
-      const res = await fetch(`/api/medicines/${medicineId}/refill`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(refillData),
-      });
+      console.log({
+        refillData,
+        prescriptionData,
+        medicineId,
+      })
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Failed to refill medicine");
-      }
+      // // Call Refill API route for Medicine Inventory
+      // const res = await fetch(`/api/medicines/${medicineId}/refill`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(refillData),
+      // });
 
-      // Update Prescription Record
-      if (prescriptionData) {
-        await fetch(`/api/prescriptions/${id}/update`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(prescriptionData),
-        });
-      }
+      // if (!res.ok) {
+      //   const error = await res.json();
+      //   throw new Error(error.error || "Failed to refill medicine");
+      // }
+
+      // // Update Prescription Record
+      // if (prescriptionData) {
+      //   await fetch(`/api/prescriptions/${id}/update`, {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(prescriptionData),
+      //   });
+      // }
 
       toast.dismiss(load);
 
@@ -1645,21 +1658,29 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         return (
           <DispensePrescriptionModal
             prescription={prescription}
-            onAction={(id, dispenseData, prescriptionData, medicineId) => {
-              console.log("Prescription Id: ", id);
-              console.log(
-                "Dispense data:",
-                dispenseData,
-                "Prescription data:",
-                prescriptionData
-              );
-              console.log("Medicine Id:", medicineId);
-              handleDispenseMedicine(
-                id,
-                dispenseData,
-                prescriptionData,
-                medicineId
-              );
+            onAction={(
+              id,
+              dispenseData,
+              prescriptionData,
+              medicineId,
+              status
+            ) => {
+              if (status === "pending") {
+                // 🔹 Just update status to pending
+                handleUpdateStatus(
+                  id,
+                  "pending",
+                  prescriptionData.pharmacistNotes
+                );
+              } else {
+                // 🔹 Normal dispense flow
+                handleDispenseMedicine(
+                  id,
+                  dispenseData,
+                  prescriptionData,
+                  medicineId
+                );
+              }
             }}
             pharmacistId={pharmacistData.userId}
           />
