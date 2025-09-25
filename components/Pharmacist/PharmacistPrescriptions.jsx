@@ -1016,6 +1016,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         instructions: Prescriptions.instructions,
         cost: Prescriptions.cost,
         refills: Prescriptions.refillsRemaining,
+        nextRefillDate: Prescriptions.nextRefillDate,
         prescribedDate: Prescriptions.createdAt,
         chiefComplaint: Consultations.chiefComplaint,
         historyOfPresentIllness: Consultations.historyOfPresentIllness,
@@ -1061,11 +1062,11 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       followUpInstructions: row.followUpInstructions,
       instructions: row.instructions,
       refills: row.refills || 0,
+      nextRefillDate: row.nextRefillDate,
       cost: row.cost || 0,
       sideEffects: row.sideEffects || [],
       interactions: row.interactions || [],
       pharmacistNotes: row.pharmacistNotes,
-      reason: "", // can hydrate from Consultation.assessment or plan
     }));
 
     setPrescriptions(data);
@@ -1482,7 +1483,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
             <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-4 lg:p-6">
               <div className="flex items-center gap-3 lg:gap-4">
                 <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -1530,22 +1531,6 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                 </div>
               </div>
             </div>
-
-            <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 backdrop-blur-sm border border-red-500/20 rounded-2xl p-4 lg:p-6">
-              <div className="flex items-center gap-3 lg:gap-4">
-                <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <AlertTriangle className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
-                </div>
-                <div>
-                  <div className="text-20-bold lg:text-32-bold text-white">
-                    {urgentCount}
-                  </div>
-                  <div className="text-10-regular lg:text-14-regular text-red-400">
-                    Urgent
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Filters */}
@@ -1573,7 +1558,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                   "ordered",
                   "pending",
                   "verified",
-                  "dispensed",
+                  "completed",
                 ].map((status) => (
                   <button
                     key={status}
@@ -1634,8 +1619,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
                             <div>
                               <span className="text-white">Patient:</span>{" "}
-                              {prescription.patientName} (
-                              {prescription.patientId})
+                              {prescription.patientName}
                             </div>
                             <div>
                               <span className="text-white">Dosage:</span>{" "}
@@ -1644,18 +1628,44 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           </div>
 
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-12-regular lg:text-14-regular text-dark-700">
-                            <div>
-                              <span className="text-white">Prescribed by:</span>{" "}
-                              {prescription.prescribedBy}
-                            </div>
-                            <div>
-                              <span className="text-white">Date:</span>{" "}
-                              {prescription.prescribedDate}
-                            </div>
-                            <div>
-                              <span className="text-white">Cost:</span> $
-                              {prescription.cost}
-                            </div>
+                            {prescription.status === "active" ? (
+                              <>
+                                <div>
+                                  <span className="text-white">
+                                    Next Refill:
+                                  </span>{" "}
+                                  {prescription.nextRefillDate ||
+                                    "Not scheduled"}
+                                </div>
+                                <div>
+                                  <span className="text-white">
+                                    Refills Left:
+                                  </span>{" "}
+                                  {prescription.refills ?? 0}
+                                </div>
+                                <div>
+                                  <span className="text-white">Cost:</span> $
+                                  {prescription.cost}
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div>
+                                  <span className="text-white">
+                                    Prescribed by:
+                                  </span>{" "}
+                                  {prescription.prescribedBy}
+                                </div>
+                                <div>
+                                  <span className="text-white">Date:</span>{" "}
+                                  {prescription.prescribedDate}
+                                </div>
+                                <div>
+                                  <span className="text-white">Duration:</span>{" "}
+                                  {prescription.duration || "N/A"}
+                                </div>
+                              </>
+                            )}
                           </div>
 
                           <div className="bg-dark-500/30 rounded-lg px-3 py-2">
