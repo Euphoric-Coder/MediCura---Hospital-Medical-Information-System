@@ -680,33 +680,6 @@ const PatientConsultation = ({ onBack, patientData }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
-        {/* Search and Filter */}
-        <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-dark-600 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search medicines or doctors..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-3xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
-              />
-            </div>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="discontinued">Discontinued</option>
-              <option value="pending">Pending</option>
-            </select>
-          </div>
-        </div>
-
         <div className="flex justify-end mb-4">
           <Button
             onClick={() => refreshPrescriptions(patientData.userId)}
@@ -878,6 +851,33 @@ const PatientConsultation = ({ onBack, patientData }) => {
                       {format(consultation.followUpDate, "PPP")}
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Search and Filter */}
+              <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-dark-600 w-5 h-5" />
+                    <input
+                      type="text"
+                      placeholder="Search medicines or doctors..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-3xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
+                    />
+                  </div>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="px-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                    <option value="discontinued">Discontinued</option>
+                    <option value="pending">Pending</option>
+                  </select>
                 </div>
               </div>
 

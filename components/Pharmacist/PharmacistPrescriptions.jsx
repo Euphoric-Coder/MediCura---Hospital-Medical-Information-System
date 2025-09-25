@@ -42,13 +42,12 @@ const PrescriptionDetailsModal = ({
   onUpdateStatus,
   onDownloadPDF,
 }) => {
-  const [notes, setNotes] = useState("");
+  // const [notes, setNotes] = useState("");
 
   if (!isOpen || !prescription) return null;
 
   const handleStatusUpdate = (status) => {
-    onUpdateStatus(prescription.id, status, notes);
-    setNotes("");
+    onUpdateStatus(prescription.id, status);
     onClose();
   };
 
@@ -248,8 +247,7 @@ const PrescriptionDetailsModal = ({
               Pharmacist Notes
             </h4>
             <textarea
-              value={notes || "NA"}
-              onChange={(e) => setNotes(e.target.value)}
+              value={prescription.pharmacistNotes || "NA"}
               placeholder="Add any notes about this prescription..."
               className="p-2 rounded-3xl shad-textArea w-full text-white min-h-[100px] resize-none disabled:cursor-not-allowed disabled:opacity-50"
               disabled
@@ -1024,6 +1022,9 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         physicalExamination: Consultations.physicalExamination,
         assessment: Consultations.assessment,
         followUpInstructions: Consultations.followUpInstructions,
+        sideEffects: Prescriptions.sideEffects,
+        interactions: Prescriptions.interaction,
+        pharmacistNotes: Prescriptions.pharmacistNotes,
 
         patientId: Patients.userId,
         patientName: Patients.name,
@@ -1061,8 +1062,9 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       instructions: row.instructions,
       refills: row.refills || 0,
       cost: row.cost || 0,
-      sideEffects: [], // can hydrate from JSON if available
-      interactions: [],
+      sideEffects: row.sideEffects || [],
+      interactions: row.interactions || [],
+      pharmacistNotes: row.pharmacistNotes,
       reason: "", // can hydrate from Consultation.assessment or plan
     }));
 
