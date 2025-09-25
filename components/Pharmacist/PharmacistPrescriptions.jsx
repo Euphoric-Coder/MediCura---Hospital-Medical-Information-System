@@ -1000,7 +1000,7 @@ const DispensePrescriptionModal = ({
   );
 };
 
-const RefillModal = ({ prescription, onRefill }) => {
+const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState("");
   const [nextRefillDate, setNextRefillDate] = useState("");
@@ -1021,7 +1021,6 @@ const RefillModal = ({ prescription, onRefill }) => {
   }, [open]);
 
   const handleSubmit = () => {
-
     const status = lastCourse ? "completed" : "active";
 
     console.log(prescription.id, {
@@ -1029,9 +1028,16 @@ const RefillModal = ({ prescription, onRefill }) => {
       medication: prescription.medication,
       quantity,
       nextRefillDate: lastCourse ? null : nextRefillDate,
-      notes,
+      pharmacistNotes: notes,
       lastCourse,
       status,
+    });
+
+    console.log("Refill Data: ", {
+      quantity,
+      unitPrice: prescription.cost,
+      pharmacistId,
+      medication: prescription.medication,
     });
 
     // onRefill(prescription.id, {
@@ -1405,14 +1411,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     medicineId
   ) => {
     try {
-      const load = toast.loading("Dispensing Medicine...");
-
-      console.log({
-        medicineId: medicineId,
-        pharmacistId: id,
-        dispenseData,
-        prescriptionData,
-      });
+      const load = toast.loading(`Dispensing ${dispenseData.medication}...`);
 
       const updatedPrescriptionData = {
         ...prescriptionData,
@@ -1458,7 +1457,12 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleRefill = async () => {};
+  const handleRefill = async (
+    id,
+    refillData,
+    prescriptionData,
+    medicineId
+  ) => {};
 
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);
@@ -1876,12 +1880,14 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           <button className="flex gap-1 items-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
                             <Phone className="w-4 h-4" /> Phone
                           </button>
-                          {prescription.nextRefillDate === getTodayIST() && (
-                            <RefillModal
-                              prescription={prescription}
-                              onRefill={handleRefill}
-                            />
-                          )}
+                          {prescription.nextRefillDate === getTodayIST() &&
+                            prescription.refills > 0 && (
+                              <RefillModal
+                                prescription={prescription}
+                                onRefill={handleRefill}
+                                pharmacistId={pharmacistData.userId}
+                              />
+                            )}
                         </div>
                         {getActionButtons(prescription)}
                       </div>
