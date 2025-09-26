@@ -537,6 +537,7 @@ const DispensePrescriptionModal = ({
   prescription,
   onAction,
   pharmacistId,
+  pending = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [medicines, setMedicines] = useState([]);
@@ -985,29 +986,33 @@ const DispensePrescriptionModal = ({
             </div>
           )}
 
-          <div className="mb-4 flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="pending"
-              checked={pendingMedicine}
-              onChange={() => setPendingMedicine(!pendingMedicine)}
-              className="w-4 h-4 accent-green-500 cursor-pointer"
-            />
-            <label
-              htmlFor="firstTime"
-              className="text-sm text-white cursor-pointer"
-            >
-              Out of Stock / Other
-            </label>
-          </div>
+          {!pending && (
+            <div className="mb-4 flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="pending"
+                checked={pendingMedicine}
+                onChange={() => setPendingMedicine(!pendingMedicine)}
+                className="w-4 h-4 accent-green-500 cursor-pointer"
+              />
+              <label
+                htmlFor="firstTime"
+                className="text-sm text-white cursor-pointer"
+              >
+                Out of Stock / Other
+              </label>
+            </div>
+          )}
 
           {/* Pharmacist Notes */}
           <div>
             <label className="text-white text-sm mb-2 block">
               Pharmacist Notes{" "}
-              <span className="text-green-400">
-                (Optional for Dispense, Required for Pending)
-              </span>
+              {!pending && (
+                <span className="text-green-400">
+                  (Optional for Dispense, Required for Pending)
+                </span>
+              )}
             </label>
             <Textarea
               value={notes}
@@ -1028,13 +1033,15 @@ const DispensePrescriptionModal = ({
           >
             Cancel
           </DialogClose>
-          <Button
-            onClick={(e) => handleAction(e, "pending")}
-            disabled={!notes.trim()}
-            className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Mark Pending
-          </Button>
+          {!pending && (
+            <Button
+              onClick={(e) => handleAction(e, "pending")}
+              disabled={!notes.trim()}
+              className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Mark Pending
+            </Button>
+          )}
           <Button
             onClick={(e) => handleAction(e, "dispensed")}
             className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-3xl"
@@ -1047,7 +1054,13 @@ const DispensePrescriptionModal = ({
   );
 };
 
-const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
+const RefillModal = ({
+  prescription,
+  onRefill,
+  pharmacistId,
+  onPending,
+  pending = false,
+}) => {
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState("");
   const [nextRefillDate, setNextRefillDate] = useState("");
@@ -1156,21 +1169,23 @@ const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="lastCourse"
-                checked={pendingMedicine}
-                onChange={() => setPendingMedicine(!pendingMedicine)}
-                className="w-4 h-4 accent-green-500 cursor-pointer"
-              />
-              <label
-                htmlFor="lastCourse"
-                className="text-sm text-white cursor-pointer"
-              >
-                Medicine Out of Stock / Other
-              </label>
-            </div>
+            {!pending && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="lastCourse"
+                  checked={pendingMedicine}
+                  onChange={() => setPendingMedicine(!pendingMedicine)}
+                  className="w-4 h-4 accent-green-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="lastCourse"
+                  className="text-sm text-white cursor-pointer"
+                >
+                  Medicine Out of Stock / Other
+                </label>
+              </div>
+            )}
 
             {!pendingMedicine && (
               <div>
@@ -1214,9 +1229,11 @@ const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
             <div>
               <label className="text-white text-sm mb-2 block">
                 Pharmacist Notes{" "}
-                <span className="text-green-400">
-                  (Optional for Dispense, Required for Pending)
-                </span>
+                {!pending && (
+                  <span className="text-green-400">
+                    (Optional for Dispense, Required for Pending)
+                  </span>
+                )}
               </label>
               <Textarea
                 value={notes}
@@ -1236,16 +1253,18 @@ const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
               >
                 Cancel
               </Button>
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  onPending(prescription.id, notes);
-                }}
-                disabled={!notes.trim()}
-                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Mark Pending
-              </Button>
+              {!pending && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onPending(prescription.id, notes);
+                  }}
+                  disabled={!notes.trim()}
+                  className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Mark Pending
+                </Button>
+              )}
               <Button
                 onClick={handleSubmit}
                 disabled={!quantity}
@@ -1867,6 +1886,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                 onPending={(id, notes) => {
                   handleUpdateStatus(id, "pending", notes);
                 }}
+                pending
               />
             ) : (
               <DispensePrescriptionModal
@@ -1897,6 +1917,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                   }
                 }}
                 pharmacistId={pharmacistData.userId}
+                pending
               />
             )}
           </>
