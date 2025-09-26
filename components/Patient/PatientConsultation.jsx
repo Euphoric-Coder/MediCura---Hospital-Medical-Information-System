@@ -18,6 +18,7 @@ import {
   AlarmClock,
   CircleX,
   AlertCircle,
+  Circle,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import {
@@ -210,7 +211,8 @@ const getStatusColor = (status) => {
     case "completed":
       return "bg-gray-500/20 text-gray-400 border-gray-500/30";
 
-    case "discontinued-doctor" || "discontinued-pharmacist":
+    case "discontinued-doctor":
+    case "discontinued-pharmacist":
       return "bg-red-500/20 text-red-400 border-red-500/30";
 
     case "pending":
@@ -220,13 +222,16 @@ const getStatusColor = (status) => {
       return "bg-blue-500/20 text-blue-400 border-blue-500/30";
 
     case "verified":
-      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30";
 
     case "recommended":
       return "bg-purple-500/20 text-purple-400 border-purple-500/30";
 
     case "request-cancellation":
       return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+
+    case "request-refill":
+      return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
 
     default:
       return "bg-gray-500/20 text-gray-400 border-gray-500/30";
@@ -238,7 +243,7 @@ const getStatusIcon = (status) => {
     case "active":
       return (
         <p className="flex items-center gap-2">
-          <CheckCircle className="w-4 h-4" />
+          <CheckCircle className="w-4 h-4 animate-pulse text-green-400" />
           Active
         </p>
       );
@@ -246,23 +251,24 @@ const getStatusIcon = (status) => {
     case "completed":
       return (
         <p className="flex items-center gap-2">
-          <CheckCircle className="w-4 h-4" />
+          <CheckCircle className="w-4 h-4 text-gray-400" />
           Course Completed
         </p>
       );
 
     case "discontinued-doctor":
+    case "discontinued-pharmacist":
       return (
         <p className="flex items-center gap-2">
-          <X className="w-4 h-4" />
-          Discontinued By Doctor
+          <CircleX className="w-4 h-4 text-red-400 animate-pulse" />
+          Discontinued
         </p>
       );
 
     case "advised-discontinued":
       return (
         <p className="flex items-center gap-2">
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 text-orange-400 animate-pulse" />
           Advised Discontinued
         </p>
       );
@@ -270,7 +276,7 @@ const getStatusIcon = (status) => {
     case "pending":
       return (
         <p className="flex items-center gap-2">
-          <Clock className="w-4 h-4" />
+          <Clock className="w-4 h-4 text-yellow-400 animate-ping" />
           Yet to be Dispensed By Pharmacist
         </p>
       );
@@ -278,7 +284,7 @@ const getStatusIcon = (status) => {
     case "verified":
       return (
         <p className="flex items-center gap-2">
-          <CheckCircle className="w-4 h-4" />
+          <CheckCircle className="w-4 h-4 text-indigo-400 animate-bounce" />
           Verified By Pharmacist - Pending Dispense
         </p>
       );
@@ -286,7 +292,7 @@ const getStatusIcon = (status) => {
     case "ordered":
       return (
         <p className="flex items-center gap-2">
-          <AlarmClock className="w-4 h-4" />
+          <AlarmClock className="w-4 h-4 text-blue-400 animate-bounce" />
           Ordered: Pending Approval
         </p>
       );
@@ -294,7 +300,7 @@ const getStatusIcon = (status) => {
     case "recommended":
       return (
         <p className="flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4" />
+          <AlertTriangle className="w-4 h-4 text-purple-400 animate-pulse" />
           Recommended By Doctor
         </p>
       );
@@ -302,7 +308,7 @@ const getStatusIcon = (status) => {
     case "request-cancellation":
       return (
         <p className="flex items-center gap-2">
-          <AlertCircle className="w-4 h-4" />
+          <AlertCircle className="w-4 h-4 text-orange-400 animate-pulse" />
           Requested Cancellation To Doctor
         </p>
       );
@@ -318,12 +324,13 @@ const getStatusIcon = (status) => {
     default:
       return (
         <p className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-gray-400" />
+          <Clock className="w-4 h-4 text-gray-400 animate-pulse" />
           Processing
         </p>
       );
   }
 };
+
 
 const PatientConsultation = ({ onBack, patientData }) => {
   const [searchTerm, setSearchTerm] = useState("");

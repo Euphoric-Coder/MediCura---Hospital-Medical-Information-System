@@ -1709,7 +1709,6 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     }
   };
 
-
   const getActionButtons = (prescription) => {
     switch (prescription.status) {
       case "ordered":
@@ -2038,8 +2037,9 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           <button className="flex gap-1 items-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
                             <Phone className="w-4 h-4" /> Phone
                           </button>
-                          {prescription.nextRefillDate === getTodayIST() &&
-                            prescription.refills > 0 && (
+                          {prescription.refills > 0 &&
+                            new Date(prescription.nextRefillDate) <=
+                              new Date(getTodayIST()) && (
                               <RefillModal
                                 prescription={prescription}
                                 onRefill={handleRefill}
