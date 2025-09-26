@@ -1508,23 +1508,27 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
         lastDispensedDate: getTodayIST(),
       };
 
-      const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dispenseData),
-      });
+      console.log("Prescription Data: ", updatedPrescriptionData);
+      console.log("Dispense Data: ", dispenseData);
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Failed to dispense medicine");
-      }
+      // const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(dispenseData),
+      // });
 
-      if (prescriptionData) {
-        await db
-          .update(Prescriptions)
-          .set(updatedPrescriptionData)
-          .where(eq(Prescriptions.id, id));
-      }
+      // if (!res.ok) {
+      //   const error = await res.json();
+      //   throw new Error(error.error || "Failed to dispense medicine");
+      // }
+
+      // if (prescriptionData) {
+      //   await fetch(`/api/prescriptions/${id}/update`, {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(updatedPrescriptionData),
+      //   });
+      // }
 
       toast.dismiss(load);
 
@@ -1550,26 +1554,29 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     try {
       const load = toast.loading(`Refilling ${refillData.medication}...`);
 
-      // Call Refill API route for Medicine Inventory
-      const res = await fetch(`/api/medicines/${medicineId}/refill`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(refillData),
-      });
+      console.log("Refill Data: ", refillData);
+      console.log("Prescription Data: ", prescriptionData);
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Failed to refill medicine");
-      }
+      // // Call Refill API route for Medicine Inventory
+      // const res = await fetch(`/api/medicines/${medicineId}/refill`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(refillData),
+      // });
 
-      // Update Prescription Record
-      if (prescriptionData) {
-        await fetch(`/api/prescriptions/${id}/update`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(prescriptionData),
-        });
-      }
+      // if (!res.ok) {
+      //   const error = await res.json();
+      //   throw new Error(error.error || "Failed to refill medicine");
+      // }
+
+      // // Update Prescription Record
+      // if (prescriptionData) {
+      //   await fetch(`/api/prescriptions/${id}/update`, {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(prescriptionData),
+      //   });
+      // }
 
       toast.dismiss(load);
 

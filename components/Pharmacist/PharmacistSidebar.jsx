@@ -51,24 +51,24 @@ const PharmacistSidebar = ({
       icon: Receipt,
       description: "Generate Patient Bills",
     },
-    {
-      id: "patients",
-      label: "Patients",
-      icon: Users,
-      description: "Patient Medication History",
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: BarChart3,
-      description: "Sales & Inventory Reports",
-    },
-    {
-      id: "drug-interactions",
-      label: "Drug Interactions",
-      icon: AlertTriangle,
-      description: "Check Drug Interactions",
-    },
+    // {
+    //   id: "patients",
+    //   label: "Patients",
+    //   icon: Users,
+    //   description: "Patient Medication History",
+    // },
+    // {
+    //   id: "reports",
+    //   label: "Reports",
+    //   icon: BarChart3,
+    //   description: "Sales & Inventory Reports",
+    // },
+    // {
+    //   id: "drug-interactions",
+    //   label: "Drug Interactions",
+    //   icon: AlertTriangle,
+    //   description: "Check Drug Interactions",
+    // },
   ];
 
   const quickActions = [
@@ -225,7 +225,7 @@ const PharmacistSidebar = ({
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8 space-y-2">
+          {/* <div className="mt-8 space-y-2">
             <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">
               Quick Actions
             </div>
@@ -251,7 +251,7 @@ const PharmacistSidebar = ({
                 </div>
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Footer Actions */}

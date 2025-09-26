@@ -235,6 +235,47 @@ export const LabTests = pgTable("lab_tests", {
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
+export const Billings = pgTable("billings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  // Relations
+  patientId: uuid("patientId")
+    .notNull()
+    .references(() => Patients.userId, { onDelete: "cascade" }),
+  doctorId: uuid("doctorId").references(() => Doctors.userId, {
+    onDelete: "set null",
+  }),
+
+  // Billing type (consultation, prescription/medicine, lab test etc.)
+  category: varchar("category", { length: 50 }).notNull(),
+  // e.g., "consultation", "prescription", "lab"
+
+  // Link to specific item if available
+  consultationId: uuid("consultationId").references(() => Consultations.id, {
+    onDelete: "set null",
+  }),
+  prescriptionId: uuid("prescriptionId").references(() => Prescriptions.id, {
+    onDelete: "set null",
+  }),
+  labTestId: uuid("labTestId"), // placeholder for future Lab schema
+
+  // Financials
+  itemName: varchar("itemName").notNull(), // e.g., "General Consultation", "Cetirizine 10mg"
+  quantity: numeric("quantity").default("1"),
+  unitPrice: numeric("unitPrice").notNull(),
+  totalPrice: numeric("totalPrice").notNull(),
+
+  // Payment info
+  paymentStatus: varchar("paymentStatus", { length: 50 }).default("unpaid"), // unpaid, paid, pending, refunded
+
+  paymentMethod: varchar("paymentMethod", { length: 50 }), // cash, card, insurance, UPI, etc.
+
+  // Metadata
+  notes: varchar("notes"),
+  breakdown: jsonb("breakdown").default({}), // e.g. { tax: 20, discount: 10 }
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
 // Pharmacist Table
 export const Pharmacists = pgTable("pharmacists", {
   userId: uuid("userId")
