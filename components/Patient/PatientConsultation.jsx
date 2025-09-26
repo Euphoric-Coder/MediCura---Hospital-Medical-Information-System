@@ -30,6 +30,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/dbConfig";
 import { format, set } from "date-fns";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 const PrescriptionDetailsModal = ({
   isOpen,
@@ -415,6 +416,13 @@ const PatientConsultation = ({ onBack, patientData }) => {
             sideEffects: p.sideEffects ?? [],
             billGenerated: p.billGenerated,
             cost: p.cost ?? 0,
+            pharmacistNotes: p.pharmacistNotes,
+            dispensedDuration: p.dispensedDuration,
+            nextRefillDate: p.nextRefillDate,
+            lastDispensedDate: p.lastDispensedDate,
+            refillsRemaining: p.refillsRemaining,
+            medicineValidity: p.medicineValidity,
+            interaction: p.interaction ?? [],
             consultationId: p.consultationId,
             appointmentDate: c.appointmentDate ? c.appointmentDate : null,
             reason: c.reason,
@@ -430,8 +438,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
     }
   };
 
-  const orderMedicine = async (id) => {
+  const orderMedicine = async (id, name) => {
     try {
+      const load = toast.loading(`Ordering ${name}...`);
       const updateStatus = await db
         .update(Prescriptions)
         .set({
@@ -441,13 +450,17 @@ const PatientConsultation = ({ onBack, patientData }) => {
         .where(eq(Prescriptions.id, id));
 
       refreshPrescriptions();
+
+      toast.dismiss(load);
+      toast.success(`${name} ordered successfully`);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const requestCancellation = async (id) => {
+  const requestCancellation = async (id, name) => {
     try {
+      const load = toast.loading(`Requesting cancellation for ${name}...`);
       const updateStatus = await db
         .update(Prescriptions)
         .set({
@@ -457,6 +470,9 @@ const PatientConsultation = ({ onBack, patientData }) => {
         .where(eq(Prescriptions.id, id));
 
       refreshPrescriptions();
+
+      toast.dismiss(load);
+      toast.success(`Cancellation request sent for ${name}`);
     } catch (error) {
       console.log(error);
     }
@@ -929,6 +945,73 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 {getStatusIcon(prescription.status)}
                               </span>
                             </div>
+                            {/* Extra details based on Active Status */}
+                            {prescription.status === "active" && (
+                              <div className="mt-4 bg-gradient-to-r from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-2xl p-4 lg:p-6">
+                                <h4 className="text-14-semibold lg:text-16-semibold text-purple-400 mb-4">
+                                  Prescription Details
+                                </h4>
+
+                                {/* Grid Layout */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-12-regular lg:text-14-regular text-dark-600">
+                                  <div className="flex flex-col">
+                                    <span className="text-white">Cost</span>
+                                    <span className="text-purple-300">
+                                      ₹{prescription.cost || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-white">
+                                      Dispensed Duration
+                                    </span>
+                                    <span className="text-purple-300">
+                                      {prescription.dispensedDuration || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-white">
+                                      Next Refill Date
+                                    </span>
+                                    <span className="text-purple-300">
+                                      {prescription.nextRefillDate || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-white">
+                                      Last Dispensed
+                                    </span>
+                                    <span className="text-purple-300">
+                                      {prescription.lastDispensedDate || "N/A"}
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-white">
+                                      Refills Remaining
+                                    </span>
+                                    <span
+                                      className={`${
+                                        prescription.refillsRemaining === 0
+                                          ? "text-red-400 font-semibold"
+                                          : "text-purple-300"
+                                      }`}
+                                    >
+                                      {prescription.refillsRemaining ?? 0}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {prescription.status === "pending" && (
+                              <div className="mt-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-12-regular lg:text-14-regular text-yellow-400">
+                                <p>
+                                  <span className="font-medium">
+                                    Pending Reason:
+                                  </span>{" "}
+                                  {prescription.pharmacistNotes ||
+                                    "No reason provided"}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -942,7 +1025,12 @@ const PatientConsultation = ({ onBack, patientData }) => {
                           {prescription.status === "recommended" && (
                             <div className="flex items-center gap-2">
                               <Button
-                                onClick={() => orderMedicine(prescription.id)}
+                                onClick={() =>
+                                  orderMedicine(
+                                    prescription.id,
+                                    prescription.medication
+                                  )
+                                }
                                 className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-lg shadow-md transition-all duration-300"
                               >
                                 <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />

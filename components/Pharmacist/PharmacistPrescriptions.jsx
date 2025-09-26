@@ -1757,7 +1757,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     (p) => p.status === "verified"
   ).length;
   const dispensedCount = prescriptions.filter(
-    (p) => p.status === "dispensed"
+    (p) => p.status === "active" || p.status === "completed"
   ).length;
   const urgentCount = prescriptions.filter(
     (p) => p.priority === "urgent" && p.status === "pending"
