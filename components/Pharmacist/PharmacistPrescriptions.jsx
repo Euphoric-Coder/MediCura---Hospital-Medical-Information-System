@@ -1090,7 +1090,8 @@ const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
       prescription.id,
       refillData,
       prescriptionData,
-      prescription.medicationId
+      prescription.medicationId,
+      prescription
     );
 
     setOpen(false);
@@ -1278,6 +1279,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     const rows = await db
       .select({
         id: Prescriptions.id,
+        consultationId: Prescriptions.consultationId,
         medicationId: Prescriptions.medicationId,
         medication: Prescriptions.medication,
         dosage: Prescriptions.dosage,
@@ -1317,6 +1319,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
 
     const data = rows.map((row) => ({
       id: row.id,
+      consultationId: row.consultationId,
       patientName: row.patientName,
       patientId: row.patientId,
       patientPhone: row.patientPhone,
@@ -1497,7 +1500,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     id,
     dispenseData,
     prescriptionData,
-    medicineId
+    medicineId,
+    prescription
   ) => {
     try {
       const load = toast.loading(`Dispensing ${dispenseData.medication}...`);
@@ -1530,6 +1534,39 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       //   });
       // }
 
+      const quantity = dispenseData.quantity ?? 1;
+      const baseAmount = (dispenseData.unitPrice ?? 0) * quantity;
+
+      // Applied 10% discount on medicines
+      const discountPercent = 20;
+      const discount = (baseAmount * discountPercent) / 100;
+
+      // GST: 5% (common for medicines), can adjust by type
+      const gstRate = 5;
+      const taxAmount = ((baseAmount - discount) * gstRate) / 100;
+
+      const totalPrice = baseAmount - discount + taxAmount;
+
+      console.log("Billing Data:", {
+        patientId: prescription.patientId,
+        consultationId: prescription.consultationId,
+        prescriptionId: prescription.id,
+        category: "prescription",
+        itemName: dispenseData.medication,
+        quantity: quantity,
+        unitPrice: dispenseData.unitPrice ?? 0,
+        baseAmount: baseAmount,
+        totalPrice: totalPrice,
+        breakdown: {
+          discountPercent: 20,
+          discountAmount: discount,
+          taxRate: 5,
+          taxAmount: taxAmount,
+        },
+        paymentStatus: "pending",
+        notes: `Dispensed the medicine ${dispenseData.medication} for patient ${prescription.patientName}`,
+      });
+
       toast.dismiss(load);
 
       refreshPrescriptions();
@@ -1550,7 +1587,13 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     }
   };
 
-  const handleRefill = async (id, refillData, prescriptionData, medicineId) => {
+  const handleRefill = async (
+    id,
+    refillData,
+    prescriptionData,
+    medicineId,
+    prescription
+  ) => {
     try {
       const load = toast.loading(`Refilling ${refillData.medication}...`);
 
@@ -1577,6 +1620,53 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       //     body: JSON.stringify(prescriptionData),
       //   });
       // }
+
+      // await db.insert(Billings).values({
+      //   patientId: prescription.patientId,
+      //   consultationId: prescription.consultationId,
+      //   prescriptionId: prescription.id,
+      //   category: "prescription",
+      //   itemName: prescription.medication,
+      //   quantity: 1,
+      //   unitPrice: prescription.cost ?? 0,
+      //   totalPrice: prescription.cost ?? 0,
+      //   paymentStatus: "pending",
+      //   paymentMethod: null,
+      //   notes: `Refilled medicine ${refillData.medication} for patient ${prescription.patientName}`,
+      // });
+
+      const quantity = refillData.quantity ?? 1;
+      const baseAmount = (parseFloat(refillData.unitPrice) ?? 0) * quantity;
+
+      // Applied 20% discount on medicines
+      const discountPercent = 20;
+      const discount = (baseAmount * discountPercent) / 100;
+
+      // GST: 5% (common for medicines), can adjust by type
+      const gstRate = 5;
+      const taxAmount = ((baseAmount - discount) * gstRate) / 100;
+
+      const totalPrice = baseAmount - discount + taxAmount;
+
+      console.log("Billing Data:", {
+        patientId: prescription.patientId,
+        consultationId: prescription.consultationId,
+        prescriptionId: prescription.id,
+        category: "prescription",
+        itemName: refillData.medication,
+        quantity: quantity,
+        unitPrice: parseFloat(refillData.unitPrice) ?? 0,
+        baseAmount: baseAmount,
+        totalPrice: totalPrice,
+        breakdown: {
+          discountPercent: 20,
+          discountAmount: discount,
+          taxRate: 5,
+          taxAmount: taxAmount,
+        },
+        paymentStatus: "pending",
+        notes: `Dispensed the medicine ${refillData.medication} for patient ${prescription.patientName}`,
+      });
 
       toast.dismiss(load);
 
@@ -1757,7 +1847,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                   id,
                   dispenseData,
                   prescriptionData,
-                  medicineId
+                  medicineId,
+                  prescription
                 );
               }
             }}

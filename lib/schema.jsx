@@ -242,12 +242,13 @@ export const Billings = pgTable("billings", {
   patientId: uuid("patientId")
     .notNull()
     .references(() => Patients.userId, { onDelete: "cascade" }),
+
   doctorId: uuid("doctorId").references(() => Doctors.userId, {
     onDelete: "set null",
   }),
 
   // Billing type (consultation, prescription/medicine, lab test etc.)
-  category: varchar("category", { length: 50 }).notNull(),
+  category: varchar("category").notNull(),
   // e.g., "consultation", "prescription", "lab"
 
   // Link to specific item if available
@@ -263,12 +264,13 @@ export const Billings = pgTable("billings", {
   itemName: varchar("itemName").notNull(), // e.g., "General Consultation", "Cetirizine 10mg"
   quantity: numeric("quantity").default("1"),
   unitPrice: numeric("unitPrice").notNull(),
+  baseAmount: numeric("baseAmount").notNull(),
   totalPrice: numeric("totalPrice").notNull(),
 
   // Payment info
-  paymentStatus: varchar("paymentStatus", { length: 50 }).default("unpaid"), // unpaid, paid, pending, refunded
+  paymentStatus: varchar("paymentStatus").default("pending"), // paid, pending, refunded
 
-  paymentMethod: varchar("paymentMethod", { length: 50 }), // cash, card, insurance, UPI, etc.
+  paymentMethod: varchar("paymentMethod"), // cash, card, insurance, UPI, etc.
 
   // Metadata
   notes: varchar("notes"),

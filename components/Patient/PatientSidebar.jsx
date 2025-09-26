@@ -62,16 +62,16 @@ const PatientSidebar = ({
       description: "Test Results & Reports",
     },
     {
-      id: "medical-records",
-      label: "Medical Records",
-      icon: FileText,
-      description: "Health History & Documents",
-    },
-    {
       id: "billing",
       label: "Billing History",
       icon: Receipt,
       description: "Bills & Payment History",
+    },
+    {
+      id: "medical-records",
+      label: "Medical Records",
+      icon: FileText,
+      description: "Health History & Documents",
     },
     {
       id: "profile",
@@ -236,7 +236,7 @@ const PatientSidebar = ({
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-8 space-y-2">
+          {/* <div className="mt-8 space-y-2">
             <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">
               Quick Actions
             </div>
@@ -262,7 +262,7 @@ const PatientSidebar = ({
                 </div>
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Footer Actions */}
