@@ -1258,6 +1258,7 @@ const RefillModal = ({
                   onClick={(e) => {
                     e.preventDefault();
                     onPending(prescription.id, notes);
+                    setOpen(false);
                   }}
                   disabled={!notes.trim()}
                   className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1534,24 +1535,24 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       console.log("Prescription Data: ", updatedPrescriptionData);
       console.log("Dispense Data: ", dispenseData);
 
-      // const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(dispenseData),
-      // });
+      const res = await fetch(`/api/medicines/${medicineId}/dispense`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dispenseData),
+      });
 
-      // if (!res.ok) {
-      //   const error = await res.json();
-      //   throw new Error(error.error || "Failed to dispense medicine");
-      // }
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to dispense medicine");
+      }
 
-      // if (prescriptionData) {
-      //   await fetch(`/api/prescriptions/${id}/update`, {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify(updatedPrescriptionData),
-      //   });
-      // }
+      if (prescriptionData) {
+        await fetch(`/api/prescriptions/${id}/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedPrescriptionData),
+        });
+      }
 
       const quantity = dispenseData.quantity ?? 1;
       const baseAmount = (dispenseData.unitPrice ?? 0) * quantity;
@@ -1566,7 +1567,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
 
       const totalPrice = baseAmount - discount + taxAmount;
 
-      console.log("Billing Data:", {
+      await db.insert(Billings).values({
         patientId: prescription.patientId,
         consultationId: prescription.consultationId,
         prescriptionId: prescription.id,
@@ -1616,43 +1617,26 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     try {
       const load = toast.loading(`Refilling ${refillData.medication}...`);
 
-      console.log("Refill Data: ", refillData);
-      console.log("Prescription Data: ", prescriptionData);
+      // Call Refill API route for Medicine Inventory
+      const res = await fetch(`/api/medicines/${medicineId}/refill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(refillData),
+      });
 
-      // // Call Refill API route for Medicine Inventory
-      // const res = await fetch(`/api/medicines/${medicineId}/refill`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(refillData),
-      // });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to refill medicine");
+      }
 
-      // if (!res.ok) {
-      //   const error = await res.json();
-      //   throw new Error(error.error || "Failed to refill medicine");
-      // }
-
-      // // Update Prescription Record
-      // if (prescriptionData) {
-      //   await fetch(`/api/prescriptions/${id}/update`, {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify(prescriptionData),
-      //   });
-      // }
-
-      // await db.insert(Billings).values({
-      //   patientId: prescription.patientId,
-      //   consultationId: prescription.consultationId,
-      //   prescriptionId: prescription.id,
-      //   category: "prescription",
-      //   itemName: prescription.medication,
-      //   quantity: 1,
-      //   unitPrice: prescription.cost ?? 0,
-      //   totalPrice: prescription.cost ?? 0,
-      //   paymentStatus: "pending",
-      //   paymentMethod: null,
-      //   notes: `Refilled medicine ${refillData.medication} for patient ${prescription.patientName}`,
-      // });
+      // Update Prescription Record
+      if (prescriptionData) {
+        await fetch(`/api/prescriptions/${id}/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(prescriptionData),
+        });
+      }
 
       const quantity = refillData.quantity ?? 1;
       const baseAmount = (parseFloat(refillData.unitPrice) ?? 0) * quantity;
@@ -1667,7 +1651,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
 
       const totalPrice = baseAmount - discount + taxAmount;
 
-      console.log("Billing Data:", {
+      await db.insert(Billings).values({
         patientId: prescription.patientId,
         consultationId: prescription.consultationId,
         prescriptionId: prescription.id,
@@ -2202,7 +2186,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                           </button>
                           {prescription.refills > 0 &&
                             new Date(prescription.nextRefillDate) <=
-                              new Date(getTodayIST()) && (
+                              new Date(getTodayIST()) &&
+                            prescription.status !== "pending" && (
                               <RefillModal
                                 prescription={prescription}
                                 onRefill={handleRefill}
