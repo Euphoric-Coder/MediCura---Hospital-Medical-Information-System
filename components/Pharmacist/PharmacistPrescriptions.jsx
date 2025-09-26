@@ -1855,6 +1855,53 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
             pharmacistId={pharmacistData.userId}
           />
         );
+      case "pending":
+        return (
+          <>
+            {prescription.refills > 0 &&
+            new Date(prescription.nextRefillDate) <= new Date(getTodayIST()) ? (
+              <RefillModal
+                prescription={prescription}
+                onRefill={handleRefill}
+                pharmacistId={pharmacistData.userId}
+                onPending={(id, notes) => {
+                  handleUpdateStatus(id, "pending", notes);
+                }}
+              />
+            ) : (
+              <DispensePrescriptionModal
+                prescription={prescription}
+                onAction={(
+                  id,
+                  dispenseData,
+                  prescriptionData,
+                  medicineId,
+                  status
+                ) => {
+                  if (status === "pending") {
+                    // Update status to pending
+                    handleUpdateStatus(
+                      id,
+                      "pending",
+                      prescriptionData.pharmacistNotes
+                    );
+                  } else {
+                    // Normal dispense workflow
+                    handleDispenseMedicine(
+                      id,
+                      dispenseData,
+                      prescriptionData,
+                      medicineId,
+                      prescription
+                    );
+                  }
+                }}
+                pharmacistId={pharmacistData.userId}
+              />
+            )}
+          </>
+        );
+
       case "dispensed":
         return (
           <div className="text-12-medium lg:text-14-medium text-green-400 px-3 lg:px-4 py-2">
@@ -1880,9 +1927,6 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
   ).length;
   const dispensedCount = prescriptions.filter(
     (p) => p.status === "active" || p.status === "completed"
-  ).length;
-  const urgentCount = prescriptions.filter(
-    (p) => p.priority === "urgent" && p.status === "pending"
   ).length;
 
   return (
