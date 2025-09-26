@@ -16,6 +16,7 @@ import {
   ChevronDown,
   RefreshCcw,
   CircleX,
+  RefreshCw,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
@@ -1619,7 +1620,13 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                 : "bg-yellow-500/20 border border-yellow-500/30"
             }`}
           >
-            <Clock className="w-3 h-3" />
+            <Clock
+              className={`w-3 h-3 ${
+                priority === "urgent"
+                  ? "text-red-400 animate-pulse"
+                  : "text-yellow-400 animate-pulse"
+              }`}
+            />
             <span
               className={
                 priority === "urgent" ? "text-red-400" : "text-yellow-400"
@@ -1635,7 +1642,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           <div
             className={`${baseClasses} bg-purple-500/20 border border-purple-500/30 text-purple-400`}
           >
-            <Clock className="w-3 h-3" />
+            <Clock className="w-3 h-3 animate-bounce" />
             <span>Ordered</span>
           </div>
         );
@@ -1645,8 +1652,8 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           <div
             className={`${baseClasses} bg-cyan-500/20 border border-cyan-500/30 text-cyan-400`}
           >
-            <CheckCircle className="w-3 h-3" />
-            <span className="">Active</span>
+            <CheckCircle className="w-3 h-3 animate-pulse" />
+            <span>Active</span>
           </div>
         );
 
@@ -1655,7 +1662,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           <div
             className={`${baseClasses} bg-blue-500/20 border border-blue-500/30 text-blue-400`}
           >
-            <CheckCircle className="w-3 h-3" />
+            <CheckCircle className="w-3 h-3 animate-pulse" />
             <span>Verified</span>
           </div>
         );
@@ -1665,7 +1672,7 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           <div
             className={`${baseClasses} bg-green-500/20 border border-green-500/30 text-green-400`}
           >
-            <CheckCircle className="w-3 h-3" />
+            <CheckCircle className="w-3 h-3 animate-pulse" />
             <span>Dispensed</span>
           </div>
         );
@@ -1675,15 +1682,33 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
           <div
             className={`${baseClasses} bg-orange-500/20 border border-orange-500/30 text-orange-400`}
           >
-            <AlertTriangle className="w-3 h-3" />
+            <AlertTriangle className="w-3 h-3 animate-bounce" />
             <span>Advised Discontinued</span>
           </div>
         );
 
+      case "request-refill":
+        return (
+          <div
+            className={`${baseClasses} bg-cyan-500/20 border border-cyan-500/30 text-cyan-400`}
+          >
+            <RefreshCw className="w-3 h-3 animate-spin" />
+            <span>Refill Requested</span>
+          </div>
+        );
+
       default:
-        return null;
+        return (
+          <div
+            className={`${baseClasses} bg-gray-500/20 border border-gray-500/30 text-gray-400`}
+          >
+            <Clock className="w-3 h-3 animate-pulse" />
+            <span>Processing</span>
+          </div>
+        );
     }
   };
+
 
   const getActionButtons = (prescription) => {
     switch (prescription.status) {

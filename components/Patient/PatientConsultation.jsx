@@ -307,8 +307,21 @@ const getStatusIcon = (status) => {
         </p>
       );
 
+    case "request-refill":
+      return (
+        <p className="flex items-center gap-2">
+          <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin" />
+          Refill Requested
+        </p>
+      );
+
     default:
-      return <Clock className="w-4 h-4" />;
+      return (
+        <p className="flex items-center gap-2">
+          <Clock className="w-4 h-4 text-gray-400" />
+          Processing
+        </p>
+      );
   }
 };
 
@@ -475,6 +488,29 @@ const PatientConsultation = ({ onBack, patientData }) => {
       toast.success(`Cancellation request sent for ${name}`);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const updatePrescriptionStatus = async (id, newStatus) => {
+    try {
+      const load = toast.loading("Updating prescription status...");
+
+      await db
+        .update(Prescriptions)
+        .set({
+          status: newStatus,
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, id));
+
+      toast.dismiss(load);
+      toast.success(`Prescription status updated to "${newStatus}"`);
+
+      // Refresh UI after update
+      refreshPrescriptions();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update prescription status");
     }
   };
 
@@ -1022,6 +1058,39 @@ const PatientConsultation = ({ onBack, patientData }) => {
                           >
                             <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
                           </button>
+                          {/* 🔹 Request Refill Button */}
+                          {(() => {
+                            const todayIST = new Date().toLocaleDateString(
+                              "en-CA",
+                              {
+                                timeZone: "Asia/Kolkata",
+                              }
+                            );
+
+                            if (
+                              prescription.refillsRemaining > 0 &&
+                              prescription.nextRefillDate === todayIST &&
+                              prescription.status !== "request-refill"
+                            ) {
+                              return (
+                                <div className="flex justify-end">
+                                  <button
+                                    onClick={() =>
+                                      updatePrescriptionStatus(
+                                        prescription.id,
+                                        "request-refill"
+                                      )
+                                    }
+                                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 lg:px-6 lg:py-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center gap-2"
+                                  >
+                                    <RefreshCw className="w-4 h-4" />
+                                    Request Refill
+                                  </button>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
                           {prescription.status === "recommended" && (
                             <div className="flex items-center gap-2">
                               <Button
