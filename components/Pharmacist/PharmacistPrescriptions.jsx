@@ -15,6 +15,7 @@ import {
   Phone,
   ChevronDown,
   RefreshCcw,
+  CircleX,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import { db } from "@/lib/dbConfig";
@@ -319,6 +320,7 @@ const VerifyPrescriptionModal = ({ prescription, onVerify }) => {
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 
                      text-white px-3 py-2 rounded-lg text-sm shadow-lg"
         >
+          <CheckCircle />
           Verify Prescription
         </Button>
       </DialogTrigger>
@@ -455,6 +457,7 @@ const DiscontinuePrescriptionModal = ({ prescription, onDiscontinue }) => {
           className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
                      text-white px-3 py-2 rounded-lg text-sm shadow-lg"
         >
+          <CircleX />
           Advise Discontinue
         </Button>
       </DialogTrigger>
@@ -537,6 +540,8 @@ const DispensePrescriptionModal = ({
   const [open, setOpen] = useState(false);
   const [medicines, setMedicines] = useState([]);
   const [notes, setNotes] = useState("");
+  const [medicineQuantity, setMedicineQuantity] = useState(null);
+  const [pendingMedicine, setPendingMedicine] = useState(false);
 
   const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
 
@@ -642,7 +647,6 @@ const DispensePrescriptionModal = ({
     handleClose();
   };
 
-
   const handleAddItem = (field, value) => {
     if (!value.trim()) return;
     setForm((prev) => ({
@@ -685,10 +689,11 @@ const DispensePrescriptionModal = ({
     >
       <DialogTrigger asChild>
         <button
-          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
                      text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium 
                      transition-all duration-300 shadow-lg hover:shadow-green-500/25"
         >
+          <Pill className="w-4 h-4" />
           Dispense
         </button>
       </DialogTrigger>
@@ -703,263 +708,296 @@ const DispensePrescriptionModal = ({
 
         {/* Editable Prescription Form */}
         <div className="space-y-4 py-4">
-          {/* Current Prescribed Medicine Info */}
-          <div className="mb-6 p-4 rounded-xl bg-dark-500/40 border border-dark-600">
-            <h4 className="text-white text-sm font-semibold mb-2">
-              Prescribed Medicine
-            </h4>
-            <p className="text-dark-600 text-sm">
-              <span className="text-white">Name:</span>{" "}
-              {prescription?.medication}
-            </p>
-            <p className="text-dark-600 text-sm">
-              <span className="text-white">Dosage:</span> {prescription?.dosage}
-              {prescription?.frequency ? ` — ${prescription.frequency}` : ""}
-            </p>
-            <p className="text-dark-600 text-sm">
-              <span className="text-white">Duration:</span>{" "}
-              {prescription?.duration}
-            </p>
-          </div>
+          {!pendingMedicine && (
+            <div>
+              {/* Current Prescribed Medicine Info */}
+              <div className="mb-6 p-4 rounded-xl bg-dark-500/40 border border-dark-600">
+                <h4 className="text-white text-sm font-semibold mb-2">
+                  Prescribed Medicine
+                </h4>
+                <p className="text-dark-600 text-sm">
+                  <span className="text-white">Name:</span>{" "}
+                  {prescription?.medication}
+                </p>
+                <p className="text-dark-600 text-sm">
+                  <span className="text-white">Dosage:</span>{" "}
+                  {prescription?.dosage}
+                  {prescription?.frequency
+                    ? ` — ${prescription.frequency}`
+                    : ""}
+                </p>
+                <p className="text-dark-600 text-sm">
+                  <span className="text-white">Duration:</span>{" "}
+                  {prescription?.duration}
+                </p>
+              </div>
 
-          {/* Dropdown for Medicines */}
-          <div className="mb-4">
-            <label className="shad-input-label block mb-2">
-              Select Dispensed Medicine
-            </label>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowMedicineDropdown(!showMedicineDropdown)}
-                className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
-              >
-                <span className="text-white">
-                  {form.medication || "Select Medicine"}
-                </span>
-                <ChevronDown
-                  className={`w-5 h-5 text-dark-600 transition-transform ${
-                    showMedicineDropdown ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Medicine Dropdown */}
-              {showMedicineDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
-                  <div className="p-3 border-b border-dark-500">
-                    <span className="text-14-medium text-dark-700">
-                      Available Medicines
+              {/* Dropdown for Medicines */}
+              <div className="mb-4">
+                <label className="shad-input-label block mb-2">
+                  Select Dispensed Medicine
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowMedicineDropdown(!showMedicineDropdown)
+                    }
+                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                  >
+                    <span className="text-white">
+                      {form.medication || "Select Medicine"}
                     </span>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    {medicines.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        onClick={() => {
-                          setForm((prev) => ({
-                            ...prev,
-                            medicationId: m.id,
-                            medication: m.name,
-                            cost: m.unitPrice || "",
-                            medicineValidity: m.expiryDate || "",
-                          }));
-                          setShowMedicineDropdown(false);
-                        }}
-                        className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
-                      >
-                        <span className="text-16-medium text-white">
-                          {m.name}
+                    <ChevronDown
+                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                        showMedicineDropdown ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Medicine Dropdown */}
+                  {showMedicineDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                      <div className="p-3 border-b border-dark-500">
+                        <span className="text-14-medium text-dark-700">
+                          Available Medicines
                         </span>
-                        {form.medication === m.name && (
-                          <Check className="w-5 h-5 text-green-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {medicines.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setForm((prev) => ({
+                                ...prev,
+                                medicationId: m.id,
+                                medication: m.name,
+                                cost: m.unitPrice || "",
+                                medicineValidity: m.expiryDate || "",
+                              }));
+                              setMedicineQuantity(m.quantity);
+                              setShowMedicineDropdown(false);
+                            }}
+                            className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                          >
+                            <span className="text-16-medium text-white">
+                              {m.name}
+                            </span>
+                            {form.medication === m.name && (
+                              <Check className="w-5 h-5 text-green-500" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+                <p className="mt-2 ml-2 text-white text-xs">
+                  <span>Quantity:</span> {medicineQuantity || 0}
+                </p>
+              </div>
+
+              {/* Auto-filled Cost */}
+              <div>
+                <label className="text-white text-sm mb-2 block">Cost</label>
+                <input
+                  type="text"
+                  value={form.cost || ""}
+                  readOnly
+                  className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
+               placeholder-dark-600 outline-none cursor-not-allowed"
+                />
+              </div>
+
+              {/* Auto-filled Medicine Validity */}
+              <div>
+                <label className="text-white text-sm mb-2 block">
+                  Medicine Validity
+                </label>
+                <input
+                  type="text"
+                  value={form.medicineValidity || ""}
+                  readOnly
+                  className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
+               placeholder-dark-600 outline-none cursor-not-allowed"
+                />
+              </div>
+
+              <FormInput
+                label="Dispensed Duration"
+                type="text"
+                value={form.dispensedDuration}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    dispensedDuration: e.target.value,
+                  }))
+                }
+              />
+
+              <FormInput
+                label="Refills Remaining"
+                type="number"
+                value={form.refillsRemaining}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    refillsRemaining: e.target.value,
+                  }))
+                }
+              />
+
+              <FormInput
+                label="Quantity (for Inventory Management)"
+                type="number"
+                value={form.quantity}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    quantity: e.target.value,
+                  }))
+                }
+              />
+
+              <FormInput
+                label="Next Refill Date"
+                type="date"
+                value={form.nextRefillDate}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    nextRefillDate: e.target.value,
+                  }))
+                }
+              />
+
+              <FormInput
+                label="Last Dispensed Date"
+                type="date"
+                value={form.lastDispensedDate}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    lastDispensedDate: e.target.value,
+                  }))
+                }
+                disabled={firstTime}
+              />
+
+              {/* First Time Checkbox */}
+              <div className="mb-4 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="firstTime"
+                  checked={form.firstTime}
+                  onChange={(e) => setFirstTime(e.target.checked)}
+                  className="w-4 h-4 accent-green-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="firstTime"
+                  className="text-sm text-white cursor-pointer"
+                >
+                  First Time Dispense
+                </label>
+              </div>
+
+              {/* Side Effects */}
+              <div>
+                <label className="text-white text-sm mb-2 block">
+                  Side Effects
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={sideEffectInput}
+                    onChange={(e) => setSideEffectInput(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
+                 placeholder-dark-600 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none"
+                    placeholder="Add side effect"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      handleAddItem("sideEffects", sideEffectInput)
+                    }
+                    className="bg-green-600 hover:bg-green-500 text-white"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {form.sideEffects.map((s, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-yellow-400 flex items-center gap-2"
+                    >
+                      {s}
+                      <X
+                        className="w-3 h-3 cursor-pointer"
+                        onClick={() => handleRemoveItem("sideEffects", i)}
+                      />
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interactions */}
+              <div>
+                <label className="text-white text-sm mb-2 block">
+                  Drug Interactions
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={interactionInput}
+                    onChange={(e) => setInteractionInput(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
+                 placeholder-dark-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+                    placeholder="Add interaction"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      handleAddItem("interaction", interactionInput)
+                    }
+                    className="bg-green-600 hover:bg-green-500 text-white"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {form.interaction.map((i, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 flex items-center gap-2"
+                    >
+                      {i}
+                      <X
+                        className="w-3 h-3 cursor-pointer"
+                        onClick={() => handleRemoveItem("interaction", idx)}
+                      />
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Auto-filled Cost */}
-          <div>
-            <label className="text-white text-sm mb-2 block">Cost</label>
-            <input
-              type="text"
-              value={form.cost || ""}
-              readOnly
-              className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
-               placeholder-dark-600 outline-none cursor-not-allowed"
-            />
-          </div>
-
-          {/* Auto-filled Medicine Validity */}
-          <div>
-            <label className="text-white text-sm mb-2 block">
-              Medicine Validity
-            </label>
-            <input
-              type="text"
-              value={form.medicineValidity || ""}
-              readOnly
-              className="w-full px-3 py-2 rounded-lg bg-dark-300 border border-dark-500 text-white font-bold 
-               placeholder-dark-600 outline-none cursor-not-allowed"
-            />
-          </div>
-
-          <FormInput
-            label="Dispensed Duration"
-            type="text"
-            value={form.dispensedDuration}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                dispensedDuration: e.target.value,
-              }))
-            }
-          />
-
-          <FormInput
-            label="Refills Remaining"
-            type="number"
-            value={form.refillsRemaining}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                refillsRemaining: e.target.value,
-              }))
-            }
-          />
-
-          <FormInput
-            label="Quantity (for Inventory Management)"
-            type="number"
-            value={form.quantity}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                quantity: e.target.value,
-              }))
-            }
-          />
-
-          <FormInput
-            label="Next Refill Date"
-            type="date"
-            value={form.nextRefillDate}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                nextRefillDate: e.target.value,
-              }))
-            }
-          />
-
-          <FormInput
-            label="Last Dispensed Date"
-            type="date"
-            value={form.lastDispensedDate}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                lastDispensedDate: e.target.value,
-              }))
-            }
-            disabled={firstTime}
-          />
-
-          {/* First Time Checkbox */}
           <div className="mb-4 flex items-center gap-2">
             <input
               type="checkbox"
-              id="firstTime"
-              checked={form.firstTime}
-              onChange={(e) => setFirstTime(e.target.checked)}
+              id="pending"
+              checked={pendingMedicine}
+              onChange={() => setPendingMedicine(!pendingMedicine)}
               className="w-4 h-4 accent-green-500 cursor-pointer"
             />
             <label
               htmlFor="firstTime"
               className="text-sm text-white cursor-pointer"
             >
-              First Time Dispense
+              Out of Stock / Other
             </label>
-          </div>
-
-          {/* Side Effects */}
-          <div>
-            <label className="text-white text-sm mb-2 block">
-              Side Effects
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={sideEffectInput}
-                onChange={(e) => setSideEffectInput(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
-                 placeholder-dark-600 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none"
-                placeholder="Add side effect"
-              />
-              <Button
-                size="sm"
-                onClick={() => handleAddItem("sideEffects", sideEffectInput)}
-                className="bg-green-600 hover:bg-green-500 text-white"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {form.sideEffects.map((s, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-yellow-400 flex items-center gap-2"
-                >
-                  {s}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => handleRemoveItem("sideEffects", i)}
-                  />
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactions */}
-          <div>
-            <label className="text-white text-sm mb-2 block">
-              Drug Interactions
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={interactionInput}
-                onChange={(e) => setInteractionInput(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-dark-300 border border-dark-600 text-white 
-                 placeholder-dark-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
-                placeholder="Add interaction"
-              />
-              <Button
-                size="sm"
-                onClick={() => handleAddItem("interaction", interactionInput)}
-                className="bg-green-600 hover:bg-green-500 text-white"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {form.interaction.map((i, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 flex items-center gap-2"
-                >
-                  {i}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => handleRemoveItem("interaction", idx)}
-                  />
-                </span>
-              ))}
-            </div>
           </div>
 
           {/* Pharmacist Notes */}
@@ -1008,12 +1046,13 @@ const DispensePrescriptionModal = ({
   );
 };
 
-const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
+const RefillModal = ({ prescription, onRefill, pharmacistId, onPending }) => {
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState("");
   const [nextRefillDate, setNextRefillDate] = useState("");
   const [notes, setNotes] = useState("");
   const [lastCourse, setLastCourse] = useState(false);
+  const [pendingMedicine, setPendingMedicine] = useState(false);
 
   if (!prescription) return null;
 
@@ -1024,21 +1063,12 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
       setNextRefillDate("");
       setNotes("");
       setLastCourse(false);
+      setPendingMedicine(false);
     }
   }, [open]);
 
   const handleSubmit = () => {
     const status = lastCourse ? "completed" : "active";
-
-    console.log(prescription.id, {
-      medicattionId: prescription.medicationId,
-      medication: prescription.medication,
-      quantity,
-      nextRefillDate: lastCourse ? null : nextRefillDate,
-      pharmacistNotes: notes,
-      lastCourse,
-      status,
-    });
 
     const refillData = {
       quantity: parseInt(quantity),
@@ -1055,12 +1085,6 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
       status,
     };
 
-    console.log("Refill Data: ", refillData);
-
-    console.log("Prescription ID: ", prescription.id);
-
-    console.log("Prescription Data: ", prescriptionData);
-
     onRefill(
       prescription.id,
       refillData,
@@ -1068,30 +1092,21 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
       prescription.medicationId
     );
 
-    // onRefill(prescription.id, {
-    //   medicineId,
-    //   medication: prescription.medication,
-    //   quantity,
-    //   nextRefillDate: lastCourse ? null : nextRefillDate,
-    //   notes,
-    //   lastCourse,
-    //   status,
-    // });
-
     setOpen(false);
   };
 
   return (
     <>
       {/* Trigger */}
-      <Button
+      <button
         onClick={() => setOpen(true)}
-        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
                    text-white px-3 lg:px-4 py-2 rounded-lg text-12-medium lg:text-14-medium 
                    transition-all duration-300 shadow-lg hover:shadow-green-500/25"
       >
+        <RefreshCcw className="w-4 h-4" />
         Refill
-      </Button>
+      </button>
 
       {/* Modal */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -1139,61 +1154,100 @@ const RefillModal = ({ prescription, onRefill, pharmacistId }) => {
               </p>
             </div>
 
-            {/* Refill Form */}
-            <FormInput
-              label="Quantity"
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="Enter quantity"
-            />
-
-            <FormInput
-              label="Next Refill Date"
-              type="date"
-              value={nextRefillDate}
-              onChange={(e) => setNextRefillDate(e.target.value)}
-              disabled={lastCourse}
-            />
-
-            {/* Checkbox for Last Course */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="lastCourse"
-                checked={lastCourse}
-                onChange={(e) => setLastCourse(e.target.checked)}
+                checked={pendingMedicine}
+                onChange={() => setPendingMedicine(!pendingMedicine)}
                 className="w-4 h-4 accent-green-500 cursor-pointer"
               />
               <label
                 htmlFor="lastCourse"
                 className="text-sm text-white cursor-pointer"
               >
-                Last course of medicine
+                Medicine Out of Stock / Other
               </label>
             </div>
 
-            <FormInput
-              label="Notes"
-              type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional notes"
-            />
+            {!pendingMedicine && (
+              <div>
+                {/* Refill Form */}
+                <FormInput
+                  label="Quantity"
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Enter quantity"
+                />
+
+                <FormInput
+                  label="Next Refill Date"
+                  type="date"
+                  value={nextRefillDate}
+                  onChange={(e) => setNextRefillDate(e.target.value)}
+                  disabled={lastCourse}
+                />
+
+                {/* Checkbox for Last Course */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="lastCourse"
+                    checked={lastCourse}
+                    onChange={(e) => setLastCourse(e.target.checked)}
+                    className="w-4 h-4 accent-green-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="lastCourse"
+                    className="text-sm text-white cursor-pointer"
+                  >
+                    Last course of medicine
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Pharmacist Notes */}
+            <div>
+              <label className="text-white text-sm mb-2 block">
+                Pharmacist Notes{" "}
+                <span className="text-green-400">
+                  (Optional for Dispense, Required for Pending)
+                </span>
+              </label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Enter pharmacist notes..."
+                className="shad-textArea text-white"
+                rows={4}
+              />
+            </div>
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 variant="ghost"
                 onClick={() => setOpen(false)}
-                className="text-dark-600 hover:text-white"
+                className="w-full text-dark-600 hover:text-white"
               >
                 Cancel
               </Button>
               <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPending(prescription.id, notes);
+                }}
+                disabled={!notes.trim()}
+                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Mark Pending
+              </Button>
+              <Button
                 onClick={handleSubmit}
                 disabled={!quantity}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 rounded-3xl hover:to-green-700 text-white"
               >
                 Confirm Refill
               </Button>
@@ -1495,32 +1549,26 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
     try {
       const load = toast.loading(`Refilling ${refillData.medication}...`);
 
-      console.log({
-        refillData,
-        prescriptionData,
-        medicineId,
-      })
+      // Call Refill API route for Medicine Inventory
+      const res = await fetch(`/api/medicines/${medicineId}/refill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(refillData),
+      });
 
-      // // Call Refill API route for Medicine Inventory
-      // const res = await fetch(`/api/medicines/${medicineId}/refill`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(refillData),
-      // });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to refill medicine");
+      }
 
-      // if (!res.ok) {
-      //   const error = await res.json();
-      //   throw new Error(error.error || "Failed to refill medicine");
-      // }
-
-      // // Update Prescription Record
-      // if (prescriptionData) {
-      //   await fetch(`/api/prescriptions/${id}/update`, {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify(prescriptionData),
-      //   });
-      // }
+      // Update Prescription Record
+      if (prescriptionData) {
+        await fetch(`/api/prescriptions/${id}/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(prescriptionData),
+        });
+      }
 
       toast.dismiss(load);
 
@@ -1666,14 +1714,14 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
               status
             ) => {
               if (status === "pending") {
-                // 🔹 Just update status to pending
+                // Update status to pending
                 handleUpdateStatus(
                   id,
                   "pending",
                   prescriptionData.pharmacistNotes
                 );
               } else {
-                // 🔹 Normal dispense flow
+                // Normal dispense workflow
                 handleDispenseMedicine(
                   id,
                   dispenseData,
@@ -1971,6 +2019,9 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
                                 prescription={prescription}
                                 onRefill={handleRefill}
                                 pharmacistId={pharmacistData.userId}
+                                onPending={(id, notes) => {
+                                  handleUpdateStatus(id, "pending", notes);
+                                }}
                               />
                             )}
                         </div>
