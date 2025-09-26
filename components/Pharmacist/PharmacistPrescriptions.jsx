@@ -708,32 +708,45 @@ const DispensePrescriptionModal = ({
           </DialogDescription>
         </DialogHeader>
 
+        {/* Current Prescribed Medicine Info */}
+        <div className="p-4 rounded-xl bg-dark-500/40 border border-dark-600">
+          <h4 className="text-white text-sm font-semibold mb-2">
+            Prescribed Medicine
+          </h4>
+          <p className="text-dark-600 text-sm">
+            <span className="text-white">Name:</span> {prescription?.medication}
+          </p>
+          <p className="text-dark-600 text-sm">
+            <span className="text-white">Dosage:</span> {prescription?.dosage}
+            {prescription?.frequency ? ` — ${prescription.frequency}` : ""}
+          </p>
+          <p className="text-dark-600 text-sm">
+            <span className="text-white">Duration:</span>{" "}
+            {prescription?.duration}
+          </p>
+        </div>
+
+        {/* Out of Stock / Other Reasons Check box  */}
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="outOfStock"
+            checked={pendingMedicine}
+            onChange={() => setPendingMedicine(!pendingMedicine)}
+            className="w-4 h-4 accent-green-500 cursor-pointer"
+          />
+          <label
+            htmlFor="outOfStock"
+            className="text-sm text-white cursor-pointer"
+          >
+            Medicine Out of Stock / Other
+          </label>
+        </div>
+
         {/* Editable Prescription Form */}
         <div className="space-y-4 py-4">
           {!pendingMedicine && (
-            <div>
-              {/* Current Prescribed Medicine Info */}
-              <div className="mb-6 p-4 rounded-xl bg-dark-500/40 border border-dark-600">
-                <h4 className="text-white text-sm font-semibold mb-2">
-                  Prescribed Medicine
-                </h4>
-                <p className="text-dark-600 text-sm">
-                  <span className="text-white">Name:</span>{" "}
-                  {prescription?.medication}
-                </p>
-                <p className="text-dark-600 text-sm">
-                  <span className="text-white">Dosage:</span>{" "}
-                  {prescription?.dosage}
-                  {prescription?.frequency
-                    ? ` — ${prescription.frequency}`
-                    : ""}
-                </p>
-                <p className="text-dark-600 text-sm">
-                  <span className="text-white">Duration:</span>{" "}
-                  {prescription?.duration}
-                </p>
-              </div>
-
+            <div className="space-y-2">
               {/* Dropdown for Medicines */}
               <div className="mb-4">
                 <label className="shad-input-label block mb-2">
@@ -873,36 +886,6 @@ const DispensePrescriptionModal = ({
                   }))
                 }
               />
-
-              <FormInput
-                label="Last Dispensed Date"
-                type="date"
-                value={form.lastDispensedDate}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    lastDispensedDate: e.target.value,
-                  }))
-                }
-                disabled={firstTime}
-              />
-
-              {/* First Time Checkbox */}
-              <div className="mb-4 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="firstTime"
-                  checked={form.firstTime}
-                  onChange={(e) => setFirstTime(e.target.checked)}
-                  className="w-4 h-4 accent-green-500 cursor-pointer"
-                />
-                <label
-                  htmlFor="firstTime"
-                  className="text-sm text-white cursor-pointer"
-                >
-                  First Time Dispense
-                </label>
-              </div>
 
               {/* Side Effects */}
               <div>
