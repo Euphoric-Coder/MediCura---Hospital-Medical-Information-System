@@ -6,7 +6,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    // Insert into Billings table
+    // Insert data into Billings table
     const result = await db.insert(Billings).values(body);
 
     return NextResponse.json(

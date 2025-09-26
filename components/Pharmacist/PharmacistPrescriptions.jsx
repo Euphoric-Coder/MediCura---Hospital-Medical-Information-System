@@ -1540,34 +1540,38 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       const quantity = dispenseData.quantity ?? 1;
       const baseAmount = (dispenseData.unitPrice ?? 0) * quantity;
 
-      // Applied 10% discount on medicines
+      // Applied 20% discount on medicines
       const discountPercent = 20;
       const discount = (baseAmount * discountPercent) / 100;
 
-      // GST: 5% (common for medicines), can adjust by type
+      // GST: 5% as per the new 2025 rule
       const gstRate = 5;
       const taxAmount = ((baseAmount - discount) * gstRate) / 100;
 
       const totalPrice = baseAmount - discount + taxAmount;
 
-      await db.insert(Billings).values({
-        patientId: prescription.patientId,
-        consultationId: prescription.consultationId,
-        prescriptionId: prescription.id,
-        category: "prescription",
-        itemName: dispenseData.medication,
-        quantity: quantity,
-        unitPrice: dispenseData.unitPrice ?? 0,
-        baseAmount: baseAmount,
-        totalPrice: totalPrice,
-        breakdown: {
-          discountPercent: 20,
-          discountAmount: discount,
-          taxRate: 5,
-          taxAmount: taxAmount,
-        },
-        paymentStatus: "pending",
-        notes: `Dispensed the medicine ${dispenseData.medication} for patient ${prescription.patientName}`,
+      await fetch("/api/billings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patientId: prescription.patientId,
+          consultationId: prescription.consultationId,
+          prescriptionId: prescription.id,
+          category: "prescription",
+          itemName: dispenseData.medication,
+          quantity: quantity,
+          unitPrice: dispenseData.unitPrice ?? 0,
+          baseAmount: baseAmount,
+          totalPrice: totalPrice,
+          breakdown: {
+            discountPercent: 20,
+            discountAmount: discount,
+            taxRate: 5,
+            taxAmount: taxAmount,
+          },
+          paymentStatus: "pending",
+          notes: `Dispensed the medicine ${dispenseData.medication} for patient ${prescription.patientName}`,
+        }),
       });
 
       toast.dismiss(load);
@@ -1628,30 +1632,34 @@ const PharmacistPrescriptions = ({ onBack, pharmacistData }) => {
       const discountPercent = 20;
       const discount = (baseAmount * discountPercent) / 100;
 
-      // GST: 5% (common for medicines), can adjust by type
+      // GST: 5% on medicines as per the new 2025 rule
       const gstRate = 5;
       const taxAmount = ((baseAmount - discount) * gstRate) / 100;
 
       const totalPrice = baseAmount - discount + taxAmount;
 
-      await db.insert(Billings).values({
-        patientId: prescription.patientId,
-        consultationId: prescription.consultationId,
-        prescriptionId: prescription.id,
-        category: "prescription",
-        itemName: refillData.medication,
-        quantity: quantity,
-        unitPrice: parseFloat(refillData.unitPrice) ?? 0,
-        baseAmount: baseAmount,
-        totalPrice: totalPrice,
-        breakdown: {
-          discountPercent: 20,
-          discountAmount: discount,
-          taxRate: 5,
-          taxAmount: taxAmount,
-        },
-        paymentStatus: "pending",
-        notes: `Dispensed the medicine ${refillData.medication} for patient ${prescription.patientName}`,
+      await fetch("/api/billings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patientId: prescription.patientId,
+          consultationId: prescription.consultationId,
+          prescriptionId: prescription.id,
+          category: "prescription",
+          itemName: refillData.medication,
+          quantity: quantity,
+          unitPrice: parseFloat(refillData.unitPrice) ?? 0,
+          baseAmount: baseAmount,
+          totalPrice: totalPrice,
+          breakdown: {
+            discountPercent: 20,
+            discountAmount: discount,
+            taxRate: 5,
+            taxAmount: taxAmount,
+          },
+          paymentStatus: "pending",
+          notes: `Dispensed the medicine ${refillData.medication} for patient ${prescription.patientName}`,
+        }),
       });
 
       toast.dismiss(load);
