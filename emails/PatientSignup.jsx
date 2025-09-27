@@ -23,7 +23,7 @@ export default function PatientSignup({ fullName }) {
           {/* Logo */}
           <Section style={{ textAlign: "center", marginBottom: "20px" }}>
             <Img
-              src="/logo.png"
+              src={`${process.env.NEXT_PUBLIC_LOGO}`}
               alt="MediCura Logo"
               width="100"
               height="100"
