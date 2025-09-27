@@ -212,7 +212,7 @@ const getStatusColor = (status) => {
       return "bg-gray-500/20 text-gray-400 border-gray-500/30";
 
     case "discontinued-doctor":
-    case "discontinued-pharmacist":
+    case "discontinued":
       return "bg-red-500/20 text-red-400 border-red-500/30";
 
     case "pending":
@@ -257,7 +257,7 @@ const getStatusIcon = (status) => {
       );
 
     case "discontinued-doctor":
-    case "discontinued-pharmacist":
+    case "discontinued":
       return (
         <p className="flex items-center gap-2">
           <CircleX className="w-4 h-4 text-red-400 animate-pulse" />
@@ -330,7 +330,6 @@ const getStatusIcon = (status) => {
       );
   }
 };
-
 
 const PatientConsultation = ({ onBack, patientData }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -518,6 +517,46 @@ const PatientConsultation = ({ onBack, patientData }) => {
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update prescription status");
+    }
+  };
+
+  const acceptDiscontinuation = async (prescription) => {
+    try {
+      const load = toast.loading("Accepting discontinuation...");
+      const res = await db
+        .update(Prescriptions)
+        .set({
+          status: "discontinued",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, prescription.id));
+
+      toast.dismiss(load);
+      toast.success("Discontinuation accepted");
+      refreshPrescriptions();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to accept discontinuation");
+    }
+  };
+
+  const rejectDiscontinuation = async (prescription) => {
+    try {
+      const load = toast.loading("Accepting discontinuation...");
+      const res = await db
+        .update(Prescriptions)
+        .set({
+          status: "ordered",
+          updatedAt: new Date(),
+        })
+        .where(eq(Prescriptions.id, prescription.id));
+
+      toast.dismiss(load);
+      toast.success("Discontinuation accepted");
+      refreshPrescriptions();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to accept discontinuation");
     }
   };
 
@@ -1055,6 +1094,17 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 </p>
                               </div>
                             )}
+                            {prescription.status === "advised-discontinued" && (
+                              <div className="mt-3 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-12-regular lg:text-14-regular text-red-400">
+                                <p>
+                                  <span className="font-medium">
+                                    Discontinuation Advise Reason:
+                                  </span>{" "}
+                                  {prescription.pharmacistNotes ||
+                                    "No reason provided"}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1122,6 +1172,29 @@ const PatientConsultation = ({ onBack, patientData }) => {
                                 <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
                                 Cancel Medicine
                               </Button>
+                            </div>
+                          )}
+
+                          {prescription.status === "advised-discontinued" && (
+                            <div className="flex items-center gap-2 lg:gap-3">
+                              <button
+                                onClick={() =>
+                                  acceptDiscontinuation(prescription)
+                                }
+                                className="flex items-center gap-2  bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                              >
+                                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
+                                Accept Discontinuation
+                              </button>
+                              <button
+                                onClick={() =>
+                                  rejectDiscontinuation(prescription)
+                                }
+                                className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-2 lg:p-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                              >
+                                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
+                                Reject Discontinuation
+                              </button>
                             </div>
                           )}
 
