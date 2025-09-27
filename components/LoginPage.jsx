@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Plus,
-  User,
-  Mail,
-  Phone,
-  Lock,
-  Briefcase,
-  ChevronDown,
-  Check,
-} from "lucide-react";
+import { User, Mail, Lock, ChevronDown, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { signUp } from "@/lib/auth";
@@ -27,7 +18,7 @@ const LoginPage = () => {
     email: "",
     phone: "",
     password: "",
-    role: "patient", // default role
+    role: "patient",
   });
   const [error, setError] = useState("");
 
@@ -53,7 +44,6 @@ const LoginPage = () => {
       return;
     }
 
-    // Auto login after sign up
     const result = await signIn("credentials", {
       email: formData.email,
       password: formData.password,
@@ -70,22 +60,26 @@ const LoginPage = () => {
 
   return (
     <RedirectPage>
-      <div className="min-h-screen flex">
+      <div className="min-h-screen flex bg-white dark:bg-dark-300 transition-colors">
         {/* Left Side - Form */}
-        <div className="flex-1 flex items-center justify-center px-8 py-12 bg-dark-300">
+        <div className="flex-1 flex items-center justify-center px-8 py-12">
           <div className="w-full max-w-md">
             {/* Logo */}
             <Link href={"/"}>
               <div className="flex items-center gap-2 mb-12">
                 <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
-                <span className="text-24-bold text-white">MediCura</span>
+                <span className="text-24-bold text-slate-900 dark:text-white">
+                  MediCura
+                </span>
               </div>
             </Link>
 
             {/* Welcome Text */}
             <div className="mb-10">
-              <h1 className="text-36-bold text-white mb-2">Hi there 👋</h1>
-              <p className="text-16-regular text-dark-700">
+              <h1 className="text-36-bold text-slate-900 dark:text-white mb-2">
+                Hi there 👋
+              </h1>
+              <p className="text-16-regular text-slate-600 dark:text-dark-700">
                 Create your account and get started.
               </p>
             </div>
@@ -94,16 +88,18 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Full Name */}
               <div>
-                <label className="shad-input-label block mb-2">Full name</label>
+                <label className="shad-input-label block mb-2 text-slate-800 dark:text-white">
+                  Full name
+                </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
+                  <User className="absolute left-3 top-3 w-5 h-5 text-slate-400 dark:text-dark-600" />
                   <input
                     type="text"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
                     placeholder="Adrian Hajdin"
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 w-full text-slate-900 dark:text-white bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg"
                     required
                   />
                 </div>
@@ -111,29 +107,30 @@ const LoginPage = () => {
 
               {/* Role */}
               <div>
-                <label className="shad-input-label block mb-2">Role</label>
+                <label className="shad-input-label block mb-2 text-slate-800 dark:text-white">
+                  Role
+                </label>
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                    className="w-full bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg px-4 py-3 text-left text-slate-900 dark:text-white flex items-center justify-between hover:border-emerald-500 transition-colors"
                   >
-                    <span className="text-white">
+                    <span>
                       {formData.role.charAt(0).toUpperCase() +
                         formData.role.slice(1)}
                     </span>
                     <ChevronDown
-                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                      className={`w-5 h-5 text-slate-500 dark:text-dark-600 transition-transform ${
                         showRoleDropdown ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
-                  {/* Role Dropdown */}
                   {showRoleDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
-                      <div className="p-3 border-b border-dark-500">
-                        <span className="text-14-medium text-dark-700">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-10">
+                      <div className="p-3 border-b border-slate-200 dark:border-dark-500">
+                        <span className="text-14-medium text-slate-600 dark:text-dark-700">
                           Select Role
                         </span>
                       </div>
@@ -151,13 +148,13 @@ const LoginPage = () => {
                               setFormData((prev) => ({ ...prev, role }));
                               setShowRoleDropdown(false);
                             }}
-                            className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                            className="w-full p-4 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors text-left"
                           >
-                            <span className="text-16-medium text-white capitalize">
+                            <span className="text-16-medium text-slate-900 dark:text-white capitalize">
                               {role.charAt(0).toUpperCase() + role.slice(1)}
                             </span>
                             {formData.role === role && (
-                              <Check className="w-5 h-5 text-green-500" />
+                              <Check className="w-5 h-5 text-emerald-500" />
                             )}
                           </button>
                         ))}
@@ -169,18 +166,18 @@ const LoginPage = () => {
 
               {/* Email */}
               <div>
-                <label className="shad-input-label block mb-2">
+                <label className="shad-input-label block mb-2 text-slate-800 dark:text-white">
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400 dark:text-dark-600" />
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="adrian@jsmastery.pr"
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 w-full text-slate-900 dark:text-white bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg"
                     required
                   />
                 </div>
@@ -188,25 +185,27 @@ const LoginPage = () => {
 
               {/* Password */}
               <div>
-                <label className="shad-input-label block mb-2">Password</label>
+                <label className="shad-input-label block mb-2 text-slate-800 dark:text-white">
+                  Password
+                </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-dark-600" />
+                  <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400 dark:text-dark-600" />
                   <input
                     type="password"
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder="Enter password"
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 w-full text-slate-900 dark:text-white bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg"
                     required
                   />
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg text-16-semibold transition-colors mt-8"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-lg text-16-semibold transition-colors mt-8"
               >
                 Get Started
               </button>
@@ -215,12 +214,12 @@ const LoginPage = () => {
 
             {/* Sign In Link */}
             <div className="mt-6 text-center">
-              <span className="text-14-regular text-dark-600">
+              <span className="text-14-regular text-slate-600 dark:text-dark-600">
                 Already have an account?{" "}
               </span>
               <button
                 onClick={() => router.push("/sign-in")}
-                className="text-14-regular text-green-500 hover:text-green-400 transition-colors"
+                className="text-14-regular text-emerald-600 dark:text-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
               >
                 Sign in
               </button>
@@ -229,7 +228,7 @@ const LoginPage = () => {
             {/* Back Link */}
             <button
               onClick={() => router.push("/")}
-              className="mt-4 text-14-regular text-dark-600 hover:text-white transition-colors"
+              className="mt-4 text-14-regular text-slate-600 dark:text-dark-600 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               ← Back to Home
             </button>
@@ -240,10 +239,10 @@ const LoginPage = () => {
         <div className="hidden md:flex flex-1 relative overflow-hidden">
           <img
             src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=1200"
-            alt="Healthcare professional with stethoscope"
-            className="side-img w-full max-h-screen"
+            alt="Healthcare professional"
+            className="side-img w-full max-h-screen object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-dark-300/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/40 dark:to-dark-300/20"></div>
         </div>
       </div>
     </RedirectPage>

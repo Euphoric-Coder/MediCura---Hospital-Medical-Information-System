@@ -310,16 +310,21 @@
 
 
   .shad-input-label {
-    @apply text-14-medium text-dark-700 !important;
-  }
+  @apply text-14-medium text-slate-700 dark:text-dark-700 !important;
+}
 
-  .shad-input {
-    @apply bg-dark-400 placeholder:text-dark-600 border-dark-500 h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
-  }
+.shad-input {
+  @apply bg-white text-slate-900 placeholder:text-slate-400 border border-slate-300 
+         dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500 
+         h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+}
 
-  .shad-input-icon {
-    @apply bg-dark-400 placeholder:text-dark-600 border-dark-500 h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
-  }
+.shad-input-icon {
+  @apply bg-white text-slate-900 placeholder:text-slate-400 border border-slate-300 
+         dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500 
+         h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+}
+
 
   .shad-textArea {
     @apply bg-dark-400 placeholder:text-dark-600 border-dark-500 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
