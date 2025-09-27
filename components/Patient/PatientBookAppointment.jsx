@@ -1083,10 +1083,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               <div className="bg-green-500/20 rounded-lg px-3 py-2">
                                 <span className="text-12-medium lg:text-14-medium text-green-400">
                                   <span className="hidden sm:inline">
-                                    ${doctor.consultationFee} consultation
+                                    ₹{doctor.consultationFee} consultation
                                   </span>
                                   <span className="sm:hidden">
-                                    ${doctor.consultationFee}
+                                    ₹{doctor.consultationFee}
                                   </span>
                                 </span>
                               </div>
@@ -1209,15 +1209,15 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                     patientHasAppointment
                       ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 cursor-not-allowed"
                       : slot.available
-                      ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
-                      : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
+                        ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
+                        : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
                   }`}
                                   title={
                                     patientHasAppointment
                                       ? `You already have an appointment on this date`
                                       : !slot.available
-                                      ? "Slot unavailable"
-                                      : "Select this slot"
+                                        ? "Slot unavailable"
+                                        : "Select this slot"
                                   }
                                 >
                                   {slot.time}
@@ -1326,7 +1326,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
                         <div className="bg-green-500/20 rounded-lg px-4 py-3">
                           <div className="text-14-semibold lg:text-16-semibold text-green-400">
-                            Consultation Fee: ${selectedDoctor.consultationFee}
+                            Consultation Fee: ₹{selectedDoctor.consultationFee}
                           </div>
                           <div className="text-12-regular text-green-300">
                             Payment due after service
@@ -1596,7 +1596,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           )}
 
                         {appointmentToday &&
-                          appointment.workflow !== "waiting" && appointment.status !== "cancelled" && (
+                          appointment.workflow !== "waiting" &&
+                          appointment.status !== "cancelled" && (
                             <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
                               {/* Reschedule Button */}
                               <button
