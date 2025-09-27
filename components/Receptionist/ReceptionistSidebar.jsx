@@ -52,18 +52,18 @@ const ReceptionistSidebar = ({
       icon: Calendar,
       description: "Schedule & Manage Appointments",
     },
-    {
-      id: "patients",
-      label: "Patient Records",
-      icon: Users,
-      description: "View Patient Information",
-    },
-    {
-      id: "billing",
-      label: "Billing & Payments",
-      icon: Receipt,
-      description: "Process Payments & Bills",
-    },
+    // {
+    //   id: "patients",
+    //   label: "Patient Records",
+    //   icon: Users,
+    //   description: "View Patient Information",
+    // },
+    // {
+    //   id: "billing",
+    //   label: "Billing & Payments",
+    //   icon: Receipt,
+    //   description: "Process Payments & Bills",
+    // },
     // {
     //   id: "insurance",
     //   label: "Insurance Verification",

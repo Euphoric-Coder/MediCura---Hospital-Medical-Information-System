@@ -171,9 +171,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   const [pastHistoryInput, setPastHistoryInput] = useState("");
 
   // Phone number states
-  const [phoneCountryCode, setPhoneCountryCode] = useState("+1");
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+91");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [emergencyCountryCode, setEmergencyCountryCode] = useState("+1");
+  const [emergencyCountryCode, setEmergencyCountryCode] = useState("+91");
   const [emergencyNumber, setEmergencyNumber] = useState("");
   const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] =
     useState(false);
