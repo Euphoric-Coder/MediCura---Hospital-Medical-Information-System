@@ -53,18 +53,18 @@ const DoctorSidebar = ({
       icon: FileText,
       description: "Write Notes & Prescriptions",
     },
-    {
-      id: "prescriptions",
-      label: "Prescriptions",
-      icon: Pill,
-      description: "Manage Prescriptions",
-    },
-    {
-      id: "lab-orders",
-      label: "Lab Orders",
-      icon: TestTube,
-      description: "Order & Review Tests",
-    },
+    // {
+    //   id: "prescriptions",
+    //   label: "Prescriptions",
+    //   icon: Pill,
+    //   description: "Manage Prescriptions",
+    // },
+    // {
+    //   id: "lab-orders",
+    //   label: "Lab Orders",
+    //   icon: TestTube,
+    //   description: "Order & Review Tests",
+    // },
     // {
     //   id: "admissions",
     //   label: "Admissions",
