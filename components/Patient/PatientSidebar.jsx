@@ -1,32 +1,23 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   Calendar,
-  Pill,
-  FileText,
-  Receipt,
+  NotebookTabs,
   User,
   Settings,
   LogOut,
   Heart,
-  Activity,
-  TestTube,
-  Phone,
-  Menu,
   X,
-  NotebookTabs,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
-const PatientSidebar = ({
-  currentPage,
-  onNavigate,
-  isOpen = true,
-  onToggle,
-}) => {
+const PatientSidebar = ({ isOpen = true, onToggle }) => {
   const { data: session } = useSession();
+  const pathname = usePathname();
 
-  // Extract user details from session
   const userName = session?.user?.name;
   const userId = session?.user?.id;
 
@@ -35,19 +26,29 @@ const PatientSidebar = ({
       id: "dashboard",
       label: "Dashboard",
       icon: Home,
+      href: "/patient/dashboard",
       description: "Overview & Health Summary",
     },
     {
       id: "appointments",
       label: "Appointments",
       icon: Calendar,
+      href: "/patient/dashboard/appointments",
       description: "Book & Manage Appointments",
     },
     {
       id: "prescriptions",
       label: "Prescriptions",
       icon: NotebookTabs,
+      href: "/patient/dashboard/prescriptions",
       description: "Consultation Details",
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      icon: User,
+      href: "/patient/dashboard/profile",
+      description: "Personal Information",
     },
     // {
     //   id: "medication",
@@ -73,45 +74,7 @@ const PatientSidebar = ({
     //   icon: FileText,
     //   description: "Health History & Documents",
     // },
-    {
-      id: "profile",
-      label: "Profile",
-      icon: User,
-      description: "Personal Information",
-    },
   ];
-
-  const quickActions = [
-    {
-      id: "emergency",
-      label: "Emergency Contact",
-      icon: Phone,
-      color: "bg-red-500",
-      description: "Call Emergency Services",
-    },
-    {
-      id: "health-tips",
-      label: "Health Tips",
-      icon: Heart,
-      color: "bg-pink-500",
-      description: "Daily Health Insights",
-    },
-    {
-      id: "vitals",
-      label: "Track Vitals",
-      icon: Activity,
-      color: "bg-blue-500",
-      description: "Log Health Metrics",
-    },
-  ];
-
-  const handleNavigate = (page) => {
-    onNavigate(page);
-    // Close sidebar on mobile after navigation
-    if (onToggle && window.innerWidth < 1024) {
-      onToggle();
-    }
-  };
 
   return (
     <>
@@ -126,13 +89,13 @@ const PatientSidebar = ({
       {/* Sidebar */}
       <div
         className={`
-        fixed lg:static inset-y-0 left-0 z-50 
-        w-80 lg:w-80 xl:w-96 
-        h-screen bg-gradient-to-b from-dark-200 to-dark-300 
-        border-r border-dark-500/50 flex flex-col
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-      `}
+          fixed lg:static inset-y-0 left-0 z-50 
+          w-80 lg:w-80 xl:w-96 
+          h-screen bg-gradient-to-b from-dark-200 to-dark-300 
+          border-r border-dark-500/50 flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
       >
         {/* Mobile Close Button */}
         {onToggle && (
@@ -186,89 +149,57 @@ const PatientSidebar = ({
               Main Menu
             </div>
 
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavigate(item.id)}
-                className={`w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group ${
-                  currentPage === item.id
-                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
-                    : "text-dark-700 hover:bg-dark-400/50 hover:text-white"
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                    currentPage === item.id
-                      ? "bg-white/20"
-                      : "bg-dark-400/50 group-hover:bg-dark-400/70"
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={onToggle}
+                  className={`w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group ${
+                    isActive
+                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
+                      : "text-dark-700 hover:bg-dark-400/50 hover:text-white"
                   }`}
                 >
-                  <item.icon
-                    className={`w-4 h-4 lg:w-5 lg:h-5 ${
-                      currentPage === item.id
-                        ? "text-white"
-                        : "text-dark-600 group-hover:text-white"
-                    }`}
-                  />
-                </div>
-                <div className="flex-1">
                   <div
-                    className={`text-12-semibold lg:text-14-semibold ${
-                      currentPage === item.id
-                        ? "text-white"
-                        : "group-hover:text-white"
+                    className={`w-8 h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      isActive
+                        ? "bg-white/20"
+                        : "bg-dark-400/50 group-hover:bg-dark-400/70"
                     }`}
                   >
-                    {item.label}
+                    <item.icon
+                      className={`w-4 h-4 lg:w-5 lg:h-5 ${
+                        isActive
+                          ? "text-white"
+                          : "text-dark-600 group-hover:text-white"
+                      }`}
+                    />
                   </div>
-                  <div
-                    className={`text-10-regular lg:text-12-regular hidden sm:block ${
-                      currentPage === item.id
-                        ? "text-white/70"
-                        : "text-dark-600 group-hover:text-dark-600"
-                    }`}
-                  >
-                    {item.description}
+                  <div className="flex-1">
+                    <div
+                      className={`text-12-semibold lg:text-14-semibold ${isActive ? "text-white" : "group-hover:text-white"}`}
+                    >
+                      {item.label}
+                    </div>
+                    <div
+                      className={`text-10-regular lg:text-12-regular hidden sm:block ${isActive ? "text-white/70" : "text-dark-600 group-hover:text-dark-600"}`}
+                    >
+                      {item.description}
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </Link>
+              );
+            })}
           </div>
-
-          {/* Quick Actions */}
-          {/* <div className="mt-8 space-y-2">
-            <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">
-              Quick Actions
-            </div>
-
-            {quickActions.map((action) => (
-              <button
-                key={action.id}
-                onClick={() => handleNavigate(action.id)}
-                className="w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group text-dark-700 hover:bg-dark-400/50 hover:text-white"
-              >
-                <div
-                  className={`w-8 h-8 lg:w-10 lg:h-10 ${action.color} rounded-xl flex items-center justify-center shadow-lg`}
-                >
-                  <action.icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-12-semibold lg:text-14-semibold group-hover:text-white">
-                    {action.label}
-                  </div>
-                  <div className="text-10-regular lg:text-12-regular text-dark-600 group-hover:text-dark-600 hidden sm:block">
-                    {action.description}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div> */}
         </div>
 
         {/* Footer Actions */}
         <div className="p-3 lg:p-4 border-t border-dark-500/50 space-y-2">
-          <button
-            onClick={() => handleNavigate("settings")}
+          <Link
+            href="/patient/dashboard/settings"
+            onClick={onToggle}
             className="w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group text-dark-700 hover:bg-dark-400/50 hover:text-white"
           >
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-dark-400/50 rounded-xl flex items-center justify-center group-hover:bg-dark-400/70 transition-all duration-300">
@@ -282,15 +213,10 @@ const PatientSidebar = ({
                 App Preferences
               </div>
             </div>
-          </button>
+          </Link>
 
           <button
-            onClick={() =>
-              signOut({
-                redirect: true,
-                callbackUrl: "/sign-in",
-              })
-            }
+            onClick={() => signOut({ redirect: true, callbackUrl: "/sign-in" })}
             className="w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group text-red-400 hover:bg-red-500/10 hover:text-red-300"
           >
             <div className="w-8 h-8 lg:w-10 lg:h-10 bg-red-500/20 rounded-xl flex items-center justify-center group-hover:bg-red-500/30 transition-all duration-300">

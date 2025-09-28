@@ -9,6 +9,7 @@ import RedirectPage from "./RedirectPage";
 import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
+import { ModeToggle } from "./ThemeButton";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -64,15 +65,18 @@ const LoginPage = () => {
         {/* Left Side - Form */}
         <div className="flex-1 flex items-center justify-center px-8 py-12">
           <div className="w-full max-w-md">
-            {/* Logo */}
-            <Link href={"/"}>
-              <div className="flex items-center gap-2 mb-12">
-                <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
-                <span className="text-24-bold text-slate-900 dark:text-white">
-                  MediCura
-                </span>
-              </div>
-            </Link>
+            <div className="flex items-center justify-between mb-12">
+              {/* Logo */}
+              <Link href={"/"}>
+                <div className="flex items-center gap-2">
+                  <Image src={"/logo.png"} alt="Logo" width={32} height={32} />
+                  <span className="text-24-bold text-slate-900 dark:text-white">
+                    MediCura
+                  </span>
+                </div>
+              </Link>
+              <ModeToggle />
+            </div>
 
             {/* Welcome Text */}
             <div className="mb-10">
