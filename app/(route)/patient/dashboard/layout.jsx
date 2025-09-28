@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/dbConfig";
@@ -28,44 +28,45 @@ export default function DashboardLayout({ children }) {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!userId || !userEmail) return;
+  const refreshPatientData = useCallback(async () => {
+    if (!userId || !userEmail) return;
 
-      try {
-        const data = await db
+    try {
+      const data = await db
+        .select()
+        .from(Users)
+        .where(eq(Users.email, userEmail));
+
+      if (data.length > 0) {
+        setRole(data[0].role);
+
+        const patient = await db
           .select()
-          .from(Users)
-          .where(eq(Users.email, userEmail));
+          .from(Patients)
+          .where(eq(Patients.userId, userId));
 
-        if (data.length > 0) {
-          setRole(data[0].role);
-
-          const patient = await db
-            .select()
-            .from(Patients)
-            .where(eq(Patients.userId, userId));
-
-          if (patient.length > 0) {
-            setPatientData(patient[0]);
-            setOnboardingStatus(patient[0].hasOnboarded);
-          }
+        if (patient.length > 0) {
+          setPatientData(patient[0]);
+          setOnboardingStatus(patient[0].hasOnboarded);
         }
-      } catch (error) {
-        console.error("Error checking onboarding:", error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error refreshing patient data:", error);
+    }
+  }, [userId, userEmail]);
 
-    if (status === "authenticated") checkOnboardingStatus();
+  // Initial load
+  useEffect(() => {
+    if (status === "authenticated") {
+      refreshPatientData().finally(() => setLoading(false));
+    }
 
     const timer = setTimeout(() => {
       if (status === "unauthenticated") setLoading(false);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [userId, userEmail, status]);
+  }, [status, refreshPatientData]);
 
   // 🔹 Loading state
   if (loading) {
@@ -96,7 +97,7 @@ export default function DashboardLayout({ children }) {
               <ShieldAlert className="w-10 h-10 text-red-400" />
             </div>
           </div>
-          <h2 className="text-24-bold text-white mb-4">Access Denied</h2>
+          <h2 className="text-white mb-4">Access Denied</h2>
           <p className="text-dark-600 text-16-regular mb-6">
             Hello <span className="text-white">{userName || "User"}</span>, you
             don’t have access to the Patient Dashboard. Please proceed to your{" "}
@@ -104,7 +105,7 @@ export default function DashboardLayout({ children }) {
           </p>
           <button
             onClick={() => router.push(`/${role}/dashboard`)}
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-green-500/25"
           >
             Go to {role} Dashboard <ArrowRight className="w-5 h-5" />
           </button>
@@ -114,7 +115,9 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <PatientProvider value={{ patientData, role, userName }}>
+    <PatientProvider
+      value={{ patientData, role, userName, refreshPatientData }}
+    >
       <div className="flex h-screen bg-dark-300">
         {/* Sidebar */}
         <PatientSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
@@ -134,7 +137,7 @@ export default function DashboardLayout({ children }) {
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <Plus className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-18-bold text-white">MediCura</span>
+                <span className="text-white">MediCura</span>
               </div>
               <div className="w-10"></div>
             </div>

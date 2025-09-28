@@ -1,6 +1,5 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -23,7 +22,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -34,8 +33,8 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Providers>{children}</Providers>
-          <Toaster richColors />
         </ThemeProvider>
+        <Toaster richColors />
       </body>
     </html>
   );

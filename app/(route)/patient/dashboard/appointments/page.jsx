@@ -6,7 +6,5 @@ import PatientBookAppointment from "@/components/Patient/PatientBookAppointment"
 export default function AppointmentsPage() {
   const { patientData } = usePatient();
 
-  console.log(patientData);
-
   return <PatientBookAppointment patientData={patientData} />;
 }

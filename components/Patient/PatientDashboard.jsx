@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { act, useEffect, useState } from "react";
 import {
   Plus,
   Calendar,
@@ -12,62 +12,116 @@ import {
   Download,
   Eye,
   Bell,
+  Users,
 } from "lucide-react";
+import { db } from "@/lib/dbConfig";
+import {
+  Appointments,
+  Consultations,
+  Doctors,
+  LabTests,
+  Prescriptions,
+} from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
-const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
+const PatientDashboard = ({ onBookAppointment, patientData }) => {
   const [activeTab, setActiveTab] = useState("overview");
 
-  const upcomingAppointments = [
-    {
-      id: "1",
-      date: "Jan 25, 2024",
-      time: "10:00 AM",
-      doctor: {
-        name: "Dr. Sarah Safari",
-        speciality: "General Medicine",
-        avatar:
-          "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      },
-      status: "upcoming",
-      type: "Annual Check-up",
-    },
-    {
-      id: "2",
-      date: "Feb 2, 2024",
-      time: "2:30 PM",
-      doctor: {
-        name: "Dr. Ava Williams",
-        speciality: "Cardiology",
-        avatar:
-          "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      },
-      status: "upcoming",
-      type: "Follow-up",
-    },
-  ];
+  // console.log(patientData);
 
-  const activePrescriptions = [
-    {
-      id: "1",
-      medication: "Lisinopril",
-      dosage: "10mg",
-      frequency: "Once daily",
-      prescribedBy: "Dr. Sarah Safari",
-      date: "2024-01-10",
-      status: "active",
-      refillsLeft: 2,
-    },
-    {
-      id: "2",
-      medication: "Metformin",
-      dosage: "500mg",
-      frequency: "Twice daily",
-      prescribedBy: "Dr. Sarah Safari",
-      date: "2024-01-10",
-      status: "active",
-      refillsLeft: 1,
-    },
-  ];
+  const [appointments, setAppointments] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [labs, setLabs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!patientData?.userId) return;
+
+    const fetchData = async () => {
+      try {
+        // Appointments
+        // Fetch appointments with doctor info in one query
+        const appts = await db
+          .select({
+            id: Appointments.id,
+            date: Appointments.date,
+            time: Appointments.time,
+            type: Appointments.type,
+            status: Appointments.status,
+            doctorId: Appointments.doctorId,
+
+            doctorName: Doctors.name,
+            doctorSpeciality: Doctors.speciality,
+            doctorAvatar: Doctors.avatar,
+          })
+          .from(Appointments)
+          .innerJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
+          .where(eq(Appointments.patientId, patientData.userId));
+
+        // console.log(appts);
+        setAppointments(appts);
+
+        // Prescriptions
+        const prescriptions = await db
+          .select({
+            id: Prescriptions.id,
+            medication: Prescriptions.medication,
+            dosage: Prescriptions.dosage,
+            frequency: Prescriptions.frequency,
+            duration: Prescriptions.duration,
+            status: Prescriptions.status,
+
+            consultationId: Consultations.id,
+            consultationDate: Consultations.createdAt,
+
+            doctorId: Doctors.userId,
+            doctorName: Doctors.name,
+            doctorSpeciality: Doctors.speciality,
+
+            appointmentId: Appointments.id,
+            appointmentDate: Appointments.date,
+            appointmentTime: Appointments.time,
+            appointmentType: Appointments.type,
+          })
+          .from(Prescriptions)
+          .innerJoin(
+            Consultations,
+            eq(Prescriptions.consultationId, Consultations.id)
+          )
+          .leftJoin(
+            Appointments,
+            eq(Consultations.appointmentId, Appointments.id)
+          )
+          .innerJoin(Doctors, eq(Consultations.doctorId, Doctors.userId))
+          .where(eq(Consultations.patientId, patientData.userId));
+
+        setPrescriptions(prescriptions.filter((p) => p.status === "active"));
+
+        // Lab Results
+        // const results = await db
+        //   .select()
+        //   .from(LabTests)
+        //   .where(eq(LabTests.patientId, patientData.userId));
+        // setLabs(results);
+
+        // console.log("Dashboard data:", { appts, prescriptions });
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white">
+        Loading your dashboard…
+      </div>
+    );
+  }
 
   const labResults = [
     {
@@ -189,6 +243,16 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
     return null;
   };
 
+  const upcomingAppt = appointments.filter(
+    (appt) => appt.status === "upcoming"
+  ).length;
+
+  const activeMeds = prescriptions.filter((p) => p.status === "active").length;
+
+  const labResultsCount = labs.filter(
+    (result) => result.status === "completed"
+  ).length;
+
   return (
     <div className="h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400 overflow-y-auto">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
@@ -201,7 +265,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
               <div>
                 <h1 className="text-24-bold lg:text-36-bold text-white">
-                  Welcome back, John
+                  Welcome back, {patientData.name}
                 </h1>
                 <p className="text-14-regular lg:text-16-regular text-dark-700">
                   Here's your health overview
@@ -234,7 +298,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
               <div>
                 <div className="text-20-bold lg:text-32-bold text-white">
-                  {upcomingAppointments.length}
+                  {upcomingAppt}
                 </div>
                 <div className="text-12-regular lg:text-14-regular text-blue-400">
                   Upcoming
@@ -250,7 +314,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
               <div>
                 <div className="text-20-bold lg:text-32-bold text-white">
-                  {activePrescriptions.length}
+                  {activeMeds}
                 </div>
                 <div className="text-12-regular lg:text-14-regular text-purple-400">
                   Active Meds
@@ -266,7 +330,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
               <div>
                 <div className="text-20-bold lg:text-32-bold text-white">
-                  {labResults.filter((l) => l.status === "completed").length}
+                  {labResultsCount}
                 </div>
                 <div className="text-12-regular lg:text-14-regular text-green-400">
                   Lab Results
@@ -332,40 +396,38 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
                   </h2>
                 </div>
 
-                {upcomingAppointments.length > 0 ? (
+                {appointments.length > 0 ? (
                   <div className="bg-dark-400/50 rounded-2xl p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <img
-                        src={upcomingAppointments[0].doctor.avatar}
-                        alt={upcomingAppointments[0].doctor.name}
+                        src={appointments[0].doctorAvatar || ""}
+                        alt={appointments[0].doctorName}
                         className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                       />
                       <div>
                         <h3 className="text-16-bold lg:text-18-bold text-white">
-                          {upcomingAppointments[0].doctor.name}
+                          {appointments[0].doctorName}
                         </h3>
                         <p className="text-14-regular text-blue-400">
-                          {upcomingAppointments[0].doctor.speciality}
+                          {appointments[0].doctorSpeciality}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 lg:gap-6 text-14-regular text-dark-700">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-blue-400" />
-                        <span>{upcomingAppointments[0].date}</span>
+                        <span>{appointments[0].date}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-purple-400" />
-                        <span>{upcomingAppointments[0].time}</span>
+                        <span>{appointments[0].time}</span>
                       </div>
                     </div>
                     <div className="mt-4">
                       <span className="text-12-regular text-dark-600">
                         Type:{" "}
                       </span>
-                      <span className="text-white">
-                        {upcomingAppointments[0].type}
-                      </span>
+                      <span className="text-white">{appointments[0].type}</span>
                     </div>
                   </div>
                 ) : (
@@ -462,7 +524,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
 
               <div className="space-y-4">
-                {upcomingAppointments.map((appointment) => (
+                {appointments.map((appointment) => (
                   <div
                     key={appointment.id}
                     className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6"
@@ -470,16 +532,16 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="flex items-center gap-4 lg:gap-6">
                         <img
-                          src={appointment.doctor.avatar}
-                          alt={appointment.doctor.name}
+                          src={appointment.doctorAvatar}
+                          alt={appointment.doctorName}
                           className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                         />
                         <div>
                           <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
-                            {appointment.doctor.name}
+                            {appointment.doctorName}
                           </h3>
                           <p className="text-14-regular text-blue-400 mb-2">
-                            {appointment.doctor.speciality}
+                            {appointment.doctorSpeciality}
                           </p>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700">
                             <div className="flex items-center gap-2">
@@ -531,7 +593,7 @@ const PatientDashboard = ({ onLogout, onBookAppointment, onGoToProfile }) => {
               </div>
 
               <div className="space-y-4">
-                {activePrescriptions.map((prescription) => (
+                {prescriptions.map((prescription) => (
                   <div
                     key={prescription.id}
                     className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6"
