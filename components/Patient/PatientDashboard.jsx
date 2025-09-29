@@ -13,6 +13,7 @@ import {
   Eye,
   Bell,
   Users,
+  RefreshCcw,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import {
@@ -23,6 +24,7 @@ import {
   Prescriptions,
 } from "@/lib/schema";
 import { eq } from "drizzle-orm";
+import { Button } from "../ui/button";
 
 const PatientDashboard = ({ onBookAppointment, patientData }) => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -30,6 +32,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
   // console.log(patientData);
 
   const [appointments, setAppointments] = useState([]);
+  const [futureAppt, setFutureAppt] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,83 +40,116 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
   useEffect(() => {
     if (!patientData?.userId) return;
 
-    const fetchData = async () => {
-      try {
-        // Appointments
-        // Fetch appointments with doctor info in one query
-        const appts = await db
-          .select({
-            id: Appointments.id,
-            date: Appointments.date,
-            time: Appointments.time,
-            type: Appointments.type,
-            status: Appointments.status,
-            doctorId: Appointments.doctorId,
-
-            doctorName: Doctors.name,
-            doctorSpeciality: Doctors.speciality,
-            doctorAvatar: Doctors.avatar,
-          })
-          .from(Appointments)
-          .innerJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
-          .where(eq(Appointments.patientId, patientData.userId));
-
-        // console.log(appts);
-        setAppointments(appts);
-
-        // Prescriptions
-        const prescriptions = await db
-          .select({
-            id: Prescriptions.id,
-            medication: Prescriptions.medication,
-            dosage: Prescriptions.dosage,
-            frequency: Prescriptions.frequency,
-            duration: Prescriptions.duration,
-            status: Prescriptions.status,
-
-            consultationId: Consultations.id,
-            consultationDate: Consultations.createdAt,
-
-            doctorId: Doctors.userId,
-            doctorName: Doctors.name,
-            doctorSpeciality: Doctors.speciality,
-
-            appointmentId: Appointments.id,
-            appointmentDate: Appointments.date,
-            appointmentTime: Appointments.time,
-            appointmentType: Appointments.type,
-          })
-          .from(Prescriptions)
-          .innerJoin(
-            Consultations,
-            eq(Prescriptions.consultationId, Consultations.id)
-          )
-          .leftJoin(
-            Appointments,
-            eq(Consultations.appointmentId, Appointments.id)
-          )
-          .innerJoin(Doctors, eq(Consultations.doctorId, Doctors.userId))
-          .where(eq(Consultations.patientId, patientData.userId));
-
-        setPrescriptions(prescriptions.filter((p) => p.status === "active"));
-
-        // Lab Results
-        // const results = await db
-        //   .select()
-        //   .from(LabTests)
-        //   .where(eq(LabTests.patientId, patientData.userId));
-        // setLabs(results);
-
-        // console.log("Dashboard data:", { appts, prescriptions });
-      } catch (err) {
-        console.error("Error loading dashboard data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      console.log("Patient Data: ", patientData);
+      // Appointments
+      const appts = await db
+        .select({
+          id: Appointments.id,
+          date: Appointments.date,
+          time: Appointments.time,
+          type: Appointments.type,
+          status: Appointments.status,
+          doctorId: Appointments.doctorId,
+
+          doctorName: Doctors.name,
+          doctorSpeciality: Doctors.speciality,
+          doctorAvatar: Doctors.avatar,
+        })
+        .from(Appointments)
+        .innerJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
+        .where(eq(Appointments.patientId, patientData.userId));
+
+      // Current IST date/time
+      const nowIST = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+      );
+
+      // Keep only future appointments
+      const futureAppts = appts
+        .filter((appt) => new Date(appt.date) > nowIST)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setFutureAppt(futureAppts);
+
+      console.log("Future Appointments: ", futureAppts);
+
+      // console.log(appts);
+      setAppointments(appts);
+
+      // Prescriptions
+      const prescriptions = await db
+        .select({
+          id: Prescriptions.id,
+          medication: Prescriptions.medication,
+          dosage: Prescriptions.dosage,
+          frequency: Prescriptions.frequency,
+          duration: Prescriptions.duration,
+          status: Prescriptions.status,
+          refills: Prescriptions.refillsRemaining,
+
+          consultationId: Consultations.id,
+          consultationDate: Consultations.createdAt,
+
+          doctorId: Doctors.userId,
+          doctorName: Doctors.name,
+          doctorSpeciality: Doctors.speciality,
+
+          appointmentId: Appointments.id,
+          appointmentDate: Appointments.date,
+          appointmentTime: Appointments.time,
+          appointmentType: Appointments.type,
+        })
+        .from(Prescriptions)
+        .innerJoin(
+          Consultations,
+          eq(Prescriptions.consultationId, Consultations.id)
+        )
+        .leftJoin(
+          Appointments,
+          eq(Consultations.appointmentId, Appointments.id)
+        )
+        .innerJoin(Doctors, eq(Consultations.doctorId, Doctors.userId))
+        .where(eq(Consultations.patientId, patientData.userId));
+
+      setPrescriptions(prescriptions.filter((p) => p.status === "active"));
+
+      // Lab Results
+      // const results = await db
+      //   .select()
+      //   .from(LabTests)
+      //   .where(eq(LabTests.patientId, patientData.userId));
+      // setLabs(results);
+
+      // console.log("Dashboard data:", { appts, prescriptions });
+    } catch (err) {
+      console.error("Error loading dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshData = () => {
+    fetchData();
+  };
+
+  const isFutureAppointment = (appointmentDate) => {
+    if (!appointmentDate) return false;
+
+    // Convert stored date string to Date object
+    const apptDate = new Date(appointmentDate);
+
+    // Get current IST date/time
+    const nowIST = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    );
+
+    return apptDate > nowIST;
+  };
 
   if (loading) {
     return (
@@ -357,7 +393,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-8">
+        <div className="flex items-center justify-between bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-8">
           <div className="flex gap-1 lg:gap-2 overflow-x-auto">
             {[
               { id: "overview", label: "Overview", icon: Heart },
@@ -379,6 +415,10 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
               </button>
             ))}
           </div>
+          <Button className="btn3" onClick={() => refreshData()}>
+            <RefreshCcw />
+            Refresh Data
+          </Button>
         </div>
 
         {/* Tab Content */}
@@ -613,11 +653,11 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700">
                             <div>
                               <span className="text-white">Prescribed by:</span>{" "}
-                              {prescription.prescribedBy}
+                              {prescription.doctorName}
                             </div>
                             <div>
                               <span className="text-white">Date:</span>{" "}
-                              {prescription.date}
+                              {prescription.appointmentDate}
                             </div>
                           </div>
                           <div className="mt-2">
@@ -625,14 +665,14 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                               Refills remaining:{" "}
                             </span>
                             <span className="text-white">
-                              {prescription.refillsLeft}
+                              {prescription.refills}
                             </span>
                           </div>
                         </div>
                       </div>
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(prescription.status, "prescription")}
-                        {prescription.refillsLeft > 0 && (
+                        {prescription.refills > 0 && (
                           <button className="text-12-medium lg:text-14-medium text-green-400 hover:text-green-300 px-3 lg:px-4 py-2 border border-green-500/30 rounded-lg bg-green-500/10 hover:bg-green-500/20 transition-colors">
                             Request Refill
                           </button>
