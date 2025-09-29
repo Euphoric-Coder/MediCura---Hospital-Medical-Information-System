@@ -14,6 +14,7 @@ import {
   Bell,
   Users,
   RefreshCcw,
+  X,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import {
@@ -23,19 +24,377 @@ import {
   LabTests,
   Prescriptions,
 } from "@/lib/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
 
+const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
+  const [reason, setReason] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setReason("");
+    }
+  }, [isOpen]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Reason for cancellation:", reason);
+    onCancel(reason);
+    onClose();
+    setReason("");
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-dark-400 border border-dark-500 rounded-3xl text-white">
+        <DialogHeader className="flex flex-row items-center justify-between">
+          <DialogTitle className="text-20-bold lg:text-24-bold">
+            Cancel Appointment
+          </DialogTitle>
+        </DialogHeader>
+
+        <DialogDescription className="text-dark-700 text-14-regular lg:text-16-regular mb-6">
+          Are you sure you want to cancel your appointment with{" "}
+          <span className="text-white font-semibold">
+            {appointment?.doctorName}
+          </span>
+          ?
+        </DialogDescription>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="shad-input-label block mb-2">
+              Reason for cancellation
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="ex: Urgent meeting came up"
+              className="shad-textArea w-full text-white min-h-[100px] resize-none"
+              rows={4}
+              required
+            />
+          </div>
+
+          <DialogFooter className="flex gap-4">
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+              >
+                Keep Appointment
+              </button>
+            </DialogClose>
+            <button
+              type="submit"
+              className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+            >
+              Cancel Appointment
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const RescheduleModal = ({
+  isOpen,
+  onClose,
+  onReschedule,
+  appointment,
+  existingAppointments,
+  allAppointments,
+}) => {
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [currentWeek, setCurrentWeek] = useState(0);
+  const [weekSchedule, setWeekSchedule] = useState([]);
+
+  // Generate slots from doctor's availability
+  const generateWeekSchedule = (weekOffset) => {
+    if (!appointment?.doctor) return [];
+
+    const { availableDays, availableHours } = appointment.doctor;
+
+    const today = new Date();
+
+    // Always use IST local date for comparisons
+    const todayStr = today.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() + weekOffset * 7);
+
+    const schedule = [];
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+
+      const dayName = date.toLocaleDateString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Kolkata",
+      });
+      const shortDay = date.toLocaleDateString("en-US", {
+        weekday: "short",
+        timeZone: "Asia/Kolkata",
+      });
+      const dateStr = date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        timeZone: "Asia/Kolkata",
+      });
+
+      // Use IST yyyy-mm-dd for database matching
+      const fullDate = date.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+      });
+
+      const slots = [];
+      if (availableDays.includes(dayName)) {
+        const [startHour, startMinute] = availableHours.start
+          .split(":")
+          .map(Number);
+        const [endHour, endMinute] = availableHours.end.split(":").map(Number);
+
+        let current = new Date(date);
+        current.setHours(startHour, startMinute, 0, 0);
+
+        const end = new Date(date);
+        end.setHours(endHour, endMinute, 0, 0);
+
+        while (current <= end) {
+          const timeString = current.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Kolkata", // enforce IST
+          });
+
+          // Match booked appointments with strict format
+          const isBooked = allAppointments.some(
+            (apt) =>
+              apt.doctorId === appointment.doctor.userId &&
+              apt.date === fullDate &&
+              apt.time.toLowerCase() === timeString.toLowerCase() &&
+              apt.status === "upcoming"
+          );
+
+          // Compare with IST-safe today string
+          const timePassed =
+            fullDate < todayStr || (fullDate === todayStr && current < today);
+
+          slots.push({
+            time: timeString,
+            available: !isBooked && !timePassed,
+          });
+
+          current.setMinutes(current.getMinutes() + 30);
+        }
+      }
+
+      schedule.push({ date: dateStr, dayName: shortDay, fullDate, slots });
+    }
+
+    console.log(schedule);
+
+    return schedule;
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setWeekSchedule(generateWeekSchedule(0));
+    }
+  }, [isOpen, appointment]);
+
+  const handleWeekChange = (direction) => {
+    const newWeek = direction === "next" ? currentWeek + 1 : currentWeek - 1;
+    setCurrentWeek(newWeek);
+    setWeekSchedule(generateWeekSchedule(newWeek));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (selectedDate && selectedTime) {
+      onReschedule(selectedDate, selectedTime);
+      onClose();
+      setSelectedDate("");
+      setSelectedTime("");
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 lg:p-8">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-20-bold lg:text-24-bold text-white">
+              Reschedule Appointment
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-dark-600 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Current Appointment Info */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 lg:p-6 mb-8">
+            <h3 className="text-16-semibold lg:text-18-semibold text-white mb-4">
+              Current Appointment
+            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <img
+                src={appointment?.doctor.avatar}
+                alt={appointment?.doctor.name}
+                className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
+              />
+              <div className="flex-1">
+                <h4 className="text-14-semibold lg:text-16-semibold text-white">
+                  {appointment?.doctor.name}
+                </h4>
+                <p className="text-14-regular text-blue-400">
+                  {appointment?.doctor.speciality}
+                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-12-regular lg:text-14-regular text-dark-700 mt-2">
+                  <span>{appointment?.date}</span>
+                  <span>{appointment?.time}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* New Time Selection */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-18-bold lg:text-20-bold text-white">
+                Select New Date & Time
+              </h3>
+              <div className="flex items-center gap-2 lg:gap-4">
+                <button
+                  onClick={() => handleWeekChange("prev")}
+                  className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                </button>
+                <span className="text-12-medium lg:text-14-medium text-white px-2 text-center">
+                  {currentWeek === 0
+                    ? "This Week"
+                    : currentWeek > 0
+                      ? `${currentWeek}w ahead`
+                      : `${Math.abs(currentWeek)}w ago`}
+                </span>
+                <button
+                  onClick={() => handleWeekChange("next")}
+                  className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mini Calendar */}
+            <div className="grid grid-cols-7 gap-1 lg:gap-2">
+              {weekSchedule.map((day, dayIndex) => (
+                <div
+                  key={dayIndex}
+                  className="bg-dark-400/50 rounded-xl p-2 lg:p-3"
+                >
+                  <div className="text-center mb-2 lg:mb-3">
+                    <h4 className="text-10-semibold lg:text-12-semibold text-white">
+                      {day.dayName}
+                    </h4>
+                    <p className="text-8-regular lg:text-10-regular text-dark-700">
+                      {day.date}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1 max-h-32 lg:max-h-48 overflow-y-auto">
+                    {day.slots.length > 0 ? (
+                      day.slots.map((slot, slotIndex) => (
+                        <button
+                          key={slotIndex}
+                          onClick={() => {
+                            if (slot.available) {
+                              setSelectedDate(day.fullDate);
+                              setSelectedTime(slot.time);
+                            }
+                          }}
+                          disabled={!slot.available}
+                          className={`w-full p-1 rounded text-8-medium lg:text-10-medium transition-all duration-200 ${
+                            selectedDate === day.fullDate &&
+                            selectedTime === slot.time
+                              ? "bg-blue-500 text-white border border-blue-400"
+                              : slot.available
+                                ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
+                                : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
+                          }`}
+                        >
+                          {slot.time}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-8-regular lg:text-10-regular text-red-400 text-center">
+                        Not Available
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!selectedDate || !selectedTime}
+              className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+            >
+              Reschedule Appointment
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PatientDashboard = ({ onBookAppointment, patientData }) => {
   const [activeTab, setActiveTab] = useState("overview");
-
-  // console.log(patientData);
 
   const [appointments, setAppointments] = useState([]);
   const [futureAppt, setFutureAppt] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
     if (!patientData?.userId) return;
@@ -47,22 +406,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
     try {
       console.log("Patient Data: ", patientData);
       // Appointments
-      const appts = await db
-        .select({
-          id: Appointments.id,
-          date: Appointments.date,
-          time: Appointments.time,
-          type: Appointments.type,
-          status: Appointments.status,
-          doctorId: Appointments.doctorId,
-
-          doctorName: Doctors.name,
-          doctorSpeciality: Doctors.speciality,
-          doctorAvatar: Doctors.avatar,
-        })
-        .from(Appointments)
-        .innerJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
-        .where(eq(Appointments.patientId, patientData.userId));
+      const appts = await fetchAppointments(patientData.userId);
 
       // Current IST date/time
       const nowIST = new Date(
@@ -76,45 +420,11 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
       setFutureAppt(futureAppts);
 
-      console.log("Future Appointments: ", futureAppts);
-
       // console.log(appts);
       setAppointments(appts);
 
       // Prescriptions
-      const prescriptions = await db
-        .select({
-          id: Prescriptions.id,
-          medication: Prescriptions.medication,
-          dosage: Prescriptions.dosage,
-          frequency: Prescriptions.frequency,
-          duration: Prescriptions.duration,
-          status: Prescriptions.status,
-          refills: Prescriptions.refillsRemaining,
-
-          consultationId: Consultations.id,
-          consultationDate: Consultations.createdAt,
-
-          doctorId: Doctors.userId,
-          doctorName: Doctors.name,
-          doctorSpeciality: Doctors.speciality,
-
-          appointmentId: Appointments.id,
-          appointmentDate: Appointments.date,
-          appointmentTime: Appointments.time,
-          appointmentType: Appointments.type,
-        })
-        .from(Prescriptions)
-        .innerJoin(
-          Consultations,
-          eq(Prescriptions.consultationId, Consultations.id)
-        )
-        .leftJoin(
-          Appointments,
-          eq(Consultations.appointmentId, Appointments.id)
-        )
-        .innerJoin(Doctors, eq(Consultations.doctorId, Doctors.userId))
-        .where(eq(Consultations.patientId, patientData.userId));
+      const prescriptions = await fetchPrescriptions(patientData.userId);
 
       setPrescriptions(prescriptions.filter((p) => p.status === "active"));
 
@@ -133,8 +443,29 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
     }
   };
 
+  const fetchAppointments = async (patientId) => {
+    const res = await fetch(
+      `/api/patient-dashboard/appointments?patientId=${patientId}`
+    );
+    if (!res.ok) throw new Error("Failed to fetch appointments");
+    return await res.json();
+  };
+
+  const fetchPrescriptions = async (patientId) => {
+    const res = await fetch(
+      `/api/patient-dashboard/prescriptions?patientId=${patientId}`
+    );
+    if (!res.ok) throw new Error("Failed to fetch prescriptions");
+    return await res.json();
+  };
+
   const refreshData = () => {
     fetchData();
+  };
+
+  const handleCancelAppointment = (reason) => {
+    console.log("Cancelling the appointment with reason:", reason);
+    console.log(selectedAppointment);
   };
 
   const isFutureAppointment = (appointmentDate) => {
@@ -436,38 +767,38 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                   </h2>
                 </div>
 
-                {appointments.length > 0 ? (
+                {futureAppt.length > 0 ? (
                   <div className="bg-dark-400/50 rounded-2xl p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <img
-                        src={appointments[0].doctorAvatar || ""}
-                        alt={appointments[0].doctorName}
+                        src={futureAppt[0].doctorAvatar || ""}
+                        alt={futureAppt[0].doctorName}
                         className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                       />
                       <div>
                         <h3 className="text-16-bold lg:text-18-bold text-white">
-                          {appointments[0].doctorName}
+                          {futureAppt[0].doctorName}
                         </h3>
                         <p className="text-14-regular text-blue-400">
-                          {appointments[0].doctorSpeciality}
+                          {futureAppt[0].doctorSpeciality}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 lg:gap-6 text-14-regular text-dark-700">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-blue-400" />
-                        <span>{appointments[0].date}</span>
+                        <span>{futureAppt[0].date}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-purple-400" />
-                        <span>{appointments[0].time}</span>
+                        <span>{futureAppt[0].time}</span>
                       </div>
                     </div>
                     <div className="mt-4">
                       <span className="text-12-regular text-dark-600">
                         Type:{" "}
                       </span>
-                      <span className="text-white">{appointments[0].type}</span>
+                      <span className="text-white">{futureAppt[0].type}</span>
                     </div>
                   </div>
                 ) : (
@@ -605,14 +936,22 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                       </div>
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(appointment.status, "appointment")}
-                        <div className="flex gap-2 flex-wrap">
-                          <button className="text-12-medium lg:text-14-medium text-blue-400 hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-500/30 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors">
-                            Reschedule
-                          </button>
-                          <button className="text-12-medium lg:text-14-medium text-red-400 hover:text-red-300 px-3 lg:px-4 py-2 border border-red-500/30 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-colors">
-                            Cancel
-                          </button>
-                        </div>
+                        {appointment.status === "upcoming" && (
+                          <div className="flex gap-2 flex-wrap">
+                            <button className="text-12-medium lg:text-14-medium text-blue-400 hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-500/30 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors">
+                              Reschedule
+                            </button>
+                            <button
+                              className="text-12-medium lg:text-14-medium text-red-400 hover:text-red-300 px-3 lg:px-4 py-2 border border-red-500/30 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                              onClick={() => {
+                                setShowCancelModal(true);
+                                setSelectedAppointment(appointment);
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -751,6 +1090,13 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
           )}
         </div>
       </div>
+      {/* Cancel Modal */}
+      <CancelModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onCancel={handleCancelAppointment}
+        appointment={selectedAppointment}
+      />
     </div>
   );
 };
