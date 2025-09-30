@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -404,7 +405,6 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
   const fetchData = async () => {
     try {
-      console.log("Patient Data: ", patientData);
       // Appointments
       const appts = await fetchAppointments(patientData.userId);
 
@@ -463,9 +463,38 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
     fetchData();
   };
 
-  const handleCancelAppointment = (reason) => {
-    console.log("Cancelling the appointment with reason:", reason);
-    console.log(selectedAppointment);
+  const handleCancelAppointment = async (reason) => {
+    if (!selectedAppointment) return;
+
+    try {
+      const loading = toast.loading("Cancelling appointment...");
+
+      const res = await fetch("/api/patient/appointments/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: selectedAppointment.id,
+          reason,
+        }),
+      });
+
+      toast.dismiss(loading);
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to cancel appointment");
+        return;
+      }
+
+      refreshData();
+
+      toast.success("Appointment cancelled successfully");
+    } catch (err) {
+      toast.dismiss();
+      console.error("Request failed:", err);
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   const isFutureAppointment = (appointmentDate) => {

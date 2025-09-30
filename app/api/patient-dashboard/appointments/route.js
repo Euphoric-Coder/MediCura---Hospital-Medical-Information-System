@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 /**
  * GET /api/patient-dashboard/appointments?patientId=<id>
@@ -30,7 +30,8 @@ export async function GET(req) {
       })
       .from(Appointments)
       .innerJoin(Doctors, eq(Appointments.doctorId, Doctors.userId))
-      .where(eq(Appointments.patientId, patientId));
+      .where(eq(Appointments.patientId, patientId))
+      .orderBy(desc(Appointments.date));
 
     return NextResponse.json(appts, { status: 200 });
   } catch (error) {

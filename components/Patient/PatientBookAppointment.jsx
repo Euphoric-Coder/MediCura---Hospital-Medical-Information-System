@@ -282,8 +282,8 @@ const RescheduleModal = ({
                   {currentWeek === 0
                     ? "This Week"
                     : currentWeek > 0
-                    ? `${currentWeek}w ahead`
-                    : `${Math.abs(currentWeek)}w ago`}
+                      ? `${currentWeek}w ahead`
+                      : `${Math.abs(currentWeek)}w ago`}
                 </span>
                 <button
                   onClick={() => handleWeekChange("next")}
@@ -327,8 +327,8 @@ const RescheduleModal = ({
                             selectedTime === slot.time
                               ? "bg-blue-500 text-white border border-blue-400"
                               : slot.available
-                              ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
-                              : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
+                                ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
+                                : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
                           }`}
                         >
                           {slot.time}
@@ -634,16 +634,35 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   };
 
   const handleCancelAppointment = async (reason) => {
-    if (selectedAppointment) {
-      const cancel = await db
-        .update(Appointments)
-        .set({ status: "cancelled", reason: reason, workflow: "cancelled" })
-        .where(eq(Appointments.id, selectedAppointment.id));
+    if (!selectedAppointment) return;
+
+    try {
+      const loading = toast.loading("Cancelling appointment...");
+
+      const res = await fetch("/api/patient/appointments/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: selectedAppointment.id,
+          reason,
+        }),
+      });
+
+      toast.dismiss(loading);
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to cancel appointment");
+        return;
+      }
 
       refreshAppointment();
 
+      toast.success("Appointment cancelled successfully");
+
       setMessage(
-        `Appointment with ${selectedAppointment.doctor.name} cancelled successfully`
+        `Appointment with ${selectedAppointment.doctorName || "Doctor"} cancelled successfully`
       );
       setMessageType("success");
 
@@ -651,6 +670,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         setMessage("");
         setMessageType("");
       }, 3000);
+    } catch (err) {
+      toast.dismiss();
+      console.error("Request failed:", err);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
