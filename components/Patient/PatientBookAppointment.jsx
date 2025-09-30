@@ -678,19 +678,35 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   };
 
   const handleRescheduleAppointment = async (newDate, newTime) => {
-    if (selectedAppointment) {
-      const reschedule = await db
-        .update(Appointments)
-        .set({
-          date: newDate,
-          time: newTime,
-          updatedAt: new Date(),
-        })
-        .where(eq(Appointments.id, selectedAppointment.id));
-      refreshAppointment();
+    if (!selectedAppointment) return;
+
+    try {
+      const loading = toast.loading("Rescheduling appointment...");
+
+      const res = await fetch("/api/patient/appointments/reschedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: selectedAppointment.id,
+          newDate,
+          newTime,
+        }),
+      });
+
+      toast.dismiss(loading);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to reschedule appointment");
+        return;
+      }
+
+      refreshAppointment?.();
+
+      toast.success("Appointment rescheduled successfully");
 
       setMessage(
-        `Appointment with ${selectedAppointment.doctor.name} rescheduled successfully`
+        `Appointment with ${selectedAppointment.doctorName || "Doctor"} rescheduled successfully`
       );
       setMessageType("success");
 
@@ -698,8 +714,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         setMessage("");
         setMessageType("");
       }, 3000);
+    } catch (err) {
+      toast.dismiss();
+      console.error("Request failed:", err);
+      toast.error("Something went wrong. Please try again.");
     }
   };
+
 
   const handleMarkAsWaiting = async (appointment) => {
     try {
