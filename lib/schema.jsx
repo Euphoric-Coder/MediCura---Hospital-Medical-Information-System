@@ -124,10 +124,6 @@ export const Appointments = pgTable("appointments", {
     .notNull()
     .references(() => Doctors.userId, { onDelete: "cascade" }),
 
-  // Data to be stored
-  patient: jsonb("patient"),
-  doctor: jsonb("doctor"),
-
   date: date("date").notNull(),
   time: varchar("time").notNull(), // e.g. "10:30 AM"
   arrivalTime: varchar("arrivalTime"), // e.g. "10:30 AM"

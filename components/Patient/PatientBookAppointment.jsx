@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
-import { Appointments, Doctors } from "@/lib/schema";
+import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { desc, eq } from "drizzle-orm";
 import { toast } from "sonner";
 
@@ -405,36 +405,37 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const data = await db.select().from(Doctors);
-        setDoctors(data);
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDoctors();
     fetchAppointments();
   }, []);
 
   const fetchAppointments = async () => {
     try {
-      const data = await db
-        .select()
-        .from(Appointments)
-        .where(eq(Appointments.patientId, patientData.userId))
-        .orderBy(desc(Appointments.date));
+      const data = await fetch(
+        `/api/patient/appointments/${patientData.userId}`
+      );
 
-      const all = await db.select().from(Appointments);
-      setExistingAppointments(data);
+      const all = await fetch("/api/patient/appointments");
 
-      console.log(data);
-      setAllAppointments(all);
+      const patientAppointments = await data.json();
+      const allAppointments = await all.json();
+
+      setExistingAppointments(patientAppointments);
+
+      setAllAppointments(allAppointments);
     } catch (error) {
       console.error("Error fetching appointments:", error);
+    }
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      const data = await db.select().from(Doctors);
+      setDoctors(data);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -555,6 +556,16 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const patientAlreadyAppointed = (date, doctorId) => {
     // Check if the patient has any appointment on the given date
+    console.log("Already Present :", doctorId, date);
+    console.log(
+      existingAppointments.some(
+        (apt) =>
+          apt.date === date &&
+          apt.status === "upcoming" &&
+          apt.doctorId === doctorId
+      )
+    );
+    console.log(existingAppointments[0]);
     return existingAppointments.some(
       (apt) =>
         apt.date === date &&
@@ -720,7 +731,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
       toast.error("Something went wrong. Please try again.");
     }
   };
-
 
   const handleMarkAsWaiting = async (appointment) => {
     try {
@@ -1236,6 +1246,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   day.fullDate,
                                   selectedDoctor.userId
                                 );
+                              console.log(
+                                "Patient Has appointment",
+                                patientHasAppointment
+                              );
 
                               return (
                                 <button
