@@ -15,6 +15,13 @@ export async function POST(req) {
       );
     }
 
+    console.log(
+      "Printing the reschedule data",
+      appointmentId,
+      newDate,
+      newTime
+    );
+
     const reschedule = await db
       .update(Appointments)
       .set({

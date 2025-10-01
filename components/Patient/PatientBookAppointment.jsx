@@ -22,6 +22,7 @@ import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { desc, eq } from "drizzle-orm";
 import { toast } from "sonner";
+import { getDoctor, getPatientAppointments } from "@/lib/patients/appointment";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -411,14 +412,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const fetchAppointments = async () => {
     try {
-      const data = await fetch(
-        `/api/patient/appointments/${patientData.userId}`
-      );
-
-      const all = await fetch("/api/patient/appointments");
-
-      const patientAppointments = await data.json();
-      const allAppointments = await all.json();
+      const { patientAppointments, allAppointments } =
+        await getPatientAppointments(patientData.userId);
 
       setExistingAppointments(patientAppointments);
 
@@ -430,8 +425,9 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const fetchDoctors = async () => {
     try {
-      const data = await db.select().from(Doctors);
-      setDoctors(data);
+      const doctor = await getDoctor();
+      console.log("Doctor Data: ", doctor);
+      setDoctors(doctor);
     } catch (error) {
       console.error("Error fetching doctors:", error);
     } finally {
@@ -691,6 +687,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const handleRescheduleAppointment = async (newDate, newTime) => {
     if (!selectedAppointment) return;
 
+    console.log("Printing the reschedule data", selectedAppointment.id);
     try {
       const loading = toast.loading("Rescheduling appointment...");
 
@@ -712,7 +709,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         return;
       }
 
-      refreshAppointment?.();
+      refreshAppointment();
 
       toast.success("Appointment rescheduled successfully");
 

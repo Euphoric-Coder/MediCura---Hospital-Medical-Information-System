@@ -4,6 +4,9 @@ import { eq } from "drizzle-orm";
 
 export async function POST(req) {
   const { appointmentId, newDate, newTime } = await req.json();
+
+  console.log("Pringting the reschedule data", appointmentId, newDate, newTime);
+
   await db
     .update(Appointments)
     .set({ date: newDate, time: newTime, updatedAt: new Date() })
