@@ -15,6 +15,8 @@ import {
   Users,
   RefreshCcw,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { db } from "@/lib/dbConfig";
 import {
@@ -37,6 +39,7 @@ import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { getPatientAppointments } from "@/lib/patients/appointment";
+import { set } from "date-fns";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -392,12 +395,14 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
   const [activeTab, setActiveTab] = useState("overview");
 
   const [appointments, setAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
   const [futureAppt, setFutureAppt] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
 
   useEffect(() => {
     if (!patientData?.userId) return;
@@ -410,6 +415,8 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
       // Appointments
       const { patientAppointments, allAppointments } =
         await getPatientAppointments(patientData.userId);
+
+      setAllAppointments(allAppointments);
 
       // Current IST date/time
       const nowIST = new Date(
@@ -456,6 +463,40 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
   const refreshData = () => {
     fetchData();
+  };
+
+  const handleRescheduleAppointment = async (newDate, newTime) => {
+    if (!selectedAppointment) return;
+
+    try {
+      const loading = toast.loading("Rescheduling appointment...");
+
+      const res = await fetch("/api/patient/appointments/reschedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: selectedAppointment.id,
+          newDate,
+          newTime,
+        }),
+      });
+
+      toast.dismiss(loading);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to reschedule appointment");
+        return;
+      }
+
+      refreshData();
+
+      toast.success("Appointment rescheduled successfully");
+    } catch (err) {
+      toast.dismiss();
+      console.error("Request failed:", err);
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   const handleCancelAppointment = async (reason) => {
@@ -956,13 +997,57 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                               {appointment.type}
                             </span>
                           </div>
+                          <div
+                            className={`mt-2 rounded-lg px-3 py-2 inline-block ${
+                              appointment.status === "cancelled"
+                                ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                                : "bg-dark-500/30"
+                            }`}
+                          >
+                            <p
+                              className={`text-10-regular lg:text-12-regular ${
+                                appointment.status === "cancelled"
+                                  ? "text-red-400"
+                                  : "text-dark-600"
+                              }`}
+                            >
+                              <span
+                                className={
+                                  appointment.status === "cancelled"
+                                    ? "text-red-300"
+                                    : "text-white"
+                                }
+                              >
+                                {appointment.status === "cancelled" &&
+                                  "Cancellation"}{" "}
+                                Reason:
+                              </span>{" "}
+                              {appointment.reason}
+                            </p>
+                          </div>
+
+                          {appointment.notes &&
+                            appointment.status !== "cancelled" && (
+                              <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
+                                <p className="text-10-regular lg:text-12-regular text-blue-400">
+                                  <span className="text-white">Notes:</span>{" "}
+                                  {appointment.notes}
+                                </p>
+                              </div>
+                            )}
                         </div>
                       </div>
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(appointment.status, "appointment")}
                         {appointment.status === "upcoming" && (
                           <div className="flex gap-2 flex-wrap">
-                            <button className="text-12-medium lg:text-14-medium text-blue-400 hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-500/30 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors">
+                            <button
+                              className="text-12-medium lg:text-14-medium text-blue-400 hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-500/30 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+                              onClick={() => {
+                                setShowRescheduleModal(true);
+                                setSelectedAppointment(appointment);
+                              }}
+                            >
                               Reschedule
                             </button>
                             <button
@@ -1120,6 +1205,16 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
         onClose={() => setShowCancelModal(false)}
         onCancel={handleCancelAppointment}
         appointment={selectedAppointment}
+      />
+
+      {/* Reschedule Modal */}
+      <RescheduleModal
+        isOpen={showRescheduleModal}
+        onClose={() => setShowRescheduleModal(false)}
+        onReschedule={handleRescheduleAppointment}
+        appointment={selectedAppointment}
+        existingAppointments={appointments}
+        allAppointments={allAppointments}
       />
     </div>
   );

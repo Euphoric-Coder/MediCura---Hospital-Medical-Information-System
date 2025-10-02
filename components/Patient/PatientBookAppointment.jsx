@@ -18,6 +18,15 @@ import {
   CheckCircle,
   X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { desc, eq } from "drizzle-orm";
@@ -27,70 +36,72 @@ import { getDoctor, getPatientAppointments } from "@/lib/patients/appointment";
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
 
+  useEffect(() => {
+    if (isOpen) {
+      setReason("");
+    }
+  }, [isOpen]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Reason for cancellation:", reason);
     onCancel(reason);
     onClose();
     setReason("");
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-md">
-        <div className="p-6 lg:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-20-bold lg:text-24-bold text-white">
-              Cancel Appointment
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-dark-600 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-dark-400 border border-dark-500 rounded-3xl text-white">
+        <DialogHeader className="flex flex-row items-center justify-between">
+          <DialogTitle className="text-20-bold lg:text-24-bold">
+            Cancel Appointment
+          </DialogTitle>
+        </DialogHeader>
+
+        <DialogDescription className="text-dark-700 text-14-regular lg:text-16-regular mb-6">
+          Are you sure you want to cancel your appointment with{" "}
+          <span className="text-white font-semibold">
+            {appointment?.doctorName}
+          </span>
+          ?
+        </DialogDescription>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="shad-input-label block mb-2">
+              Reason for cancellation
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="ex: Urgent meeting came up"
+              className="shad-textArea w-full text-white min-h-[100px] resize-none"
+              rows={4}
+              required
+            />
           </div>
 
-          <p className="text-14-regular lg:text-16-regular text-dark-700 mb-8">
-            Are you sure you want to cancel your appointment with{" "}
-            {appointment?.doctor.name}?
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="shad-input-label block mb-2">
-                Reason for cancellation
-              </label>
-              <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="ex: Urgent meeting came up"
-                className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                rows={4}
-                required
-              />
-            </div>
-
-            <div className="flex gap-4">
+          <DialogFooter className="flex gap-4">
+            <DialogClose asChild>
               <button
                 type="button"
-                onClick={onClose}
                 className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
               >
                 Keep Appointment
               </button>
-              <button
-                type="submit"
-                className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
-              >
-                Cancel Appointment
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+            </DialogClose>
+            <button
+              type="submit"
+              className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-700 disabled:cursor-not-allowed text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
+              disabled={!reason}
+            >
+              Cancel Appointment
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -687,7 +698,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const handleRescheduleAppointment = async (newDate, newTime) => {
     if (!selectedAppointment) return;
 
-    console.log("Printing the reschedule data", selectedAppointment.id);
     try {
       const loading = toast.loading("Rescheduling appointment...");
 
