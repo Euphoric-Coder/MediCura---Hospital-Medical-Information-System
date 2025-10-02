@@ -36,6 +36,7 @@ import {
 import { eq } from "drizzle-orm";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { getPatientAppointments } from "@/lib/patients/appointment";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -90,14 +91,14 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
             <DialogClose asChild>
               <button
                 type="button"
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
               >
                 Keep Appointment
               </button>
             </DialogClose>
             <button
               type="submit"
-              className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+              className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
             >
               Cancel Appointment
             </button>
@@ -406,7 +407,8 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
   const fetchData = async () => {
     try {
       // Appointments
-      const appts = await fetchAppointments(patientData.userId);
+      const { patientAppointments, allAppointments } =
+        await getPatientAppointments(patientData.userId);
 
       // Current IST date/time
       const nowIST = new Date(
@@ -414,14 +416,14 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
       );
 
       // Keep only future appointments
-      const futureAppts = appts
+      const futureAppts = patientAppointments
         .filter((appt) => new Date(appt.date) > nowIST)
         .sort((a, b) => new Date(a.date) - new Date(b.date));
 
       setFutureAppt(futureAppts);
 
-      // console.log(appts);
-      setAppointments(appts);
+      // console.log(patientAppointments);
+      setAppointments(patientAppointments);
 
       // Prescriptions
       const prescriptions = await fetchPrescriptions(patientData.userId);
@@ -435,20 +437,12 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
       //   .where(eq(LabTests.patientId, patientData.userId));
       // setLabs(results);
 
-      // console.log("Dashboard data:", { appts, prescriptions });
+      // console.log("Dashboard data:", { patientAppointments, prescriptions });
     } catch (err) {
       console.error("Error loading dashboard data:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchAppointments = async (patientId) => {
-    const res = await fetch(
-      `/api/patient-dashboard/appointments?patientId=${patientId}`
-    );
-    if (!res.ok) throw new Error("Failed to fetch appointments");
-    return await res.json();
   };
 
   const fetchPrescriptions = async (patientId) => {
@@ -800,16 +794,16 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                   <div className="bg-dark-400/50 rounded-2xl p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <img
-                        src={futureAppt[0].doctorAvatar || ""}
-                        alt={futureAppt[0].doctorName}
+                        src={futureAppt[0].doctor.avatar || ""}
+                        alt={futureAppt[0].doctor.name}
                         className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                       />
                       <div>
                         <h3 className="text-16-bold lg:text-18-bold text-white">
-                          {futureAppt[0].doctorName}
+                          {futureAppt[0].doctor.name}
                         </h3>
                         <p className="text-14-regular text-blue-400">
-                          {futureAppt[0].doctorSpeciality}
+                          {futureAppt[0].doctor.speciality}
                         </p>
                       </div>
                     </div>
@@ -932,16 +926,16 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="flex items-center gap-4 lg:gap-6">
                         <img
-                          src={appointment.doctorAvatar}
-                          alt={appointment.doctorName}
+                          src={appointment.doctor.avatar}
+                          alt={appointment.doctor.name}
                           className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                         />
                         <div>
                           <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
-                            {appointment.doctorName}
+                            {appointment.doctor.name}
                           </h3>
                           <p className="text-14-regular text-blue-400 mb-2">
-                            {appointment.doctorSpeciality}
+                            {appointment.doctor.speciality}
                           </p>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700">
                             <div className="flex items-center gap-2">
