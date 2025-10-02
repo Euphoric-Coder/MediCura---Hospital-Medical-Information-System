@@ -76,13 +76,13 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
               >
                 Keep Appointment
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+                className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
               >
                 Cancel Appointment
               </button>

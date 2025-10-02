@@ -98,7 +98,8 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
             </DialogClose>
             <button
               type="submit"
-              className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
+              className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-700 disabled:cursor-not-allowed text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
+              disabled={!reason}
             >
               Cancel Appointment
             </button>
