@@ -1739,13 +1739,14 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
         {/* Manage Appointments Tab */}
         {activeTab === "manage" && (
-          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
+          <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-8 shadow-sm">
             <div className="flex items-center justify-between gap-3 mb-6 lg:mb-8">
+              {/* Title */}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <Calendar className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center bg-gradient-to-r from-sky-500 to-sky-600 text-white ring-1 ring-black/5 dark:ring-white/10">
+                  <Calendar className="w-4 h-4 lg:w-5 lg:h-5" />
                 </div>
-                <h2 className="text-18-bold lg:text-24-bold text-white">
+                <h2 className="text-[18px] lg:text-[24px] font-bold text-slate-900 dark:text-white">
                   Your Appointments
                 </h2>
               </div>
@@ -1767,9 +1768,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 return (
                   <div
                     key={appointment.id}
-                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-dark-500/80 transition-all duration-300"
+                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-4 lg:p-6 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Left: Doctor + meta */}
                       <div className="flex items-center gap-4 lg:gap-6">
                         <div className="relative">
                           <img
@@ -1778,57 +1780,61 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               "/doctor-avatar.jpg"
                             }
                             alt={appointment.doctor.name}
-                            className="w-12 h-12 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-dark-500/50"
+                            className="w-12 h-12 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700"
                           />
-                          <div className="absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center border-2 border-dark-400">
-                            <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+                          <div className="absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
+                            <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4" />
                           </div>
                         </div>
 
                         <div className="space-y-2 lg:space-y-3">
                           <div>
-                            <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
+                            <h3 className="text-base lg:text-xl font-semibold text-slate-900 dark:text-white mb-1">
                               {appointment.doctor.name}
                             </h3>
-                            <p className="text-12-regular lg:text-14-regular text-green-400">
+                            <p className="text-xs lg:text-sm text-emerald-700 dark:text-emerald-300">
                               {appointment.doctor.speciality}
                             </p>
                           </div>
 
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6 text-12-regular lg:text-14-regular text-dark-700">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-blue-400" />
+                          {/* Date + Time */}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6 text-xs lg:text-sm">
+                            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                              <Calendar className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                               <span>{appointment.date}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-purple-400" />
+                            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                              <Clock className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                               <span>{appointment.time}</span>
                             </div>
                           </div>
 
+                          {/* Reason / Notes */}
                           <div
-                            className={`rounded-lg px-3 py-2 inline-block ${
+                            className={[
+                              "rounded-lg px-3 py-2 inline-block border",
                               appointment.status === "cancelled"
-                                ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                                : "bg-dark-500/30"
-                            }`}
+                                ? "bg-rose-50/70 dark:bg-rose-900/20 border-rose-300/60 dark:border-rose-400/30 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
+                                : "bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700",
+                            ].join(" ")}
                           >
                             <p
-                              className={`text-10-regular lg:text-12-regular ${
+                              className={[
+                                "text-[11px] lg:text-xs",
                                 appointment.status === "cancelled"
-                                  ? "text-red-400"
-                                  : "text-dark-600"
-                              }`}
+                                  ? "text-rose-700 dark:text-rose-300"
+                                  : "text-slate-600 dark:text-slate-300",
+                              ].join(" ")}
                             >
                               <span
                                 className={
                                   appointment.status === "cancelled"
-                                    ? "text-red-300"
-                                    : "text-white"
+                                    ? "text-rose-800 dark:text-rose-200 font-medium"
+                                    : "text-slate-900 dark:text-white font-medium"
                                 }
                               >
                                 {appointment.status === "cancelled" &&
-                                  "Cancellation"}{" "}
+                                  "Cancellation "}
                                 Reason:
                               </span>{" "}
                               {appointment.reason}
@@ -1837,9 +1843,11 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
                           {appointment.notes &&
                             appointment.status !== "cancelled" && (
-                              <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
-                                <p className="text-10-regular lg:text-12-regular text-blue-400">
-                                  <span className="text-white">Notes:</span>{" "}
+                              <div className="bg-sky-50/70 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-700 rounded-lg px-3 py-2 inline-block ml-0 sm:ml-2">
+                                <p className="text-[11px] lg:text-xs text-sky-800 dark:text-sky-300">
+                                  <span className="text-slate-900 dark:text-white font-medium">
+                                    Notes:
+                                  </span>{" "}
                                   {appointment.notes}
                                 </p>
                               </div>
@@ -1847,6 +1855,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                         </div>
                       </div>
 
+                      {/* Right: Status + Actions */}
                       <div className="flex flex-col items-start lg:items-end gap-3 lg:gap-4">
                         {getStatusBadge(
                           appointment.status,
@@ -1854,6 +1863,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           appointment.date
                         )}
 
+                        {/* Upcoming (not today, not waiting) */}
                         {appointment.status === "upcoming" &&
                           !appointmentToday &&
                           appointment.workflow !== "waiting" && (
@@ -1862,7 +1872,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                 onClick={() =>
                                   handleRescheduleClick(appointment)
                                 }
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-sky-500/25 flex items-center justify-center gap-2"
                               >
                                 <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">
@@ -1872,7 +1882,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               </button>
                               <button
                                 onClick={() => handleCancelClick(appointment)}
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-red-500/25 flex items-center justify-center gap-2"
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-rose-500/25 flex items-center justify-center gap-2"
                               >
                                 <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">Cancel</span>
@@ -1881,16 +1891,17 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                             </div>
                           )}
 
+                        {/* Today (not waiting/cancelled) */}
                         {appointmentToday &&
                           appointment.workflow !== "waiting" &&
                           appointment.status !== "cancelled" && (
                             <div className="flex flex-row lg:flex-col gap-2 lg:gap-3 w-full lg:w-auto">
-                              {/* Reschedule Button */}
+                              {/* Reschedule */}
                               <button
                                 onClick={() =>
                                   handleRescheduleClick(appointment)
                                 }
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-sky-500/25 flex items-center justify-center gap-2"
                               >
                                 <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">
@@ -1899,10 +1910,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                 <span className="sm:hidden">Edit</span>
                               </button>
 
-                              {/* Mark as Waiting Button */}
+                              {/* Mark as Waiting */}
                               <button
                                 onClick={() => handleMarkAsWaiting(appointment)}
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-3 lg:px-4 py-2 rounded-lg text-10-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2"
+                                className="flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-amber-500/25 flex items-center justify-center gap-2"
                               >
                                 <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">
@@ -1922,19 +1933,22 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             {existingAppointments.filter((apt) => apt.status === "upcoming")
               .length === 0 && (
               <div className="text-center py-12 lg:py-20">
-                <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-blue-500/20">
-                  <Calendar className="w-8 h-8 lg:w-12 lg:h-12 text-blue-400" />
+                <div className="w-16 h-16 lg:w-24 lg:h-24 rounded-3xl mx-auto mb-6 lg:mb-8 flex items-center justify-center bg-gradient-to-r from-sky-500/15 to-sky-600/15 border border-sky-400/30 dark:from-sky-500/20 dark:to-sky-600/20 dark:border-sky-400/25">
+                  <Calendar className="w-8 h-8 lg:w-12 lg:h-12 text-sky-600 dark:text-sky-300" />
                 </div>
-                <h3 className="text-18-bold lg:text-24-bold text-white mb-4">
+
+                <h3 className="text-[18px] lg:text-[24px] font-bold text-slate-900 dark:text-white mb-4">
                   No upcoming appointments
                 </h3>
-                <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto mb-6 lg:mb-8">
+
+                <p className="text-sm lg:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-6 lg:mb-8">
                   You don't have any upcoming appointments. Book your next visit
                   with our healthcare providers.
                 </p>
+
                 <button
                   onClick={() => setActiveTab("book")}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                  className="inline-flex items-center justify-center bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-sm lg:text-base font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:outline-offset-2"
                 >
                   Book Your First Appointment
                 </button>

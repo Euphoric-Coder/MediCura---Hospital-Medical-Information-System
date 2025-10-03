@@ -130,8 +130,8 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
                   onClick={onToggle}
                   className={`w-full flex items-center gap-3 xl:gap-4 px-3 xl:px-4 py-2.5 xl:py-3 rounded-xl text-left transition-all duration-300 group ${
                     isActive
-                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
-                      : "text-gray-700 dark:text-dark-700 hover:bg-gray-200 dark:hover:bg-dark-400/50 hover:text-gray-900 dark:hover:text-white"
+                      ? "bg-gradient-to-r from-green-500 to-green-600 dark:from-specialGreen-500 dark:to-specialGreen-600 text-white shadow-lg shadow-green-500/25"
+                      : "text-gray-700 dark:text-dark-700 hover:bg-gray-200 dark:hover:bg-dark-500/50 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   <div
