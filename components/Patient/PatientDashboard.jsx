@@ -583,35 +583,41 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
   const getStatusBadge = (status, type) => {
     const baseClasses =
-      "flex items-center gap-2 px-3 py-1 rounded-full text-12-medium";
+      "flex items-center gap-2 px-3 py-1 rounded-full text-12-medium transition-colors";
 
     if (type === "appointment") {
       switch (status) {
         case "upcoming":
           return (
             <div
-              className={`${baseClasses} bg-blue-500/20 border border-blue-500/30`}
+              className={`${baseClasses} 
+              bg-blue-100 border border-blue-200 text-blue-700
+              dark:bg-blue-500/20 dark:border-blue-500/30 dark:text-blue-400`}
             >
               <Calendar className="w-3 h-3" />
-              <span className="text-blue-400">Upcoming</span>
+              <span>Upcoming</span>
             </div>
           );
         case "completed":
           return (
             <div
-              className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
+              className={`${baseClasses} 
+              bg-green-100 border border-green-200 text-green-700
+              dark:bg-green-500/20 dark:border-green-500/30 dark:text-green-400`}
             >
               <Clock className="w-3 h-3" />
-              <span className="text-green-400">Completed</span>
+              <span>Completed</span>
             </div>
           );
         case "cancelled":
           return (
             <div
-              className={`${baseClasses} bg-red-500/20 border border-red-500/30`}
+              className={`${baseClasses} 
+              bg-red-100 border border-red-200 text-red-700
+              dark:bg-red-500/20 dark:border-red-500/30 dark:text-red-400`}
             >
               <Clock className="w-3 h-3" />
-              <span className="text-red-400">Cancelled</span>
+              <span>Cancelled</span>
             </div>
           );
       }
@@ -622,19 +628,23 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
         case "active":
           return (
             <div
-              className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
+              className={`${baseClasses} 
+              bg-green-100 border border-green-200 text-green-700
+              dark:bg-green-500/20 dark:border-green-500/30 dark:text-green-400`}
             >
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-400">Active</span>
+              <span>Active</span>
             </div>
           );
         case "completed":
           return (
             <div
-              className={`${baseClasses} bg-gray-500/20 border border-gray-500/30`}
+              className={`${baseClasses} 
+              bg-gray-100 border border-gray-200 text-gray-700
+              dark:bg-gray-500/20 dark:border-gray-500/30 dark:text-gray-400`}
             >
               <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-              <span className="text-gray-400">Completed</span>
+              <span>Completed</span>
             </div>
           );
       }
@@ -645,28 +655,34 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
         case "completed":
           return (
             <div
-              className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
+              className={`${baseClasses} 
+              bg-green-100 border border-green-200 text-green-700
+              dark:bg-green-500/20 dark:border-green-500/30 dark:text-green-400`}
             >
               <TestTube className="w-3 h-3" />
-              <span className="text-green-400">Completed</span>
+              <span>Completed</span>
             </div>
           );
         case "pending":
           return (
             <div
-              className={`${baseClasses} bg-yellow-500/20 border border-yellow-500/30`}
+              className={`${baseClasses} 
+              bg-yellow-100 border border-yellow-200 text-yellow-700
+              dark:bg-yellow-500/20 dark:border-yellow-500/30 dark:text-yellow-400`}
             >
               <Clock className="w-3 h-3" />
-              <span className="text-yellow-400">Pending</span>
+              <span>Pending</span>
             </div>
           );
         case "in-progress":
           return (
             <div
-              className={`${baseClasses} bg-blue-500/20 border border-blue-500/30`}
+              className={`${baseClasses} 
+              bg-blue-100 border border-blue-200 text-blue-700
+              dark:bg-blue-500/20 dark:border-blue-500/30 dark:text-blue-400`}
             >
               <Activity className="w-3 h-3" />
-              <span className="text-blue-400">In Progress</span>
+              <span>In Progress</span>
             </div>
           );
       }
@@ -674,6 +690,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
     return null;
   };
+
 
   const upcomingAppt = appointments.filter(
     (appt) => appt.status === "upcoming"
@@ -981,19 +998,26 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
           )}
 
           {activeTab === "appointments" && (
-            <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
+            <div
+              className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
+  backdrop-blur-xl border border-gray-200 dark:border-dark-500/50 
+  rounded-3xl p-6 lg:p-8 transition-colors"
+            >
+              {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-20-bold lg:text-24-bold text-white">
+                  <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
                     Your Appointments
                   </h2>
                 </div>
                 <button
                   onClick={onBookAppointment}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
+                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+      text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-14-semibold lg:text-16-semibold 
+      transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
                 >
                   <Plus className="w-5 h-5" />
                   <span className="hidden sm:inline">Book New</span>
@@ -1001,13 +1025,17 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                 </button>
               </div>
 
+              {/* Appointment List */}
               <div className="space-y-4">
                 {appointments.map((appointment) => (
                   <div
                     key={appointment.id}
-                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6"
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+        backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
+        rounded-2xl p-4 lg:p-6 transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Doctor Info */}
                       <div className="flex items-center gap-4 lg:gap-6">
                         <img
                           src={appointment.doctor.avatar}
@@ -1015,49 +1043,45 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                           className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                         />
                         <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
+                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
                             {appointment.doctor.name}
                           </h3>
-                          <p className="text-14-regular text-blue-400 mb-2">
+                          <p className="text-14-regular text-blue-600 dark:text-blue-400 mb-2">
                             {appointment.doctor.speciality}
                           </p>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
                             <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4" />
+                              <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                               <span>{appointment.date}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4" />
+                              <Clock className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                               <span>{appointment.time}</span>
                             </div>
                           </div>
                           <div className="mt-2">
-                            <span className="text-12-regular text-dark-600">
+                            <span className="text-12-regular text-gray-600 dark:text-dark-600">
                               Type:{" "}
                             </span>
-                            <span className="text-white">
+                            <span className="text-gray-900 dark:text-white">
                               {appointment.type}
                             </span>
                           </div>
+
+                          {/* Status */}
                           <div
                             className={`mt-2 rounded-lg px-3 py-2 inline-block ${
                               appointment.status === "cancelled"
-                                ? "bg-red-500/20 border border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                                : "bg-dark-500/30"
+                                ? "bg-red-100 border border-red-300 text-red-600 dark:bg-red-500/20 dark:border-red-500/40 dark:text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                                : "bg-gray-100 text-gray-600 dark:bg-dark-500/30 dark:text-dark-600"
                             }`}
                           >
-                            <p
-                              className={`text-10-regular lg:text-12-regular ${
-                                appointment.status === "cancelled"
-                                  ? "text-red-400"
-                                  : "text-dark-600"
-                              }`}
-                            >
+                            <p className="text-10-regular lg:text-12-regular">
                               <span
                                 className={
                                   appointment.status === "cancelled"
-                                    ? "text-red-300"
-                                    : "text-white"
+                                    ? "text-red-600 dark:text-red-300"
+                                    : "text-gray-900 dark:text-white"
                                 }
                               >
                                 {appointment.status === "cancelled" &&
@@ -1068,23 +1092,28 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                             </p>
                           </div>
 
+                          {/* Notes */}
                           {appointment.notes &&
                             appointment.status !== "cancelled" && (
-                              <div className="bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
-                                <p className="text-10-regular lg:text-12-regular text-blue-400">
-                                  <span className="text-white">Notes:</span>{" "}
+                              <div className="bg-blue-100 dark:bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
+                                <p className="text-10-regular lg:text-12-regular text-blue-600 dark:text-blue-400">
+                                  <span className="text-gray-900 dark:text-white">
+                                    Notes:
+                                  </span>{" "}
                                   {appointment.notes}
                                 </p>
                               </div>
                             )}
                         </div>
                       </div>
+
+                      {/* Actions */}
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(appointment.status, "appointment")}
                         {appointment.status === "upcoming" && (
                           <div className="flex gap-2 flex-wrap">
                             <button
-                              className="text-12-medium lg:text-14-medium text-blue-400 hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-500/30 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+                              className="text-12-medium lg:text-14-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-300 dark:border-blue-500/30 rounded-lg bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 transition-colors"
                               onClick={() => {
                                 setShowRescheduleModal(true);
                                 setSelectedAppointment(appointment);
@@ -1093,7 +1122,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                               Reschedule
                             </button>
                             <button
-                              className="text-12-medium lg:text-14-medium text-red-400 hover:text-red-300 px-3 lg:px-4 py-2 border border-red-500/30 rounded-lg bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                              className="text-12-medium lg:text-14-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 px-3 lg:px-4 py-2 border border-red-300 dark:border-red-500/30 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
                               onClick={() => {
                                 setShowCancelModal(true);
                                 setSelectedAppointment(appointment);
@@ -1112,58 +1141,80 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
           )}
 
           {activeTab === "prescriptions" && (
-            <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
+            <div
+              className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
+  backdrop-blur-xl border border-gray-200 dark:border-dark-500/50 
+  rounded-3xl p-6 lg:p-8 transition-colors"
+            >
+              {/* Header */}
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <Pill className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-20-bold lg:text-24-bold text-white">
+                <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
                   Active Prescriptions
                 </h2>
               </div>
 
+              {/* Prescription Cards */}
               <div className="space-y-4">
                 {prescriptions.map((prescription) => (
                   <div
                     key={prescription.id}
-                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6"
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+        backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
+        rounded-2xl p-4 lg:p-6 transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Left Side */}
                       <div className="flex items-center gap-4 lg:gap-6">
                         <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
                           <Pill className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
+                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
                             {prescription.medication}
                           </h3>
-                          <p className="text-14-regular text-purple-400 mb-2">
+                          <p className="text-14-regular text-purple-700 dark:text-purple-400 mb-2">
                             {prescription.dosage} - {prescription.frequency}
                           </p>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
                             <div>
-                              <span className="text-white">Prescribed by:</span>{" "}
+                              <span className="text-gray-900 dark:text-white">
+                                Prescribed by:
+                              </span>{" "}
                               {prescription.doctorName}
                             </div>
                             <div>
-                              <span className="text-white">Date:</span>{" "}
+                              <span className="text-gray-900 dark:text-white">
+                                Date:
+                              </span>{" "}
                               {prescription.appointmentDate}
                             </div>
                           </div>
                           <div className="mt-2">
-                            <span className="text-12-regular text-dark-600">
+                            <span className="text-12-regular text-gray-600 dark:text-dark-600">
                               Refills remaining:{" "}
                             </span>
-                            <span className="text-white">
+                            <span className="text-gray-900 dark:text-white">
                               {prescription.refills}
                             </span>
                           </div>
                         </div>
                       </div>
+
+                      {/* Right Side */}
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(prescription.status, "prescription")}
                         {prescription.refills > 0 && (
-                          <button className="text-12-medium lg:text-14-medium text-green-400 hover:text-green-300 px-3 lg:px-4 py-2 border border-green-500/30 rounded-lg bg-green-500/10 hover:bg-green-500/20 transition-colors">
+                          <button
+                            className="text-12-medium lg:text-14-medium 
+                text-green-700 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 
+                px-3 lg:px-4 py-2 border border-green-300 dark:border-green-500/30 
+                rounded-lg bg-green-100 hover:bg-green-200 
+                dark:bg-green-500/10 dark:hover:bg-green-500/20 
+                transition-colors"
+                          >
                             Request Refill
                           </button>
                         )}
@@ -1176,58 +1227,88 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
           )}
 
           {activeTab === "lab-results" && (
-            <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
+            <div
+              className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
+  backdrop-blur-xl border border-gray-200 dark:border-dark-500/50 
+  rounded-3xl p-6 lg:p-8 transition-colors"
+            >
+              {/* Header */}
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
                   <TestTube className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-20-bold lg:text-24-bold text-white">
+                <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
                   Lab Results
                 </h2>
               </div>
 
+              {/* Lab Results Cards */}
               <div className="space-y-4">
                 {labResults.map((result) => (
                   <div
                     key={result.id}
-                    className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6"
+                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+        backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
+        rounded-2xl p-4 lg:p-6 transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Left Section */}
                       <div className="flex items-center gap-4 lg:gap-6">
                         <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
                           <TestTube className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-white mb-1">
+                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
                             {result.testName}
                           </h3>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-dark-700 mb-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700 mb-2">
                             <div>
-                              <span className="text-white">Date:</span>{" "}
+                              <span className="text-gray-900 dark:text-white">
+                                Date:
+                              </span>{" "}
                               {result.date}
                             </div>
                             <div>
-                              <span className="text-white">Ordered by:</span>{" "}
+                              <span className="text-gray-900 dark:text-white">
+                                Ordered by:
+                              </span>{" "}
                               {result.doctor}
                             </div>
                           </div>
                           {result.result && (
-                            <div className="bg-green-500/20 rounded-lg px-3 py-2 inline-block">
-                              <span className="text-12-regular text-green-400">
+                            <div className="bg-green-100 dark:bg-green-500/20 rounded-lg px-3 py-2 inline-block">
+                              <span className="text-12-regular text-green-700 dark:text-green-400">
                                 Result: {result.result} ({result.normalRange})
                               </span>
                             </div>
                           )}
                         </div>
                       </div>
+
+                      {/* Right Section */}
                       <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
                         {getStatusBadge(result.status, "lab")}
                         {result.status === "completed" && (
                           <div className="flex gap-2">
-                            <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
+                            {/* View Button */}
+                            <button
+                              className="bg-blue-100 hover:bg-blue-200 text-blue-700 
+                  dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-600 
+                  dark:hover:from-blue-600 dark:hover:to-blue-700 
+                  dark:text-white p-2 rounded-lg transition-all duration-300 
+                  shadow-sm dark:shadow-lg dark:hover:shadow-blue-500/25"
+                            >
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-green-500/25">
+
+                            {/* Download Button */}
+                            <button
+                              className="bg-green-100 hover:bg-green-200 text-green-700 
+                  dark:bg-gradient-to-r dark:from-green-500 dark:to-green-600 
+                  dark:hover:from-green-600 dark:hover:to-green-700 
+                  dark:text-white p-2 rounded-lg transition-all duration-300 
+                  shadow-sm dark:shadow-lg dark:hover:shadow-green-500/25"
+                            >
                               <Download className="w-4 h-4" />
                             </button>
                           </div>
