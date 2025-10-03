@@ -333,6 +333,7 @@ const getStatusIcon = (status) => {
 
 const PatientConsultation = ({ onBack, patientData }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({});
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -569,18 +570,28 @@ const PatientConsultation = ({ onBack, patientData }) => {
     (consultation) => consultation.prescriptions
   );
 
-  const filteredPrescriptions = allPrescriptions.filter((prescription) => {
-    const matchesSearch =
-      prescription.medication
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      prescription.prescribedBy
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      selectedStatus === "all" || prescription.status === selectedStatus;
-    return matchesSearch && matchesStatus;
-  });
+  // const filteredPrescriptions = allPrescriptions.filter((prescription) => {
+  //   const matchesSearch =
+  //     prescription.medication
+  //       .toLowerCase()
+  //       .includes(searchTerm.toLowerCase()) ||
+  //     prescription.prescribedBy
+  //       .toLowerCase()
+  //       .includes(searchTerm.toLowerCase());
+  //   const matchesStatus =
+  //     selectedStatus === "all" || prescription.status === selectedStatus;
+  //   return matchesSearch && matchesStatus;
+  // });
+
+  const updateFilter = (consultationId, field, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [consultationId]: {
+        ...(prev[consultationId] || { search: "", status: "all" }),
+        [field]: value,
+      },
+    }));
+  };
 
   const handleViewDetails = (prescription) => {
     setSelectedPrescription(prescription);
@@ -790,215 +801,227 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
         {/* Consultation Prescriptions */}
         <div className="space-y-6 lg:space-y-8">
-          {consultationPrescriptions.map((consultation) => (
-            <div
-              key={consultation.id}
-              className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6"
-            >
-              {/* Consultation Header */}
-              <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4 lg:p-6 mb-6">
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Stethoscope className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+          {consultationPrescriptions.map((consultation) => {
+            const { search = "", status = "all" } =
+              filters[consultation.id] || {};
+
+            const filteredPrescriptions = consultation.prescriptions.filter(
+              (p) => {
+                const matchesSearch =
+                  p.medication.toLowerCase().includes(search.toLowerCase()) ||
+                  p.prescribedBy.toLowerCase().includes(search.toLowerCase());
+
+                const matchesStatus = status === "all" || p.status === status;
+
+                return matchesSearch && matchesStatus;
+              }
+            );
+
+            return (
+              <div
+                key={consultation.id}
+                className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6"
+              >
+                {/* Consultation Header */}
+                <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4 lg:p-6 mb-6">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Stethoscope className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-16-bold lg:text-20-bold text-white">
+                          {consultation.appointmentType}
+                        </h3>
+                        <p className="text-12-regular lg:text-14-regular text-green-400">
+                          {format(consultation.consultationDate, "PPP")}
+                        </p>
+                        <p className="text-12-regular lg:text-14-regular text-dark-700">
+                          {consultation.doctor} - {consultation.doctorSpecialty}
+                        </p>
+                      </div>
                     </div>
                     <div>
-                      <h3 className="text-16-bold lg:text-20-bold text-white">
-                        {consultation.appointmentType}
-                      </h3>
-                      <p className="text-12-regular lg:text-14-regular text-green-400">
-                        {format(consultation.consultationDate, "PPP")}
-                      </p>
-                      <p className="text-12-regular lg:text-14-regular text-dark-700">
-                        {consultation.doctor} - {consultation.doctorSpecialty}
-                      </p>
+                      <button
+                        onClick={() =>
+                          downloadDoctorPrescription(consultation, patientData)
+                        }
+                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
+                      >
+                        <Download className="w-5 h-5" />
+                        Download PDF
+                      </button>
                     </div>
                   </div>
-                  <div>
-                    <button
-                      onClick={() =>
-                        downloadDoctorPrescription(consultation, patientData)
-                      }
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center justify-center gap-2"
-                    >
-                      <Download className="w-5 h-5" />
-                      Download PDF
-                    </button>
-                  </div>
-                </div>
 
-                <div className="space-y-2 text-14-regular text-dark-700">
-                  <div>
-                    <span className="text-white font-medium">
-                      Chief Complaint:
-                    </span>
-                    {Array.isArray(consultation.chiefComplaint) &&
-                    consultation.chiefComplaint.length > 0 ? (
-                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
-                        {consultation.chiefComplaint.map((item, index) => (
-                          <li
-                            key={index}
-                            className="text-14-regular text-dark-700"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-dark-700">
-                        No Chief Complaint provided
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <span className="text-white font-medium">
-                      History of Present Illness:
-                    </span>
-                    {Array.isArray(consultation.historyOfPresentIllness) &&
-                    consultation.historyOfPresentIllness.length > 0 ? (
-                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
-                        {consultation.historyOfPresentIllness.map(
-                          (item, index) => (
+                  <div className="space-y-2 text-14-regular text-dark-700">
+                    <div>
+                      <span className="text-white font-medium">
+                        Chief Complaint:
+                      </span>
+                      {Array.isArray(consultation.chiefComplaint) &&
+                      consultation.chiefComplaint.length > 0 ? (
+                        <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                          {consultation.chiefComplaint.map((item, index) => (
                             <li
                               key={index}
                               className="text-14-regular text-dark-700"
                             >
                               {item}
                             </li>
-                          )
-                        )}
-                      </ul>
-                    ) : (
-                      <p className="text-dark-700">
-                        No History of Present Illness provided
-                      </p>
-                    )}
-                  </div>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-dark-700">
+                          No Chief Complaint provided
+                        </p>
+                      )}
+                    </div>
 
-                  <div>
-                    <span className="text-white font-medium">
-                      Physical Examination:
-                    </span>
-                    {Array.isArray(consultation.physicalExamination) &&
-                    consultation.physicalExamination.length > 0 ? (
-                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
-                        {consultation.physicalExamination.map((item, index) => (
-                          <li
-                            key={index}
-                            className="text-14-regular text-dark-700"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-dark-700">
-                        No Physical Examination provided
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <span className="text-white font-medium">Diagnosis:</span>
-                    {Array.isArray(consultation.diagnosis) &&
-                    consultation.diagnosis.length > 0 ? (
-                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
-                        {consultation.diagnosis.map((item, index) => (
-                          <li
-                            key={index}
-                            className="text-14-regular text-dark-700"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-dark-700">No diagnosis provided</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <span className="text-white font-medium">
-                      Consultation Notes:
-                    </span>
-                    {Array.isArray(consultation.consultationNotes) &&
-                    consultation.consultationNotes.length > 0 ? (
-                      <ul className="list-disc list-inside text-white mt-1 space-y-1">
-                        {consultation.consultationNotes.map((item, index) => (
-                          <li
-                            key={index}
-                            className="text-14-regular text-dark-700"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-dark-700">
-                        No Consultation Notes provided
-                      </p>
-                    )}
-                  </div>
-
-                  {consultation.followUpDate && (
                     <div>
                       <span className="text-white font-medium">
-                        Expected Follow-up Date:
-                      </span>{" "}
-                      {format(consultation.followUpDate, "PPP")}
+                        History of Present Illness:
+                      </span>
+                      {Array.isArray(consultation.historyOfPresentIllness) &&
+                      consultation.historyOfPresentIllness.length > 0 ? (
+                        <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                          {consultation.historyOfPresentIllness.map(
+                            (item, index) => (
+                              <li
+                                key={index}
+                                className="text-14-regular text-dark-700"
+                              >
+                                {item}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      ) : (
+                        <p className="text-dark-700">
+                          No History of Present Illness provided
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Search and Filter */}
-              <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8">
-                <div className="flex flex-col lg:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-dark-600 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Search medicines or doctors..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-3xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
-                    />
+                    <div>
+                      <span className="text-white font-medium">
+                        Physical Examination:
+                      </span>
+                      {Array.isArray(consultation.physicalExamination) &&
+                      consultation.physicalExamination.length > 0 ? (
+                        <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                          {consultation.physicalExamination.map(
+                            (item, index) => (
+                              <li
+                                key={index}
+                                className="text-14-regular text-dark-700"
+                              >
+                                {item}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      ) : (
+                        <p className="text-dark-700">
+                          No Physical Examination provided
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-white font-medium">Diagnosis:</span>
+                      {Array.isArray(consultation.diagnosis) &&
+                      consultation.diagnosis.length > 0 ? (
+                        <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                          {consultation.diagnosis.map((item, index) => (
+                            <li
+                              key={index}
+                              className="text-14-regular text-dark-700"
+                            >
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-dark-700">No diagnosis provided</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-white font-medium">
+                        Consultation Notes:
+                      </span>
+                      {Array.isArray(consultation.consultationNotes) &&
+                      consultation.consultationNotes.length > 0 ? (
+                        <ul className="list-disc list-inside text-white mt-1 space-y-1">
+                          {consultation.consultationNotes.map((item, index) => (
+                            <li
+                              key={index}
+                              className="text-14-regular text-dark-700"
+                            >
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-dark-700">
+                          No Consultation Notes provided
+                        </p>
+                      )}
+                    </div>
+
+                    {consultation.followUpDate && (
+                      <div>
+                        <span className="text-white font-medium">
+                          Expected Follow-up Date:
+                        </span>{" "}
+                        {format(consultation.followUpDate, "PPP")}
+                      </div>
+                    )}
                   </div>
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="px-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="discontinued">Discontinued</option>
-                    <option value="pending">Pending</option>
-                  </select>
                 </div>
-              </div>
 
-              {/* Prescriptions from this consultation */}
-              <div className="space-y-4">
-                <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
-                  Prescribed Medications
-                </h4>
-                {consultation.prescriptions
-                  .filter((prescription) => {
-                    const matchesSearch =
-                      prescription.medication
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase()) ||
-                      prescription.prescribedBy
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase());
-                    const matchesStatus =
-                      selectedStatus === "all" ||
-                      prescription.status === selectedStatus;
-                    return matchesSearch && matchesStatus;
-                  })
-                  .map((prescription) => (
+                {/* Search and Filter */}
+                <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-6 lg:mb-8">
+                  <div className="flex flex-col lg:flex-row gap-4">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-dark-600 w-5 h-5" />
+                      <input
+                        type="text"
+                        placeholder="Search medicines or doctors..."
+                        value={search}
+                        onChange={(e) =>
+                          updateFilter(
+                            consultation.id,
+                            "search",
+                            e.target.value
+                          )
+                        }
+                        className="w-full pl-12 pr-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-3xl text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
+                      />
+                    </div>
+                    <select
+                      value={status}
+                      onChange={(e) =>
+                        updateFilter(consultation.id, "status", e.target.value)
+                      }
+                      className="px-4 py-3 bg-dark-500/50 border border-dark-500/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="completed">Completed</option>
+                      <option value="discontinued">Discontinued</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Prescriptions from this consultation */}
+                <div className="space-y-4">
+                  <h4 className="text-16-bold lg:text-18-bold text-white mb-4">
+                    Prescribed Medications
+                  </h4>
+                  {filteredPrescriptions.map((prescription) => (
                     <div
                       key={prescription.id}
                       className="bg-dark-500/30 rounded-2xl p-4 lg:p-6 hover:bg-dark-500/40 transition-all duration-300"
@@ -1212,25 +1235,26 @@ const PatientConsultation = ({ onBack, patientData }) => {
                       </div>
                     </div>
                   ))}
-              </div>
-            </div>
-          ))}
-        </div>
+                </div>
 
-        {/* No Results */}
-        {filteredPrescriptions.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <NotepadTextDashed className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-18-bold text-white mb-2">
-              No Prescription found
-            </h3>
-            <p className="text-14-regular text-dark-700">
-              Try adjusting your search or filter criteria
-            </p>
-          </div>
-        )}
+                {/* No Results */}
+                {filteredPrescriptions.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <NotepadTextDashed className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-18-bold text-white mb-2">
+                      No Prescription found
+                    </h3>
+                    <p className="text-14-regular text-dark-700">
+                      Try adjusting your search or filter criteria
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {/* Back Button */}
         <button
