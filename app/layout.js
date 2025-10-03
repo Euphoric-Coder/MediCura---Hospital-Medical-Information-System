@@ -22,7 +22,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -33,8 +33,8 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Providers>{children}</Providers>
+          <Toaster richColors />
         </ThemeProvider>
-        <Toaster richColors />
       </body>
     </html>
   );

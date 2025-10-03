@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }) {
         {/* Main Content */}
         <div className="flex-1 overflow-auto relative">
           {/* Mobile Header */}
-          <div className="lg:hidden bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-30">
+          <div className="xl:hidden bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-30">
             <div className="flex items-center justify-between px-4 py-3">
               <button
                 onClick={toggleSidebar}

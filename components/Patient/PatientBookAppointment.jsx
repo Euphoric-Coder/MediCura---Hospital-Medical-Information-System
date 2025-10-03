@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   CheckCircle,
   X,
+  RefreshCcw,
 } from "lucide-react";
 import {
   Dialog,
@@ -32,6 +33,7 @@ import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { desc, eq } from "drizzle-orm";
 import { toast } from "sonner";
 import { getDoctor, getPatientAppointments } from "@/lib/patients/appointment";
+import { Button } from "../ui/button";
 
 const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
   const [reason, setReason] = useState("");
@@ -448,6 +450,18 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   const refreshAppointment = async () => {
     await fetchAppointments();
+  };
+
+  const refreshDoctorAppointments = async () => {
+    const loading = toast.loading("Refreshing doctor data... Please wait...");
+
+    await fetchDoctors();
+    await fetchAppointments();
+    toast.dismiss(loading);
+
+    setStep("select-doctor");
+
+    toast.success("Doctor data refreshed successfully");
   };
 
   // Generate week schedule for selected doctor
@@ -1005,48 +1019,57 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         {/* Book New Appointment Tab */}
         {activeTab === "book" && (
           <div className="space-y-8">
-            {/* Progress Steps */}
-            <div className="flex items-center gap-2 lg:gap-4 mb-8 overflow-x-auto">
-              <div
-                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                  step === "select-doctor"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
-                }`}
-              >
-                <User className="w-4 h-4" />
-                <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                  <span className="hidden sm:inline">Select Doctor</span>
-                  <span className="sm:hidden">Doctor</span>
-                </span>
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              {/* Progress Steps */}
+              <div className="flex items-center gap-2 lg:gap-4 mb-8 overflow-x-auto">
+                <div
+                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
+                    step === "select-doctor"
+                      ? "bg-green-500 text-white"
+                      : "bg-dark-400/50 text-dark-700"
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
+                    <span className="hidden sm:inline">Select Doctor</span>
+                    <span className="sm:hidden">Doctor</span>
+                  </span>
+                </div>
+                <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
+                <div
+                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
+                    step === "select-time"
+                      ? "bg-green-500 text-white"
+                      : "bg-dark-400/50 text-dark-700"
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
+                    <span className="hidden sm:inline">Select Time</span>
+                    <span className="sm:hidden">Time</span>
+                  </span>
+                </div>
+                <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
+                <div
+                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
+                    step === "confirm"
+                      ? "bg-green-500 text-white"
+                      : "bg-dark-400/50 text-dark-700"
+                  }`}
+                >
+                  <Check className="w-4 h-4" />
+                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
+                    Confirm
+                  </span>
+                </div>
               </div>
-              <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
-              <div
-                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                  step === "select-time"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
-                }`}
+              <Button
+                className="btn3"
+                onClick={() => refreshDoctorAppointments()}
               >
-                <Calendar className="w-4 h-4" />
-                <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                  <span className="hidden sm:inline">Select Time</span>
-                  <span className="sm:hidden">Time</span>
-                </span>
-              </div>
-              <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
-              <div
-                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                  step === "confirm"
-                    ? "bg-green-500 text-white"
-                    : "bg-dark-400/50 text-dark-700"
-                }`}
-              >
-                <Check className="w-4 h-4" />
-                <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                  Confirm
-                </span>
-              </div>
+                <RefreshCcw className="w-5 h-5" />
+                Refresh Doctor Data
+              </Button>
             </div>
 
             {/* Step 1: Select Doctor */}
@@ -1530,13 +1553,24 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         {/* Manage Appointments Tab */}
         {activeTab === "manage" && (
           <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
-            <div className="flex items-center gap-3 mb-6 lg:mb-8">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <Calendar className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+            <div className="flex items-center justify-between gap-3 mb-6 lg:mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Calendar className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                </div>
+                <h2 className="text-18-bold lg:text-24-bold text-white">
+                  Your Appointments
+                </h2>
               </div>
-              <h2 className="text-18-bold lg:text-24-bold text-white">
-                Your Appointments
-              </h2>
+              <Button
+                className="btn3"
+                onClick={() => {
+                  refreshAppointment();
+                }}
+              >
+                <RefreshCcw className="w-5 h-5" />
+                Refresh Appointment
+              </Button>
             </div>
 
             <div className="space-y-4 lg:space-y-6">
