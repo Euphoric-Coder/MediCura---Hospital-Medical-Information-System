@@ -691,7 +691,6 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
     return null;
   };
 
-
   const upcomingAppt = appointments.filter(
     (appt) => appt.status === "upcoming"
   ).length;
@@ -760,8 +759,8 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
           {/* Active Meds */}
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-500/10 dark:to-purple-600/5 backdrop-blur-sm border border-purple-200 dark:border-purple-500/20 rounded-2xl p-4 lg:p-6 shadow-sm dark:shadow-none transition-colors">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Pill className="w-5 h-5 lg:w-7 lg:h-7 text-white" />
+              <div className="w-10 h-10 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-300 to-purple-400 dark:from-purple-500 dark:to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Pill className="w-5 h-5 lg:w-7 lg:h-7 text-purple-600 dark:text-purple-300" />
               </div>
               <div>
                 <div className="text-20-bold lg:text-32-bold text-gray-900 dark:text-white">
@@ -939,7 +938,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
               {/* Health Summary */}
               <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-500/10 dark:to-green-600/5 backdrop-blur-xl border border-green-200 dark:border-green-500/20 rounded-3xl p-6 lg:p-8 shadow-sm dark:shadow-none">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md">
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 dark:from-specialGreen-500 dark:to-specialGreen-600 rounded-xl flex items-center justify-center shadow-md">
                     <Heart className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
@@ -1006,7 +1005,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-specialBlue-500 dark:to-specialBlue-600 rounded-xl flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
@@ -1015,7 +1014,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                 </div>
                 <button
                   onClick={onBookAppointment}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 dark:from-specialGreen-500 dark:to-specialGreen-600 dark:hover:from-green-600 dark:hover:to-green-700
       text-white px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-14-semibold lg:text-16-semibold 
       transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
                 >
@@ -1148,9 +1147,10 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Pill className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-r from-purple-200 to-purple-300 dark:from-purple-500 dark:to-purple-600">
+                  <Pill className="w-5 h-5 text-purple-700 dark:text-white" />
                 </div>
+
                 <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
                   Active Prescriptions
                 </h2>
@@ -1168,7 +1168,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       {/* Left Side */}
                       <div className="flex items-center gap-4 lg:gap-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                        <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-500 dark:to-pink-600 rounded-2xl flex items-center justify-center">
                           <Pill className="w-8 h-8 text-white" />
                         </div>
                         <div>
@@ -1234,7 +1234,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 dark:from-specialGreen-500 dark:to-specialGreen-600 rounded-xl flex items-center justify-center">
                   <TestTube className="w-5 h-5 text-white" />
                 </div>
                 <h2 className="text-20-bold lg:text-24-bold text-gray-900 dark:text-white">
@@ -1254,7 +1254,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       {/* Left Section */}
                       <div className="flex items-center gap-4 lg:gap-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 dark:from-specialGreen-500 dark:to-specialBlue-600 rounded-2xl flex items-center justify-center">
                           <TestTube className="w-8 h-8 text-white" />
                         </div>
                         <div>
