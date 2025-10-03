@@ -309,21 +309,24 @@ const RescheduleModal = ({
             </div>
 
             {/* Mini Calendar */}
-            <div className="grid grid-cols-7 gap-1 lg:gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 lg:gap-3">
               {weekSchedule.map((day, dayIndex) => (
                 <div
                   key={dayIndex}
-                  className="bg-dark-400/50 rounded-xl p-2 lg:p-3"
+                  className="bg-gray-50 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
+                 rounded-xl p-2 lg:p-3 transition-colors"
                 >
+                  {/* Header */}
                   <div className="text-center mb-2 lg:mb-3">
-                    <h4 className="text-10-semibold lg:text-12-semibold text-white">
+                    <h4 className="text-10-semibold lg:text-12-semibold text-gray-900 dark:text-white">
                       {day.dayName}
                     </h4>
-                    <p className="text-8-regular lg:text-10-regular text-dark-700">
+                    <p className="text-8-regular lg:text-10-regular text-gray-600 dark:text-dark-700">
                       {day.date}
                     </p>
                   </div>
 
+                  {/* Slots */}
                   <div className="space-y-1 max-h-32 lg:max-h-48 overflow-y-auto">
                     {day.slots.length > 0 ? (
                       day.slots.map((slot, slotIndex) => (
@@ -336,20 +339,20 @@ const RescheduleModal = ({
                             }
                           }}
                           disabled={!slot.available}
-                          className={`w-full p-1 rounded text-8-medium lg:text-10-medium transition-all duration-200 ${
-                            selectedDate === day.fullDate &&
-                            selectedTime === slot.time
-                              ? "bg-blue-500 text-white border border-blue-400"
-                              : slot.available
-                                ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30"
-                                : "bg-red-500/20 text-red-400 border border-red-500/30 cursor-not-allowed"
-                          }`}
+                          className={`w-full p-1 rounded text-[10px] sm:text-xs lg:text-sm border transition-all duration-200
+                ${
+                  selectedDate === day.fullDate && selectedTime === slot.time
+                    ? "bg-blue-500 text-white border-blue-500 shadow-sm dark:from-specialBlue-500 dark:to-specialBlue-600"
+                    : slot.available
+                      ? "bg-green-100 text-green-600 hover:bg-green-200 border-green-300 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30 dark:hover:bg-green-500/30"
+                      : "bg-red-100 text-red-600 border-red-300 cursor-not-allowed dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
+                }`}
                         >
                           {slot.time}
                         </button>
                       ))
                     ) : (
-                      <p className="text-8-regular lg:text-10-regular text-red-400 text-center">
+                      <p className="text-8-regular lg:text-10-regular text-red-600 dark:text-red-400 text-center">
                         Not Available
                       </p>
                     )}
@@ -813,6 +816,98 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     return date === todayIST;
   };
 
+  const StepHeader = ({
+    step = "select-doctor",
+    refreshDoctorAppointments,
+  }) => {
+    const steps = [
+      {
+        key: "select-doctor",
+        label: "Select Doctor",
+        short: "Doctor",
+        Icon: User,
+      },
+      {
+        key: "select-time",
+        label: "Select Time",
+        short: "Time",
+        Icon: Calendar,
+      },
+      {
+        key: "confirm",
+        label: "Confirm",
+        short: "Confirm",
+        Icon: Check,
+      },
+    ];
+
+    const activeIndex = Math.max(
+      0,
+      steps.findIndex((s) => s.key === step)
+    );
+
+    return (
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Progress Steps */}
+        <div className="w-full md:w-auto flex items-center gap-2 lg:gap-4 mb-2 md:mb-0 overflow-x-auto no-scrollbar">
+          {steps.map((s, idx) => {
+            const isActive = idx === activeIndex;
+            const isCompleted = idx < activeIndex;
+            const isPending = idx > activeIndex;
+
+            return (
+              <div key={s.key} className="flex items-center flex-shrink-0">
+                {/* Step pill with FULL border (no ring, no side-only) */}
+                <div
+                  className={[
+                    "flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl transition-colors shadow-sm",
+                    "border", // <-- full border always
+                    isActive && "bg-emerald-500 text-white border-emerald-600",
+                    isCompleted &&
+                      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-400/30",
+                    isPending &&
+                      "bg-white/80 text-slate-600 border-slate-300 dark:bg-slate-800/70 dark:text-slate-300 dark:border-slate-700",
+                  ].join(" ")}
+                >
+                  <s.Icon
+                    className={[
+                      "w-4 h-4",
+                      isPending && "text-slate-500 dark:text-slate-400",
+                      isCompleted && "text-emerald-600 dark:text-emerald-300",
+                      isActive && "text-white",
+                    ].join(" ")}
+                  />
+                  <span className="text-xs lg:text-sm font-medium whitespace-nowrap">
+                    <span className="hidden sm:inline">{s.label}</span>
+                    <span className="sm:hidden">{s.short}</span>
+                  </span>
+                </div>
+
+                {/* Connector (no borders here, just a background bar) */}
+                {idx < steps.length - 1 && (
+                  <div
+                    className={[
+                      "mx-2 lg:mx-4 w-6 lg:w-10 h-0.5 flex-shrink-0 rounded",
+                      isCompleted
+                        ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                        : "bg-slate-200 dark:bg-slate-700",
+                    ].join(" ")}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Refresh Button with FULL border */}
+        <Button className="btn3" onClick={() => refreshDoctorAppointments?.()}>
+          <RefreshCcw className="w-5 h-5" />
+          Refresh Doctor Data
+        </Button>
+      </div>
+    );
+  };
+
   const getStatusBadge = (status, workflow, date) => {
     // Convert today's date to IST yyyy-mm-dd
     const todayIST = new Date().toLocaleDateString("en-CA", {
@@ -934,32 +1029,40 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     ));
   };
 
-  // If still loading → show loader
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors">
         <div className="flex flex-col items-center">
+          {/* Spinner */}
           <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-white text-lg">Loading your data...</p>
+
+          {/* Text */}
+          <p className="text-gray-800 dark:text-white text-lg">
+            Loading your data...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-dark-300 dark:via-dark-200 dark:to-dark-400">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div
+              className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl flex items-center justify-center shadow-lg
+                    bg-gradient-to-r from-green-500 to-green-600"
+            >
               <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-20-bold lg:text-36-bold text-white">
+              {/* Use neutral text tokens for light/dark */}
+              <h1 className="text-[20px] lg:text-[36px] font-bold text-slate-900 dark:text-white">
                 Appointments
               </h1>
-              <p className="text-12-regular lg:text-16-regular text-dark-700">
+              <p className="text-xs lg:text-base text-slate-600 dark:text-slate-400">
                 Book and manage your healthcare visits
               </p>
             </div>
@@ -968,45 +1071,90 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
           {/* Message */}
           {message && (
             <div
-              className={`flex items-center gap-3 p-3 lg:p-4 rounded-xl border backdrop-blur-sm mb-6 ${
+              role={messageType === "success" ? "status" : "alert"}
+              aria-live="polite"
+              className={[
+                // layout
+                "flex items-center gap-3 p-3 lg:p-4 rounded-xl mb-6 backdrop-blur-sm",
+                // full border (no side-only)
+                "border",
+                // base light/dark surface
+                "bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700",
+                // variant overlays
                 messageType === "success"
-                  ? "bg-green-500/10 border-green-500/30 text-green-400"
-                  : "bg-red-500/10 border-red-500/30 text-red-400"
-              }`}
+                  ? "shadow-[inset_0_0_0_9999px_rgba(16,185,129,0.08)] border-emerald-300/40 dark:border-emerald-400/30"
+                  : "shadow-[inset_0_0_0_9999px_rgba(239,68,68,0.08)] border-rose-300/40 dark:border-rose-400/30",
+              ].join(" ")}
             >
               {messageType === "success" ? (
-                <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                <CheckCircle
+                  className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400"
+                  aria-hidden="true"
+                />
               ) : (
-                <AlertTriangle className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                <AlertTriangle
+                  className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 text-rose-600 dark:text-rose-400"
+                  aria-hidden="true"
+                />
               )}
-              <span className="text-14-regular lg:text-16-regular">
+
+              <span
+                className={[
+                  "text-sm lg:text-base",
+                  "text-slate-800 dark:text-slate-100",
+                  messageType === "success"
+                    ? "text-emerald-700 dark:text-emerald-300"
+                    : "text-rose-700 dark:text-rose-300",
+                ].join(" ")}
+              >
                 {message}
               </span>
             </div>
           )}
 
           {/* Tab Navigation */}
-          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6 mb-8">
+          <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 mb-8 shadow-sm">
             <div className="flex gap-2">
+              {/* Book New */}
               <button
                 onClick={() => setActiveTab("book")}
-                className={`flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 ${
+                aria-pressed={activeTab === "book"}
+                className={[
+                  // layout
+                  "flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium",
+                  "transition-all duration-300",
+                  // full border always (no side-only)
+                  "border",
+                  // states
                   activeTab === "book"
-                    ? "bg-green-500 text-white shadow-lg shadow-green-500/25"
-                    : "bg-dark-400/50 text-dark-700 hover:bg-dark-400/70 hover:text-white"
-                }`}
+                    ? "bg-emerald-500 text-white border-emerald-600 shadow-lg shadow-emerald-500/25"
+                    : "bg-white/80 text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-800/70 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white",
+                  // accessible focus without weird side lines
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:outline-offset-2",
+                ].join(" ")}
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Book New</span>
                 <span className="sm:hidden">Book</span>
               </button>
+
+              {/* Manage Appointments */}
               <button
                 onClick={() => setActiveTab("manage")}
-                className={`flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 ${
+                aria-pressed={activeTab === "manage"}
+                className={[
+                  // layout
+                  "flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-3 rounded-xl text-xs lg:text-sm font-medium",
+                  "transition-all duration-300",
+                  // full border always
+                  "border",
+                  // states
                   activeTab === "manage"
-                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                    : "bg-dark-400/50 text-dark-700 hover:bg-dark-400/70 hover:text-white"
-                }`}
+                    ? "bg-sky-600 text-white border-sky-700 shadow-lg shadow-sky-500/25"
+                    : "bg-white/80 text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-800/70 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white",
+                  // focus style
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500 focus-visible:outline-offset-2",
+                ].join(" ")}
               >
                 <Calendar className="w-4 h-4" />
                 <span className="hidden sm:inline">Manage Appointments</span>
@@ -1019,84 +1167,44 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         {/* Book New Appointment Tab */}
         {activeTab === "book" && (
           <div className="space-y-8">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              {/* Progress Steps */}
-              <div className="flex items-center gap-2 lg:gap-4 mb-8 overflow-x-auto">
-                <div
-                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                    step === "select-doctor"
-                      ? "bg-green-500 text-white"
-                      : "bg-dark-400/50 text-dark-700"
-                  }`}
-                >
-                  <User className="w-4 h-4" />
-                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                    <span className="hidden sm:inline">Select Doctor</span>
-                    <span className="sm:hidden">Doctor</span>
-                  </span>
-                </div>
-                <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
-                <div
-                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                    step === "select-time"
-                      ? "bg-green-500 text-white"
-                      : "bg-dark-400/50 text-dark-700"
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                    <span className="hidden sm:inline">Select Time</span>
-                    <span className="sm:hidden">Time</span>
-                  </span>
-                </div>
-                <div className="w-4 lg:w-8 h-0.5 bg-dark-500 flex-shrink-0"></div>
-                <div
-                  className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl ${
-                    step === "confirm"
-                      ? "bg-green-500 text-white"
-                      : "bg-dark-400/50 text-dark-700"
-                  }`}
-                >
-                  <Check className="w-4 h-4" />
-                  <span className="text-10-medium lg:text-14-medium whitespace-nowrap">
-                    Confirm
-                  </span>
-                </div>
-              </div>
-              <Button
-                className="btn3"
-                onClick={() => refreshDoctorAppointments()}
-              >
-                <RefreshCcw className="w-5 h-5" />
-                Refresh Doctor Data
-              </Button>
-            </div>
+            <StepHeader
+              step={step}
+              refreshDoctorAppointments={refreshDoctorAppointments}
+            />
 
             {/* Step 1: Select Doctor */}
             {step === "select-doctor" && (
               <>
                 {/* Filters */}
-                <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6">
+                <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm ">
                   <div className="flex flex-col md:flex-row gap-4">
+                    {/* Search */}
                     <div className="flex-1 relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="w-5 h-5 text-dark-600" />
+                        <Search className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                       </div>
+
                       <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search doctors by name or speciality..."
-                        className="shad-input pl-10 w-full text-white"
+                        className="w-full pl-10 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5"
                       />
                     </div>
+
+                    {/* Specialty filter */}
                     <select
                       value={specialtyFilter}
                       onChange={(e) => setSpecialtyFilter(e.target.value)}
-                      className="shad-select-trigger text-white"
+                      className="w-full md:w-64 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5 px-3"
                     >
                       {specialties.map((speciality) => (
-                        <option key={speciality} value={speciality}>
+                        <option
+                          key={speciality}
+                          value={speciality}
+                          className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                        >
                           {speciality === "all"
                             ? "All Specialties"
                             : speciality}
@@ -1107,12 +1215,18 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 </div>
 
                 {/* Doctor List */}
-                <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
+                <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-6 lg:p-8 shadow-sm">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                      <Stethoscope className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white ring-1 ring-black/5 dark:ring-white/10">
+                      <Stethoscope className="w-5 h-5" />
                     </div>
-                    <h2 className="text-20-bold lg:text-24-bold text-white">
+
+                    {/* If you already have utilities like text-20-bold / text-24-bold, keep them. 
+       Otherwise, this fallback uses Tailwind sizes */}
+                    <h2
+                      className="text-[20px] lg:text-[24px] font-bold text-slate-900 dark:text-white
+    "
+                    >
                       Available Doctors
                     </h2>
                   </div>
@@ -1121,51 +1235,107 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                     {filteredDoctors.map((doctor) => (
                       <div
                         key={doctor.userId}
-                        className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-4 lg:p-6 hover:border-green-500/50 transition-all duration-300 cursor-pointer group"
-                        onClick={() => handleDoctorSelect(doctor)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Select ${doctor.name}, ${doctor.speciality}`}
+                        onClick={() => handleDoctorSelect?.(doctor)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ")
+                            handleDoctorSelect?.(doctor);
+                        }}
+                        className="
+            group relative cursor-pointer transition-all duration-300
+            rounded-2xl p-4 lg:p-6 backdrop-blur
+            border
+            bg-white/80 border-slate-200 hover:border-emerald-500/60
+            shadow-sm hover:shadow-md
+            dark:bg-slate-800/70 dark:border-slate-700 dark:hover:border-emerald-400/50
+          "
                       >
                         <div className="flex items-start gap-4">
-                          <div className="relative">
+                          {/* Avatar + badge */}
+                          <div className="relative shrink-0">
                             <img
                               src={doctor.avatar}
                               alt={doctor.name}
-                              className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl object-cover border-2 border-dark-500/50 group-hover:border-green-500/50 transition-all duration-300"
+                              className="
+                  w-16 h-16 lg:w-20 lg:h-20 rounded-2xl object-cover
+                  border-2 transition-all duration-300
+                  border-slate-200 group-hover:border-emerald-500/60
+                  dark:border-slate-700 dark:group-hover:border-emerald-400/60
+                "
                             />
-                            <div className="absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2 w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center border-2 border-dark-400">
-                              <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+                            <div
+                              className="
+                  absolute -bottom-1 -right-1 lg:-bottom-2 lg:-right-2
+                  w-6 h-6 lg:w-8 lg:h-8 rounded-full
+                  flex items-center justify-center
+                  border-2
+                  bg-gradient-to-r from-emerald-500 to-emerald-600 text-white
+                  border-white dark:border-slate-800
+                "
+                              aria-hidden="true"
+                            >
+                              <Stethoscope className="w-3 h-3 lg:w-4 lg:h-4" />
                             </div>
                           </div>
 
-                          <div className="flex-1 space-y-3">
-                            <div>
-                              <h3 className="text-16-bold lg:text-20-bold text-white group-hover:text-green-400 transition-colors">
+                          {/* Info */}
+                          <div className="flex-1 space-y-3 min-w-0">
+                            <div className="truncate">
+                              <h3
+                                className="
+                    text-lg lg:text-xl font-semibold truncate
+                    text-slate-900 group-hover:text-emerald-600
+                    dark:text-white dark:group-hover:text-emerald-400
+                  "
+                                title={doctor.name}
+                              >
                                 {doctor.name}
                               </h3>
-                              <p className="text-14-regular text-blue-400">
+                              <p
+                                className="
+                    text-sm lg:text-base truncate
+                    text-sky-700 dark:text-sky-400
+                  "
+                                title={doctor.speciality}
+                              >
                                 {doctor.speciality}
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                               {renderStars(doctor.rating)}
-                              <span className="text-14-medium text-white ml-2">
+                              <span className="text-sm font-medium text-slate-900 dark:text-white">
                                 {doctor.rating}
                               </span>
-                              <span className="text-12-regular text-dark-600">
-                                ({doctor.yearsOfExperience} yearsOfExperience)
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                ({doctor.yearsOfExperience} yrs)
                               </span>
                             </div>
 
-                            <div className="space-y-2 text-12-regular lg:text-14-regular text-dark-700">
-                              <div className="items-center gap-2 hidden sm:flex">
-                                <Phone className="w-4 h-4 text-blue-400" />
-                                <span>{doctor.phone}</span>
-                              </div>
+                            {/* Contact (hidden on very small screens) */}
+                            <div className="space-y-2 text-xs lg:text-sm text-slate-600 dark:text-slate-300">
+                              {doctor.phone ? (
+                                <div className="hidden sm:flex items-center gap-2">
+                                  <Phone className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                                  <span className="truncate">
+                                    {doctor.phone}
+                                  </span>
+                                </div>
+                              ) : null}
                             </div>
 
+                            {/* Fee + CTA */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                              <div className="bg-green-500/20 rounded-lg px-3 py-2">
-                                <span className="text-12-medium lg:text-14-medium text-green-400">
+                              <div
+                                className="
+                    rounded-lg px-3 py-2
+                    bg-emerald-50 text-emerald-700
+                    dark:bg-emerald-500/15 dark:text-emerald-300
+                  "
+                              >
+                                <span className="text-sm lg:text-base font-medium">
                                   <span className="hidden sm:inline">
                                     ₹{doctor.consultationFee} consultation
                                   </span>
@@ -1174,7 +1344,25 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   </span>
                                 </span>
                               </div>
-                              <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 lg:px-6 py-2 rounded-xl text-12-medium lg:text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25 opacity-0 group-hover:opacity-100">
+
+                              <button
+                                type="button"
+                                className="
+                    w-full sm:w-auto
+                    bg-gradient-to-r from-emerald-500 to-emerald-600
+                    hover:from-emerald-600 hover:to-emerald-700
+                    text-white px-4 lg:px-6 py-2 rounded-xl
+                    text-sm lg:text-base font-medium
+                    transition-all duration-300 shadow-lg hover:shadow-emerald-500/25
+                    sm:opacity-0 sm:group-hover:opacity-100
+                    focus:outline-none focus:ring-2 focus:ring-emerald-500/70 focus:ring-offset-2
+                    dark:focus:ring-offset-slate-900
+                  "
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDoctorSelect?.(doctor);
+                                }}
+                              >
                                 <span className="hidden sm:inline">
                                   Select Doctor
                                 </span>
@@ -1253,21 +1441,24 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                   </div>
 
                   {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-2 lg:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 lg:gap-4">
                     {weekSchedule.map((day, dayIndex) => (
                       <div
                         key={dayIndex}
-                        className="bg-dark-400/50 rounded-xl lg:rounded-2xl p-2 lg:p-4"
+                        className="bg-gray-50 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
+                 rounded-xl lg:rounded-2xl p-2 lg:p-4 transition-colors"
                       >
+                        {/* Header */}
                         <div className="text-center mb-4">
-                          <h3 className="text-10-semibold lg:text-16-semibold text-white">
+                          <h3 className="text-12-semibold lg:text-16-semibold text-gray-900 dark:text-white">
                             {day.dayName}
                           </h3>
-                          <p className="text-8-regular lg:text-14-regular text-dark-700">
+                          <p className="text-10-regular lg:text-14-regular text-gray-600 dark:text-dark-700">
                             {day.date}
                           </p>
                         </div>
 
+                        {/* Slots */}
                         <div className="space-y-1 lg:space-y-2 max-h-48 lg:max-h-96 overflow-y-auto">
                           {day.slots.length > 0 ? (
                             day.slots.map((slot, slotIndex) => {
@@ -1276,10 +1467,6 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   day.fullDate,
                                   selectedDoctor.userId
                                 );
-                              console.log(
-                                "Patient Has appointment",
-                                patientHasAppointment
-                              );
 
                               return (
                                 <button
@@ -1292,17 +1479,17 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   disabled={
                                     !slot.available || patientHasAppointment
                                   }
-                                  className={`w-full p-2 rounded border transition-colors
+                                  className={`w-full p-2 rounded border text-xs sm:text-sm lg:text-base transition-colors
                   ${
                     patientHasAppointment
-                      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 cursor-not-allowed"
+                      ? "bg-yellow-100 text-yellow-600 border-yellow-300 cursor-not-allowed dark:bg-yellow-500/20 dark:text-yellow-400 dark:border-yellow-500/30"
                       : slot.available
-                        ? "bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
-                        : "bg-red-500/20 text-red-400 border-red-500/30 cursor-not-allowed"
+                        ? "bg-green-100 text-green-600 border-green-300 hover:bg-green-200 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30 dark:hover:bg-green-500/30"
+                        : "bg-red-100 text-red-600 border-red-300 cursor-not-allowed dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
                   }`}
                                   title={
                                     patientHasAppointment
-                                      ? `You already have an appointment on this date`
+                                      ? "You already have an appointment on this date"
                                       : !slot.available
                                         ? "Slot unavailable"
                                         : "Select this slot"
@@ -1313,7 +1500,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               );
                             })
                           ) : (
-                            <p className="text-center text-red-400 text-sm">
+                            <p className="text-center text-red-600 dark:text-red-400 text-xs sm:text-sm">
                               Not Available
                             </p>
                           )}

@@ -549,8 +549,16 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-white">
-        Loading your dashboard…
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors">
+        <div className="flex flex-col items-center">
+          {/* Spinner */}
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+
+          {/* Text */}
+          <p className="text-gray-800 dark:text-white text-lg">
+            Loading your data...
+          </p>
+        </div>
       </div>
     );
   }
