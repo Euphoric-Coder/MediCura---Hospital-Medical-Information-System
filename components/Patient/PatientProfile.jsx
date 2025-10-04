@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   User,
@@ -15,8 +15,44 @@ import {
   Camera,
   CheckCircle,
   AlertCircle,
+  Search,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import UpdatePassword from "../UpdatePassword";
+import { usePatient } from "@/contexts/PatientContext";
+import { fetchPhysicians } from "@/lib/patients/profile";
+
+// const physicians = [
+//   {
+//     id: "1",
+//     name: "Dr. Adam Smith",
+//     avatar:
+//       "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+//     speciality: "General Medicine",
+//   },
+//   {
+//     id: "2",
+//     name: "Dr. Sarah Johnson",
+//     avatar:
+//       "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+//     speciality: "Internal Medicine",
+//   },
+//   {
+//     id: "3",
+//     name: "Dr. Michael Brown",
+//     avatar:
+//       "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+//     speciality: "Family Medicine",
+//   },
+//   {
+//     id: "4",
+//     name: "Dr. Emily Davis",
+//     avatar:
+//       "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+//     speciality: "Cardiology",
+//   },
+// ];
 
 const PatientProfile = ({ onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +60,23 @@ const PatientProfile = ({ onBack }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+
+  const { patientData } = usePatient();
+
+  useEffect(() => {
+    fetchPhysician();
+  }, [patientData]);
+
+  const fetchPhysician = async () => {
+    const data = await fetchPhysicians();
+    // if patientData isn't ready yet, bail early
+    if (!patientData?.primaryPhysician) return;
+
+    // find returns a single object or undefined
+    const match = data.find((p) => p.name === patientData.primaryPhysician);
+    setSelectedPhysician(match ?? null);
+    setPhysicians(data);
+  };
 
   const [profileData, setProfileData] = useState({
     // Personal Information
@@ -62,6 +115,18 @@ const PatientProfile = ({ onBack }) => {
   });
 
   const [editData, setEditData] = useState(profileData);
+  const [physicians, setPhysicians] = useState([]);
+  const [selectedPhysician, setSelectedPhysician] = useState(null);
+  const [showPhysicianDropdown, setShowPhysicianDropdown] = useState(false);
+
+  const handlePhysicianSelect = (physician) => {
+    setSelectedPhysician(physician);
+    setProfileData((prev) => ({
+      ...prev,
+      primaryPhysician: physician.name,
+    }));
+    setShowPhysicianDropdown(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -93,7 +158,8 @@ const PatientProfile = ({ onBack }) => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      setProfileData(editData);
+      console.log("Edit Data:", editData);
+      // setProfileData(editData);
       setIsEditing(false);
       setMessage("Profile updated successfully!");
       setMessageType("success");
@@ -102,6 +168,10 @@ const PatientProfile = ({ onBack }) => {
       setMessageType("error");
     } finally {
       setIsSaving(false);
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 3000);
     }
   };
 
@@ -137,7 +207,7 @@ const PatientProfile = ({ onBack }) => {
             value={isEditing ? editData[name] : value}
             onChange={handleInputChange}
             disabled={!isEditing}
-            className={`shad-input pl-10 w-full text-white ${
+            className={`shad-input rounded-3xl pl-10 w-full text-white ${
               !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
             }`}
           />
@@ -390,12 +460,88 @@ const PatientProfile = ({ onBack }) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ProfileField
-                  label="Primary Physician"
-                  name="primaryPhysician"
-                  value={profileData.primaryPhysician}
-                  icon={User}
-                />
+                <div className="md:col-span-2">
+                  <label className="shad-input-label block mb-2">
+                    Primary care physician
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPhysicianDropdown(!showPhysicianDropdown)
+                      }
+                      disabled={!isEditing}
+                      className={`w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors ${
+                        !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Search className="w-5 h-5 text-dark-600" />
+                        {selectedPhysician ? (
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={selectedPhysician.avatar}
+                              alt={selectedPhysician.name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                            <span className="text-white">
+                              {selectedPhysician.name}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-dark-600">
+                            Select a physician
+                          </span>
+                        )}
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-dark-600 transition-transform ${
+                          showPhysicianDropdown ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Physician Dropdown */}
+                    {showPhysicianDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                        <div className="p-3 border-b border-dark-500">
+                          <span className="text-14-medium text-dark-700">
+                            Physicians
+                          </span>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          {physicians.map((physician) => (
+                            <button
+                              key={physician.id}
+                              type="button"
+                              onClick={() => handlePhysicianSelect(physician)}
+                              className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                            >
+                              <img
+                                src={physician.avatar}
+                                alt={physician.name}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                              <div className="flex-1">
+                                <div className="text-16-medium text-white">
+                                  {physician.name}
+                                </div>
+                                {physician.speciality && (
+                                  <div className="text-12-regular text-dark-600">
+                                    {physician.speciality}
+                                  </div>
+                                )}
+                              </div>
+                              {selectedPhysician?.id === physician.id && (
+                                <Check className="w-5 h-5 text-green-500" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <ProfileField
                   label="Insurance Provider"
                   name="insuranceProvider"
