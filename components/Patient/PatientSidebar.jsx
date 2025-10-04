@@ -11,6 +11,7 @@ import {
   LogOut,
   Heart,
   X,
+  Receipt,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
@@ -45,6 +46,13 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
       description: "Consultation Details",
     },
     {
+      id: "billing",
+      label: "Billing",
+      icon: Receipt,
+      href: "/patient/dashboard/billing",
+      description: "Manage Billing & Payments",
+    },
+    {
       id: "profile",
       label: "Profile",
       icon: User,
@@ -69,7 +77,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
           fixed xl:static inset-y-0 left-0 z-50 
           w-80 xl:w-96 
           h-screen bg-gradient-to-b from-white to-gray-100 
-          dark:from-dark-200 dark:to-dark-300
+          dark:from-slate-900 dark:via-slate-950 dark:to-slate-900
           border-r border-gray-200 dark:border-dark-500/50 
           flex flex-col
           transform transition-transform duration-300 ease-in-out

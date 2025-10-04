@@ -26,7 +26,9 @@ const PatientProfile = ({ onBack }) => {
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
   const [profileData, setProfileData] = useState({
-    fullName: "John Smith",
+    // Personal Information
+    name: "John Smith",
+    avatar: "https://via.placeholder.com/150",
     email: "john.smith@email.com",
     phone: "+1 (555) 123-4567",
     dateOfBirth: "1990-05-15",
@@ -35,11 +37,28 @@ const PatientProfile = ({ onBack }) => {
     occupation: "Software Engineer",
     emergencyContactName: "Jane Smith",
     emergencyPhone: "+1 (555) 987-6543",
+
+    // Health Information
+    primaryPhysician: "Dr. Sarah Johnson",
     insuranceProvider: "BlueCross BlueShield",
     insurancePolicyNumber: "BC123456789",
-    allergies: "Penicillin, Peanuts",
-    currentMedications: "Lisinopril 10mg daily",
-    primaryPhysician: "Dr. Sarah Johnson",
+    insurancePolicyDocument: "https://via.placeholder.com/150",
+    insurancePolicyDocumentId: "policy123",
+    allergies: ["Penicillin", "Peanuts"], // JSON array of allergies, e.g., "Penicillin, Peanuts",
+    currentMedications: ["Aspirin", "Ibuprofen"], // JSON array of current medications, e.g., "Aspirin, Ibuprofen",
+    familyMedicalHistory: ["High blood pressure", "Diabetes"], // JSON array of family medical history, e.g., "High blood pressure, Diabetes",
+    pastMedicalHistory: ["Heart attack", "Stroke"], // JSON array of past medical history, e.g., "Heart attack, Stroke",
+
+    // Identification
+    identificationType: "Driver's License",
+    identificationNumber: "123456789",
+    identificationDocument: "https://via.placeholder.com/150",
+    identificationDocumentId: "license123",
+
+    // Consent
+    treatmentConsent: true,
+    disclosureConsent: false,
+    privacyConsent: false,
   });
 
   const [editData, setEditData] = useState(profileData);
@@ -170,7 +189,7 @@ const PatientProfile = ({ onBack }) => {
                 </div>
                 <div>
                   <h1 className="text-36-bold text-white mb-2">
-                    {profileData.fullName}
+                    {profileData.name}
                   </h1>
                   <p className="text-16-regular text-dark-700">
                     {profileData.email}
@@ -268,8 +287,8 @@ const PatientProfile = ({ onBack }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
                   label="Full Name"
-                  name="fullName"
-                  value={profileData.fullName}
+                  name="name"
+                  value={profileData.name}
                   icon={User}
                 />
                 <ProfileField
