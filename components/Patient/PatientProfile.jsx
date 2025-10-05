@@ -23,36 +23,51 @@ import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
 import { fetchPhysicians } from "@/lib/patients/profile";
 
-// const physicians = [
-//   {
-//     id: "1",
-//     name: "Dr. Adam Smith",
-//     avatar:
-//       "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-//     speciality: "General Medicine",
-//   },
-//   {
-//     id: "2",
-//     name: "Dr. Sarah Johnson",
-//     avatar:
-//       "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-//     speciality: "Internal Medicine",
-//   },
-//   {
-//     id: "3",
-//     name: "Dr. Michael Brown",
-//     avatar:
-//       "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-//     speciality: "Family Medicine",
-//   },
-//   {
-//     id: "4",
-//     name: "Dr. Emily Davis",
-//     avatar:
-//       "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-//     speciality: "Cardiology",
-//   },
-// ];
+const commonAllergies = [
+  "Penicillin",
+  "Peanuts",
+  "Tree nuts",
+  "Shellfish",
+  "Fish",
+  "Eggs",
+  "Milk",
+  "Soy",
+  "Wheat",
+  "Sesame",
+  "Latex",
+  "Dust mites",
+  "Pollen",
+  "Pet dander",
+  "Aspirin",
+  "Ibuprofen",
+  "Sulfa drugs",
+  "Codeine",
+  "Morphine",
+  "Contrast dye",
+];
+
+const commonMedications = [
+  "Lisinopril",
+  "Metformin",
+  "Amlodipine",
+  "Metoprolol",
+  "Omeprazole",
+  "Simvastatin",
+  "Losartan",
+  "Albuterol",
+  "Hydrochlorothiazide",
+  "Atorvastatin",
+  "Levothyroxine",
+  "Ibuprofen",
+  "Acetaminophen",
+  "Aspirin",
+  "Prednisone",
+  "Amoxicillin",
+  "Azithromycin",
+  "Ciprofloxacin",
+  "Warfarin",
+  "Insulin",
+];
 
 const PatientProfile = ({ onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -61,9 +76,10 @@ const PatientProfile = ({ onBack }) => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
-  const { patientData } = usePatient();
+  const { patientData, refreshPatientData } = usePatient();
 
   useEffect(() => {
+    setProfileData(patientData);
     fetchPhysician();
   }, [patientData]);
 
@@ -78,46 +94,16 @@ const PatientProfile = ({ onBack }) => {
     setPhysicians(data);
   };
 
-  const [profileData, setProfileData] = useState({
-    // Personal Information
-    name: "John Smith",
-    avatar: "https://via.placeholder.com/150",
-    email: "john.smith@email.com",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "1990-05-15",
-    gender: "Male",
-    address: "123 Main Street, New York, NY 10001",
-    occupation: "Software Engineer",
-    emergencyContactName: "Jane Smith",
-    emergencyPhone: "+1 (555) 987-6543",
-
-    // Health Information
-    primaryPhysician: "Dr. Sarah Johnson",
-    insuranceProvider: "BlueCross BlueShield",
-    insurancePolicyNumber: "BC123456789",
-    insurancePolicyDocument: "https://via.placeholder.com/150",
-    insurancePolicyDocumentId: "policy123",
-    allergies: ["Penicillin", "Peanuts"], // JSON array of allergies, e.g., "Penicillin, Peanuts",
-    currentMedications: ["Aspirin", "Ibuprofen"], // JSON array of current medications, e.g., "Aspirin, Ibuprofen",
-    familyMedicalHistory: ["High blood pressure", "Diabetes"], // JSON array of family medical history, e.g., "High blood pressure, Diabetes",
-    pastMedicalHistory: ["Heart attack", "Stroke"], // JSON array of past medical history, e.g., "Heart attack, Stroke",
-
-    // Identification
-    identificationType: "Driver's License",
-    identificationNumber: "123456789",
-    identificationDocument: "https://via.placeholder.com/150",
-    identificationDocumentId: "license123",
-
-    // Consent
-    treatmentConsent: true,
-    disclosureConsent: false,
-    privacyConsent: false,
-  });
+  const [profileData, setProfileData] = useState({});
 
   const [editData, setEditData] = useState(profileData);
   const [physicians, setPhysicians] = useState([]);
   const [selectedPhysician, setSelectedPhysician] = useState(null);
   const [showPhysicianDropdown, setShowPhysicianDropdown] = useState(false);
+  const [allergySearch, setAllergySearch] = useState("");
+  const [showAllergyDropdown, setShowAllergyDropdown] = useState(false);
+  const [showMedicationDropdown, setShowMedicationDropdown] = useState(false);
+  const [medicationSearch, setMedicationSearch] = useState("");
 
   const handlePhysicianSelect = (physician) => {
     setSelectedPhysician(physician);
@@ -127,6 +113,116 @@ const PatientProfile = ({ onBack }) => {
     }));
     setShowPhysicianDropdown(false);
   };
+
+  // Multi-select handlers
+  const handleAllergySelect = (allergy) => {
+    if (!profileData.allergies.includes(allergy)) {
+      setProfileData((prev) => ({
+        ...prev,
+        allergies: [...prev.allergies, allergy],
+      }));
+    }
+    setAllergySearch("");
+    setShowAllergyDropdown(false);
+  };
+
+  const handleAllergyKeyPress = (e) => {
+    if (e.key === "Enter" && allergySearch.trim()) {
+      e.preventDefault();
+      handleAllergySelect(allergySearch.trim());
+    }
+  };
+
+  const removeAllergy = (allergyToRemove) => {
+    setProfileData((prev) => ({
+      ...prev,
+      allergies: prev.allergies.filter(
+        (allergy) => allergy !== allergyToRemove
+      ),
+    }));
+  };
+
+  const handleMedicationSelect = (medication) => {
+    if (!profileData.currentMedications.includes(medication)) {
+      setProfileData((prev) => ({
+        ...prev,
+        currentMedications: [...prev.currentMedications, medication],
+      }));
+    }
+    setMedicationSearch("");
+    setShowMedicationDropdown(false);
+  };
+
+  const handleMedicationKeyPress = (e) => {
+    if (e.key === "Enter" && medicationSearch.trim()) {
+      e.preventDefault();
+      handleMedicationSelect(medicationSearch.trim());
+    }
+  };
+
+  const removeMedication = (medicationToRemove) => {
+    setProfileData((prev) => ({
+      ...prev,
+      currentMedications: prev.currentMedications.filter(
+        (med) => med !== medicationToRemove
+      ),
+    }));
+  };
+
+  // Point-wise input handlers
+  const addFamilyHistory = () => {
+    if (familyHistoryInput.trim()) {
+      setProfileData((prev) => ({
+        ...prev,
+        familyMedicalHistory: [
+          ...prev.familyMedicalHistory,
+          familyHistoryInput.trim(),
+        ],
+      }));
+      setFamilyHistoryInput("");
+    }
+  };
+
+  const removeFamilyHistory = (index) => {
+    setProfileData((prev) => ({
+      ...prev,
+      familyMedicalHistory: prev.familyMedicalHistory.filter(
+        (_, i) => i !== index
+      ),
+    }));
+  };
+
+  const addPastHistory = () => {
+    if (pastHistoryInput.trim()) {
+      setProfileData((prev) => ({
+        ...prev,
+        pastMedicalHistory: [
+          ...prev.pastMedicalHistory,
+          pastHistoryInput.trim(),
+        ],
+      }));
+      setPastHistoryInput("");
+    }
+  };
+
+  const removePastHistory = (index) => {
+    setProfileData((prev) => ({
+      ...prev,
+      pastMedicalHistory: prev.pastMedicalHistory.filter((_, i) => i !== index),
+    }));
+  };
+
+  const filteredAllergies = commonAllergies.filter(
+    (allergy) =>
+      allergy.toLowerCase().includes(allergySearch.toLowerCase()) &&
+      !profileData.allergies?.includes(allergy)
+  );
+
+  const filteredMedications = commonMedications.filter(
+    (medication) =>
+      medication.toLowerCase().includes(medicationSearch.toLowerCase()) &&
+      !profileData.currentMedications?.includes(medication)
+  );
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -548,28 +644,197 @@ const PatientProfile = ({ onBack }) => {
                   value={profileData.insuranceProvider}
                   icon={Shield}
                 />
+                <ProfileField
+                  label="Insurance Policy Number"
+                  name="insurancePolicyNumber"
+                  value={profileData.insurancePolicyNumber}
+                  icon={Shield}
+                />
+
+                {/* Allergies */}
                 <div className="md:col-span-2">
-                  <ProfileField
-                    label="Insurance Policy Number"
-                    name="insurancePolicyNumber"
-                    value={profileData.insurancePolicyNumber}
-                    icon={Shield}
-                  />
+                  <label className="shad-input-label block mb-2">
+                    Allergies (if any)
+                  </label>
+                  <div className="space-y-3">
+                    {/* Selected Allergies */}
+                    {profileData.allergies?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {profileData.allergies.map((allergy, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 bg-red-500/20 border border-red-500/30 rounded-full px-3 py-1"
+                          >
+                            <span className="text-12-medium text-red-400">
+                              {allergy}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeAllergy(allergy)}
+                              disabled={!isEditing}
+                              className="text-red-400 hover:text-red-300 transition-colors disabled:cursor-not-allowed"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Allergy Input */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={allergySearch}
+                        onChange={(e) => setAllergySearch(e.target.value)}
+                        onKeyPress={handleAllergyKeyPress}
+                        placeholder="Type to search allergies or add custom..."
+                        className="shad-input p-3 rounded-3xl w-full text-white disabled:cursor-not-allowed"
+                        disabled={!isEditing}
+                        onFocus={() => setShowAllergyDropdown(true)}
+                        onBlur={() =>
+                          setTimeout(() => setShowAllergyDropdown(false), 150)
+                        } // small delay
+                      />
+                      {/* Allergy Dropdown */}
+                      {showAllergyDropdown &&
+                        (allergySearch || filteredAllergies.length > 0) && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                            <div className="max-h-48 overflow-y-auto">
+                              {allergySearch &&
+                                !filteredAllergies.includes(allergySearch) && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAllergySelect(allergySearch)
+                                    }
+                                    className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
+                                  >
+                                    <Plus className="w-4 h-4 text-green-500" />
+                                    <span className="text-14-regular text-white">
+                                      Add "{allergySearch}"
+                                    </span>
+                                  </button>
+                                )}
+                              {filteredAllergies.map((allergy) => (
+                                <button
+                                  key={allergy}
+                                  type="button"
+                                  onMouseDown={() =>
+                                    handleAllergySelect(allergy)
+                                  }
+                                  className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                                >
+                                  <span className="text-14-regular text-white">
+                                    {allergy}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  </div>
                 </div>
-                <ProfileField
-                  label="Allergies"
-                  name="allergies"
-                  value={profileData.allergies}
-                  icon={AlertCircle}
-                  isTextArea
-                />
-                <ProfileField
-                  label="Current Medications"
-                  name="currentMedications"
-                  value={profileData.currentMedications}
-                  icon={Plus}
-                  isTextArea
-                />
+
+                {/* Current Medications */}
+                <div className="md:col-span-2">
+                  <label className="shad-input-label block mb-2">
+                    Current medications
+                  </label>
+                  <div className="space-y-3">
+                    {/* Selected Medications */}
+                    {profileData.currentMedications?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {profileData.currentMedications.map(
+                          (medication, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-3 py-1"
+                            >
+                              <span className="text-12-medium text-blue-400">
+                                {medication}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeMedication(medication)}
+                                disabled={!isEditing}
+                                className="text-blue-400 hover:text-blue-300 transition-colors disabled:cursor-not-allowed"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {/* Medication Input */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={medicationSearch}
+                        onChange={(e) => {
+                          setMedicationSearch(e.target.value);
+                        }}
+                        disabled={!isEditing}
+                        onKeyPress={handleMedicationKeyPress}
+                        onFocus={() => setShowMedicationDropdown(true)}
+                        onBlur={() =>
+                          setTimeout(
+                            () => setShowMedicationDropdown(false),
+                            150
+                          )
+                        } // small delay
+                        placeholder="Type to search medications or add custom..."
+                        className="shad-input rounded-3xl p-2 w-full text-white disabled:cursor-not-allowed"
+                      />
+
+                      {/* Medication Dropdown */}
+                      {showMedicationDropdown &&
+                        (medicationSearch ||
+                          filteredMedications.length > 0) && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                            <div className="max-h-48 overflow-y-auto">
+                              {medicationSearch &&
+                                !filteredMedications.includes(
+                                  medicationSearch
+                                ) && (
+                                  <button
+                                    type="button"
+                                    onMouseDown={() =>
+                                      handleMedicationSelect(medicationSearch)
+                                    }
+                                    className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
+                                  >
+                                    <Plus className="w-4 h-4 text-green-500" />
+                                    <span className="text-14-regular text-white">
+                                      Add "{medicationSearch}"
+                                    </span>
+                                  </button>
+                                )}
+                              {filteredMedications.map((medication) => (
+                                <button
+                                  key={medication}
+                                  type="button"
+                                  onClick={() =>
+                                    handleMedicationSelect(medication)
+                                  }
+                                  className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                                >
+                                  <span className="text-14-regular text-white">
+                                    {medication}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+
+                
               </div>
             </div>
           </div>
