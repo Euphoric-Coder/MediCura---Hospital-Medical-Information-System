@@ -13,12 +13,14 @@ import {
   Search,
   Check,
   X,
+  HardDrive,
 } from "lucide-react";
 import FileUpload from "../FileUpload";
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
 import { fetchPhysicians } from "@/lib/patients/profile";
 import AvatarUpload from "../AvatarUpload";
+import InputField from "./OnboardingInput";
 
 const physicians = [
   {
@@ -166,6 +168,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     privacyConsent: false,
   });
   const [physicians, setPhysicians] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const { data: session } = useSession();
 
@@ -227,6 +230,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
         [name]: value,
       }));
     }
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
   // Multi-select handlers
@@ -418,9 +425,67 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     setShowIdTypeDropdown(false);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // split phone & emergency phone by space ("+91 9876543210")
+    const [phoneCode, phoneNumber] = formData.phone.trim().split(" ");
+    const [emCode, emNumber] = formData.emergencyPhone.trim().split(" ");
+
+    // ✅ Personal Info
+    if (!formData.name.trim()) newErrors.name = "Full name is required.";
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+
+    if (!phoneNumber || phoneNumber.length < 5)
+      newErrors.phone = "Valid phone number is required.";
+
+    if (!formData.dateOfBirth)
+      newErrors.dateOfBirth = "Date of birth is required.";
+
+    if (!formData.gender) newErrors.gender = "Please select your gender.";
+
+    if (!formData.address.trim()) newErrors.address = "Address is required.";
+
+    if (!formData.occupation.trim())
+      newErrors.occupation = "Occupation is required.";
+
+    if (!formData.emergencyContactName.trim())
+      newErrors.emergencyContactName = "Emergency contact name is required.";
+
+    if (!emNumber || emNumber.length < 5)
+      newErrors.emergencyPhone = "Valid emergency phone number is required.";
+
+    // ✅ Medical Info
+    if (!formData.insuranceProvider.trim())
+      newErrors.insuranceProvider = "Insurance provider is required.";
+
+    if (!formData.insurancePolicyNumber.trim())
+      newErrors.insurancePolicyNumber = "Insurance policy number is required.";
+
+    // ✅ Identification
+    if (!formData.identificationNumber.trim())
+      newErrors.identificationNumber = "Identification number is required.";
+
+    // ✅ Consent
+    if (!formData.privacyConsent)
+      newErrors.privacyConsent = "You must agree to the privacy policy.";
+
+    return newErrors;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Onboarding form submitted:", formData);
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      console.log("Validation failed:", validationErrors);
+      console.log("Form data:", formData);
+      return;
+    }
+
+    console.log("Form submitted:", formData);
+    setErrors({}); // clear any previous errors
   };
 
   return (
@@ -475,7 +540,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     type="text"
                     name="name"
                     value={formData.name}
-                    placeholder="ex: Adam"
+                    placeholder="ex: Sagnik"
                     className="shad-input pl-10 w-full text-[17px] font-medium h-[56px]
                    text-slate-900 dark:text-white bg-white dark:bg-dark-500
                    border border-slate-300 dark:border-dark-500
@@ -520,7 +585,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    placeholder="adrian@jsmastery.pro"
+                    placeholder="sagnik@patient.medicura.com"
                     className="shad-input pl-10 w-full rounded-2xl text-white disabled:cursor-not-allowed disabled:opacity-80"
                     disabled
                   />
@@ -598,25 +663,16 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                 </div>
               </div>
 
-              {/* Date of Birth */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Date of birth
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar className="w-5 h-5 text-dark-600" />
-                  </div>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className="shad-input pl-10 p-2 w-full text-white rounded-2xl"
-                    required
-                  />
-                </div>
-              </div>
+              <InputField
+                type="date"
+                label="Date of Birth"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                icon={Calendar}
+                addStyle="p-3"
+                error={errors.dateOfBirth}
+              />
 
               {/* Gender */}
               <div>
@@ -659,44 +715,30 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               </div>
 
               {/* Address */}
-              <div>
-                <label className="shad-input-label block mb-2">Address</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MapPin className="w-5 h-5 text-dark-600" />
-                  </div>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder="ex: 14 street, New York, NY - 5101"
-                    className="shad-input pl-10 w-full text-white rounded-2xl"
-                    required
-                  />
-                </div>
-              </div>
+              <InputField
+                type="text"
+                label="Address"
+                name="address"
+                placeholder="ex: MG Road, Bengaluru, India, 560001"
+                value={formData.address}
+                onChange={handleInputChange}
+                icon={MapPin}
+                addStyle="p-3"
+                error={errors.address}
+              />
 
               {/* Occupation */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Occupation
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Briefcase className="w-5 h-5 text-dark-600" />
-                  </div>
-                  <input
-                    type="text"
-                    name="occupation"
-                    value={formData.occupation}
-                    onChange={handleInputChange}
-                    placeholder="Software Engineer"
-                    className="shad-input pl-10 w-full text-white rounded-2xl"
-                    required
-                  />
-                </div>
-              </div>
+              <InputField
+                type="text"
+                label="Occupation"
+                name="occupation"
+                value={formData.occupation}
+                onChange={handleInputChange}
+                placeholder="Software Engineer"
+                icon={Briefcase}
+                addStyle="p-3"
+                error={errors.occupation}
+              />
 
               {/* Emergency Contact Name */}
               <div>
@@ -1242,9 +1284,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
                   {/* Dropdown */}
                   {showIdTypeDropdown && (
-                    <div
-                      className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden animate-fadeIn"
-                    >
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden animate-fadeIn">
                       <div className="p-3 border-b border-slate-200 dark:border-dark-500">
                         <span className="text-14-medium text-slate-700 dark:text-slate-300">
                           Identification Types

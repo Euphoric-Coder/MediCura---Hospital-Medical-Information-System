@@ -308,6 +308,21 @@
   @apply px-4 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-700 rounded-full
 }
 
+.input-field {
+  @apply w-full border-[2px] border-slate-300 dark:border-dark-500 rounded-3xl shadow-md
+  bg-white text-slate-900 placeholder:text-slate-400
+  dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600
+  transition-all duration-500;
+}
+
+.input-error-field {
+  @apply w-full border-[2px] border-red-400 dark:border-red-600 rounded-3xl shadow-md
+  bg-white text-slate-900 placeholder:text-slate-400
+  dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600
+  transition-all duration-500;
+}
+
+
 
   .shad-input-label {
   @apply text-14-medium text-slate-700 dark:text-dark-700 !important;
