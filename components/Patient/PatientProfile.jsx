@@ -1062,19 +1062,32 @@ const PatientProfile = ({ onBack }) => {
                           (history, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded-lg p-3"
+                              className="
+        flex items-center justify-between rounded-lg p-3
+        border
+        bg-emerald-100 border-emerald-400
+        dark:bg-emerald-900/20 dark:border-emerald-700
+      "
                             >
                               <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-14-regular text-white">
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                                <span className="text-sm text-slate-800 dark:text-slate-100">
                                   {history}
                                 </span>
                               </div>
+
                               <button
                                 type="button"
                                 onClick={() => removeFamilyHistory(index)}
-                                className="text-red-400 hover:text-red-300 transition-colors disabled:cursor-not-allowed"
                                 disabled={!isEditing}
+                                aria-disabled={!isEditing}
+                                className="
+          text-rose-600 hover:text-rose-700
+          dark:text-rose-300 dark:hover:text-rose-200
+          transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 rounded-md
+        "
+                                title="Remove item"
                               >
                                 <X className="w-4 h-4" />
                               </button>
@@ -1125,19 +1138,32 @@ const PatientProfile = ({ onBack }) => {
                           (history, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between bg-blue-500/10 border border-blue-500/20 rounded-lg p-3"
+                              className="
+        flex items-center justify-between rounded-lg p-3
+        border
+        bg-sky-100 border-sky-400
+        dark:bg-sky-900/20 dark:border-sky-700
+      "
                             >
                               <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                <span className="text-14-regular text-white">
+                                <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                                <span className="text-sm text-slate-800 dark:text-slate-100">
                                   {history}
                                 </span>
                               </div>
+
                               <button
                                 type="button"
                                 onClick={() => removePastHistory(index)}
-                                className="text-red-400 hover:text-red-300 transition-colors disabled:cursor-not-allowed"
                                 disabled={!isEditing}
+                                aria-disabled={!isEditing}
+                                className="
+          text-rose-600 hover:text-rose-700
+          dark:text-rose-300 dark:hover:text-rose-200
+          transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 rounded-md
+        "
+                                title="Remove item"
                               >
                                 <X className="w-4 h-4" />
                               </button>
