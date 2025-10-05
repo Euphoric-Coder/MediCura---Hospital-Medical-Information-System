@@ -18,6 +18,7 @@ import FileUpload from "../FileUpload";
 import { usePatient } from "@/contexts/PatientContext";
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
+import { fetchPhysicians } from "@/lib/patients/profile";
 
 const physicians = [
   {
@@ -162,6 +163,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     disclosureConsent: false,
     privacyConsent: true,
   });
+  const [physicians, setPhysicians] = useState([]);
 
   const { data: session } = useSession();
 
@@ -171,7 +173,13 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       name: session?.user?.name || "",
       email: session?.user?.email || "",
     }));
+    fetchPhysician();
   }, [session?.user]);
+
+  const fetchPhysician = async () => {
+    const data = await fetchPhysicians();
+    setPhysicians(data);
+  };
 
   // Multi-select states
   const [allergySearch, setAllergySearch] = useState("");
