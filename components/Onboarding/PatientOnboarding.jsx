@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   User,
@@ -15,6 +15,9 @@ import {
   X,
 } from "lucide-react";
 import FileUpload from "../FileUpload";
+import { usePatient } from "@/contexts/PatientContext";
+import { useSession } from "next-auth/react";
+import { ModeToggle } from "../ThemeButton";
 
 const physicians = [
   {
@@ -159,6 +162,16 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     disclosureConsent: false,
     privacyConsent: true,
   });
+
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      name: session?.user?.name || "",
+      email: session?.user?.email || "",
+    }));
+  }, [session?.user]);
 
   // Multi-select states
   const [allergySearch, setAllergySearch] = useState("");
@@ -402,6 +415,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
             <p className="text-16-regular text-dark-700">
               Let us know more about yourself
             </p>
+            <ModeToggle />
           </div>
 
           {/* Personal Information */}
@@ -422,10 +436,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     type="text"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
                     placeholder="ex: Adam"
-                    className="shad-input pl-10 w-full text-white"
-                    required
+                    className="shad-input pl-10 w-full text-white disabled:cursor-not-allowed disabled:opacity-80"
+                    disabled
                   />
                 </div>
               </div>
@@ -443,10 +456,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
                     placeholder="adrian@jsmastery.pro"
-                    className="shad-input pl-10 w-full text-white"
-                    required
+                    className="shad-input pl-10 w-full text-white disabled:cursor-not-allowed disabled:opacity-80"
+                    disabled
                   />
                 </div>
               </div>
