@@ -161,9 +161,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     identificationDocumentId: null,
 
     // Consent
-    treatmentConsent: true,
+    treatmentConsent: false,
     disclosureConsent: false,
-    privacyConsent: true,
+    privacyConsent: false,
   });
   const [physicians, setPhysicians] = useState([]);
 
@@ -203,7 +203,6 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   const [showEmergencyCountryDropdown, setShowEmergencyCountryDropdown] =
     useState(false);
 
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadData, setUploadData] = useState(null);
   const [fileId, setFileId] = useState(null);
   const [insuranceUpload, setInsuranceUpload] = useState(null);
@@ -427,14 +426,18 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-300 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-slate-100 dark:bg-dark-200 border-b border-slate-200 dark:border-dark-500 px-8 py-6 transition-colors">
+      <div className="sticky top-0 z-50 bg-slate-100/60 dark:bg-dark-200/60 backdrop-blur-lg border-b-2 border-slate-300/50 dark:border-dark-600/50 px-8 py-6 shadow-lg shadow-slate-200/20 dark:shadow-black/30 transition-all duration-300">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center shadow-lg shadow-green-500/25">
               <Plus className="w-5 h-5 text-white" />
             </div>
-            <span className="text-24-bold">MediCura</span>
+            <span className="text-24-bold text-slate-900 dark:text-white transition-colors">
+              MediCura
+            </span>
           </div>
+
+          {/* Theme Toggle */}
           <ModeToggle />
         </div>
       </div>
@@ -476,7 +479,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     className="shad-input pl-10 w-full text-[17px] font-medium h-[56px]
                    text-slate-900 dark:text-white bg-white dark:bg-dark-500
                    border border-slate-300 dark:border-dark-500
-                   rounded-xl disabled:cursor-not-allowed disabled:opacity-80
+                   rounded-2xl disabled:cursor-not-allowed disabled:opacity-80
                    transition-colors shadow-sm focus:border-emerald-500 focus:ring-emerald-500/30"
                     disabled
                   />
@@ -518,7 +521,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     name="email"
                     value={formData.email}
                     placeholder="adrian@jsmastery.pro"
-                    className="shad-input pl-10 w-full text-white disabled:cursor-not-allowed disabled:opacity-80"
+                    className="shad-input pl-10 w-full rounded-2xl text-white disabled:cursor-not-allowed disabled:opacity-80"
                     disabled
                   />
                 </div>
@@ -537,7 +540,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       onClick={() =>
                         setShowPhoneCountryDropdown(!showPhoneCountryDropdown)
                       }
-                      className="bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 text-white flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                      className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
                     >
                       <span>
                         {
@@ -556,7 +559,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     </button>
 
                     {showPhoneCountryDropdown && (
-                      <div className="absolute top-full left-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                      <div className="absolute top-full left-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
                         <div className="max-h-60 overflow-y-auto">
                           {countryCodes.map((country, index) => (
                             <button
@@ -565,14 +568,14 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                               onClick={() =>
                                 handlePhoneCountrySelect(country.code)
                               }
-                              className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                              className="w-full p-3 flex items-center gap-3 hover:bg-light-200 dark:hover:bg-dark-500 transition-colors text-left"
                             >
                               <span className="text-lg">{country.flag}</span>
                               <div>
-                                <div className="text-14-medium text-white">
+                                <div className="text-14-medium">
                                   {country.code}
                                 </div>
-                                <div className="text-12-regular text-dark-600">
+                                <div className="text-12-regular text-dark-400 dark:text-dark-600">
                                   {country.country}
                                 </div>
                               </div>
@@ -589,7 +592,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     value={phoneNumber}
                     onChange={(e) => handlePhoneNumberChange(e.target.value)}
                     placeholder="123 456 7890"
-                    className="shad-input flex-1 text-white"
+                    className="shad-input rounded-2xl p-3 flex-1 text-white"
                     required
                   />
                 </div>
@@ -609,7 +612,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 p-2 w-full text-white rounded-2xl"
                     required
                   />
                 </div>
@@ -628,7 +631,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       onChange={handleInputChange}
                       className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500"
                     />
-                    <span className="text-14-regular text-white">Male</span>
+                    <span className="text-14-regular">Male</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -639,7 +642,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       onChange={handleInputChange}
                       className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500"
                     />
-                    <span className="text-14-regular text-white">Female</span>
+                    <span className="text-14-regular">Female</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -650,7 +653,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       onChange={handleInputChange}
                       className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 focus:ring-green-500"
                     />
-                    <span className="text-14-regular text-white">Other</span>
+                    <span className="text-14-regular">Other</span>
                   </label>
                 </div>
               </div>
@@ -668,7 +671,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="ex: 14 street, New York, NY - 5101"
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 w-full text-white rounded-2xl"
                     required
                   />
                 </div>
@@ -689,7 +692,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     value={formData.occupation}
                     onChange={handleInputChange}
                     placeholder="Software Engineer"
-                    className="shad-input pl-10 w-full text-white"
+                    className="shad-input pl-10 w-full text-white rounded-2xl"
                     required
                   />
                 </div>
@@ -706,7 +709,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   value={formData.emergencyContactName}
                   onChange={handleInputChange}
                   placeholder="Guardian's name"
-                  className="shad-input w-full text-white"
+                  className="shad-input w-full text-white rounded-2xl p-3"
                   required
                 />
               </div>
@@ -726,7 +729,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                           !showEmergencyCountryDropdown
                         )
                       }
-                      className="bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 text-white flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                      className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
                     >
                       <span>
                         {
@@ -746,7 +749,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     </button>
 
                     {showEmergencyCountryDropdown && (
-                      <div className="absolute top-full left-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                      <div className="absolute top-full left-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
                         <div className="max-h-60 overflow-y-auto">
                           {countryCodes.map((country, index) => (
                             <button
@@ -755,14 +758,14 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                               onClick={() =>
                                 handleEmergencyCountrySelect(country.code)
                               }
-                              className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                              className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left"
                             >
                               <span className="text-lg">{country.flag}</span>
                               <div>
-                                <div className="text-14-medium text-white">
+                                <div className="text-14-medium">
                                   {country.code}
                                 </div>
-                                <div className="text-12-regular text-dark-600">
+                                <div className="text-12-regular text-slate-600 dark:text-dark-600">
                                   {country.country}
                                 </div>
                               </div>
@@ -781,7 +784,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       handleEmergencyNumberChange(e.target.value)
                     }
                     placeholder="123 456 7890"
-                    className="shad-input flex-1 text-white"
+                    className="shad-input flex-1 text-white p-3 rounded-2xl"
                     required
                   />
                 </div>
@@ -807,10 +810,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     onClick={() =>
                       setShowPhysicianDropdown(!showPhysicianDropdown)
                     }
-                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                    className="w-full bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg px-4 py-3 text-left flex items-center justify-between hover:border-emerald-500 transition-all duration-200shadow-sm focus:ring-2 focus:ring-emerald-500/40"
                   >
                     <div className="flex items-center gap-3">
-                      <Search className="w-5 h-5 text-dark-600" />
+                      <Search className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                       {selectedPhysician ? (
                         <div className="flex items-center gap-3">
                           <img
@@ -818,28 +821,28 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                             alt={selectedPhysician.name}
                             className="w-8 h-8 rounded-full object-cover"
                           />
-                          <span className="text-white">
+                          <span className="text-slate-900 dark:text-white font-medium">
                             {selectedPhysician.name}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-dark-600">
+                        <span className="text-slate-500 dark:text-slate-400">
                           Select a physician
                         </span>
                       )}
                     </div>
                     <ChevronDown
-                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                      className={`w-5 h-5 text-slate-600 dark:text-slate-300 transition-transform ${
                         showPhysicianDropdown ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
-                  {/* Physician Dropdown */}
+                  {/* Dropdown */}
                   {showPhysicianDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
-                      <div className="p-3 border-b border-dark-500">
-                        <span className="text-14-medium text-dark-700">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden animate-fadeIn">
+                      <div className="p-3 border-b border-slate-200 dark:border-dark-500">
+                        <span className="text-14-medium text-slate-700 dark:text-slate-300">
                           Physicians
                         </span>
                       </div>
@@ -849,7 +852,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                             key={physician.id}
                             type="button"
                             onClick={() => handlePhysicianSelect(physician)}
-                            className="w-full p-4 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                            className="w-full p-4 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors text-left"
                           >
                             <img
                               src={physician.avatar}
@@ -857,17 +860,17 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                               className="w-10 h-10 rounded-full object-cover"
                             />
                             <div className="flex-1">
-                              <div className="text-16-medium text-white">
+                              <div className="text-16-medium text-slate-900 dark:text-white font-medium">
                                 {physician.name}
                               </div>
                               {physician.speciality && (
-                                <div className="text-12-regular text-dark-600">
+                                <div className="text-12-regular text-slate-500 dark:text-slate-400">
                                   {physician.speciality}
                                 </div>
                               )}
                             </div>
                             {selectedPhysician?.id === physician.id && (
-                              <Check className="w-5 h-5 text-green-500" />
+                              <Check className="w-5 h-5 text-emerald-500" />
                             )}
                           </button>
                         ))}
@@ -888,7 +891,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   value={formData.insuranceProvider}
                   onChange={handleInputChange}
                   placeholder="ex: BlueCross"
-                  className="shad-input w-full text-white"
+                  className="shad-input w-full text-white p-3 rounded-2xl"
                   required
                 />
               </div>
@@ -904,7 +907,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   value={formData.insurancePolicyNumber}
                   onChange={handleInputChange}
                   placeholder="ex: ABC1234567"
-                  className="shad-input w-full text-white"
+                  className="shad-input w-full text-white p-3 rounded-2xl"
                   required
                 />
               </div>
@@ -961,7 +964,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     onChange={(e) => setAllergySearch(e.target.value)}
                     onKeyPress={handleAllergyKeyPress}
                     placeholder="Type to search allergies or add custom..."
-                    className="shad-input w-full text-white"
+                    className="shad-input w-full text-white p-3 rounded-2xl"
                     onFocus={() => setShowAllergyDropdown(true)}
                     onBlur={() =>
                       setTimeout(() => setShowAllergyDropdown(false), 150)
@@ -1049,7 +1052,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       setTimeout(() => setShowMedicationDropdown(false), 150)
                     } // small delay
                     placeholder="Type to search medications or add custom..."
-                    className="shad-input w-full text-white"
+                    className="shad-input w-full text-white p-3 rounded-2xl"
                   />
 
                   {/* Medication Dropdown */}
@@ -1136,7 +1139,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       }
                     }}
                     placeholder="ex: Mother had breast cancer"
-                    className="shad-input flex-1 text-white"
+                    className="shad-input flex-1 text-white p-3 rounded-2xl"
                   />
                   <button
                     type="button"
@@ -1194,7 +1197,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       }
                     }}
                     placeholder="ex: Asthma diagnosis in childhood"
-                    className="shad-input flex-1 text-white"
+                    className="shad-input flex-1 text-white p-3 rounded-2xl"
                   />
                   <button
                     type="button"
@@ -1224,39 +1227,43 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   <button
                     type="button"
                     onClick={() => setShowIdTypeDropdown(!showIdTypeDropdown)}
-                    className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                    className="w-full bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg px-4 py-3 text-left flex items-center justify-between hover:border-emerald-500 transition-all duration-200shadow-sm focus:ring-2 focus:ring-emerald-500/40"
                   >
-                    <span className="text-white">
-                      {formData.identificationType}
+                    <span className="text-slate-900 dark:text-white font-medium">
+                      {formData.identificationType ||
+                        "Select Identification Type"}
                     </span>
                     <ChevronDown
-                      className={`w-5 h-5 text-dark-600 transition-transform ${
+                      className={`w-5 h-5 text-slate-600 dark:text-slate-300 transition-transform ${
                         showIdTypeDropdown ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
-                  {/* ID Type Dropdown */}
+                  {/* Dropdown */}
                   {showIdTypeDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
-                      <div className="p-3 border-b border-dark-500">
-                        <span className="text-14-medium text-dark-700">
+                    <div
+                      className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden animate-fadeIn"
+                    >
+                      <div className="p-3 border-b border-slate-200 dark:border-dark-500">
+                        <span className="text-14-medium text-slate-700 dark:text-slate-300">
                           Identification Types
                         </span>
                       </div>
+
                       <div className="max-h-60 overflow-y-auto">
                         {idTypes.map((idType) => (
                           <button
                             key={idType}
                             type="button"
                             onClick={() => handleIdTypeSelect(idType)}
-                            className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                            className="w-full p-4 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors text-left"
                           >
-                            <span className="text-16-medium text-white">
+                            <span className="text-16-medium text-slate-900 dark:text-white font-medium">
                               {idType}
                             </span>
                             {formData.identificationType === idType && (
-                              <Check className="w-5 h-5 text-green-500" />
+                              <Check className="w-5 h-5 text-emerald-500" />
                             )}
                           </button>
                         ))}
@@ -1277,7 +1284,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   value={formData.identificationNumber}
                   onChange={handleInputChange}
                   placeholder="ex 1234567"
-                  className="shad-input w-full text-white"
+                  className="shad-input w-full text-white p-3 rounded-2xl"
                   required
                 />
               </div>
@@ -1314,7 +1321,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   onChange={handleInputChange}
                   className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
                 />
-                <span className="text-14-regular text-white">
+                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
                   I consent to receive treatment for my health condition.
                 </span>
               </label>
@@ -1327,7 +1334,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   onChange={handleInputChange}
                   className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
                 />
-                <span className="text-14-regular text-white">
+                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
                   I consent to the use and disclosure of my health information
                   for treatment purposes.
                 </span>
@@ -1342,7 +1349,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
                   required
                 />
-                <span className="text-14-regular text-white">
+                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
                   I acknowledge that I have reviewed and agree to the{" "}
                   <span className="text-green-500 underline">
                     privacy policy
@@ -1372,7 +1379,9 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
           {/* Copyright */}
           <div className="mt-16">
-            <p className="copyright">©carepulse copyright</p>
+            <p className="text-center text-slate-600 dark:text-slate-400 text-sm">
+              © MediCura — All rights reserved
+            </p>
           </div>
         </div>
       </div>
