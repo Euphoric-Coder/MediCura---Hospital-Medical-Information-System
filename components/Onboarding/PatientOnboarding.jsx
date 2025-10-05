@@ -15,7 +15,6 @@ import {
   X,
 } from "lucide-react";
 import FileUpload from "../FileUpload";
-import { usePatient } from "@/contexts/PatientContext";
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
 import { fetchPhysicians } from "@/lib/patients/profile";
@@ -204,6 +203,8 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadData, setUploadData] = useState(null);
   const [fileId, setFileId] = useState(null);
+  const [insuranceUpload, setInsuranceUpload] = useState(null);
+  const [insuranceFileId, setInsuranceFileId] = useState(null);
   const [showPhysicianDropdown, setShowPhysicianDropdown] = useState(false);
   const [showIdTypeDropdown, setShowIdTypeDropdown] = useState(false);
   const [selectedPhysician, setSelectedPhysician] = useState(null);
@@ -369,12 +370,21 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       !formData.currentMedications.includes(medication)
   );
 
-  const handleFileUpload = (uploadData, fileId) => {
+  const handleDocumentUpload = (uploadData, fileId) => {
     console.log("File uploaded:", fileId, uploadData);
     setFormData((prev) => ({
       ...prev,
       identificationDocument: uploadData,
       identificationDocumentId: fileId,
+    }));
+  };
+
+  const handleInsuranceFileUpload = (uploadData, fileId) => {
+    console.log("File uploaded:", fileId, uploadData);
+    setFormData((prev) => ({
+      ...prev,
+      insurancePolicyDocument: uploadData,
+      insurancePolicyDocumentId: fileId,
     }));
   };
 
@@ -855,6 +865,20 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   required
                 />
               </div>
+
+              <div className="md:col-span-2">
+                <label className="shad-input-label block mb-2">
+                  Scanned Copy of Insurance Document
+                </label>
+                <FileUpload
+                  uploadData={insuranceUpload}
+                  setUploadData={setInsuranceUpload}
+                  fileId={insuranceFileId}
+                  setFileId={setInsuranceFileId}
+                  handleFileUpload={handleInsuranceFileUpload}
+                  folder="Patient"
+                />
+              </div>
             </div>
 
             {/* Allergies */}
@@ -1225,7 +1249,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   setUploadData={setUploadData}
                   fileId={fileId}
                   setFileId={setFileId}
-                  handleFileUpload={handleFileUpload}
+                  handleFileUpload={handleDocumentUpload}
                   folder="Patient"
                 />
               </div>

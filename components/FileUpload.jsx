@@ -81,6 +81,7 @@ export default function FileUpload({
     // Whenever uploadData or fileId changes, we call handleInputChange
     // Only call if both are defined, or tweak the logic as needed
     if (uploadData && fileId) {
+      console.log("File uploaded:", fileId, uploadData);
       handleFileUpload(uploadData.url, fileId);
     }
   }, [uploadData, fileId]);
