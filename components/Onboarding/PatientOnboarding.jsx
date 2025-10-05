@@ -18,6 +18,7 @@ import FileUpload from "../FileUpload";
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
 import { fetchPhysicians } from "@/lib/patients/profile";
+import AvatarUpload from "../AvatarUpload";
 
 const physicians = [
   {
@@ -133,6 +134,8 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     name: "",
     email: "",
     phone: "",
+    avatarId: null,
+    avatar: null,
     dateOfBirth: "",
     gender: "",
     address: "",
@@ -208,6 +211,8 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   const [showPhysicianDropdown, setShowPhysicianDropdown] = useState(false);
   const [showIdTypeDropdown, setShowIdTypeDropdown] = useState(false);
   const [selectedPhysician, setSelectedPhysician] = useState(null);
+  const [avatarData, setAvatarData] = useState(null);
+  const [avatarId, setAvatarId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
@@ -370,6 +375,15 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       !formData.currentMedications.includes(medication)
   );
 
+  const handleAvatarUpload = (url, id) => {
+    console.log("Avatar uploaded:", url, id);
+    setFormData((prev) => ({
+      ...prev,
+      avatar: url,
+      avatarId: id,
+    }));
+  };
+
   const handleDocumentUpload = (uploadData, fileId) => {
     console.log("File uploaded:", fileId, uploadData);
     setFormData((prev) => ({
@@ -411,14 +425,17 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-300 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-dark-200 border-b border-dark-500 px-8 py-6">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-            <Plus className="w-5 h-5 text-white" />
+      <div className="bg-slate-100 dark:bg-dark-200 border-b border-slate-200 dark:border-dark-500 px-8 py-6 transition-colors">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <Plus className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-24-bold">MediCura</span>
           </div>
-          <span className="text-24-bold text-white">MediCura</span>
+          <ModeToggle />
         </div>
       </div>
 
@@ -427,38 +444,64 @@ const OnboardingPage = ({ onBack, onComplete }) => {
         <div className="sub-container max-w-4xl">
           {/* Welcome Section */}
           <div className="mb-12">
-            <h1 className="text-36-bold text-white mb-2 flex items-center gap-2">
+            <h1 className="text-36-bold text-slate-900 dark:text-white mb-2">
               Welcome 👋
             </h1>
-            <p className="text-16-regular text-dark-700">
+            <p className="text-16-regular text-slate-700 dark:text-slate-400">
               Let us know more about yourself
             </p>
-            <ModeToggle />
           </div>
 
           {/* Personal Information */}
           <section>
-            <h2 className="text-24-bold text-white mb-8">
+            <h2 className="text-24-bold text-slate-700 dark:text-slate-50 mb-8">
               Personal Information
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Full Name */}
-              <div className="md:col-span-2">
-                <label className="shad-input-label block mb-2">Full name</label>
+              {/* Full Name Field */}
+              <div className="w-full">
+                <label className="shad-input-label block mb-3 text-[15px] font-medium">
+                  Full Name
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="w-5 h-5 text-dark-600" />
+                    <User className="w-5 h-5 text-dark-600 dark:text-slate-400" />
                   </div>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     placeholder="ex: Adam"
-                    className="shad-input pl-10 w-full text-white disabled:cursor-not-allowed disabled:opacity-80"
+                    className="shad-input pl-10 w-full text-[17px] font-medium h-[56px]
+                   text-slate-900 dark:text-white bg-white dark:bg-dark-500
+                   border border-slate-300 dark:border-dark-500
+                   rounded-xl disabled:cursor-not-allowed disabled:opacity-80
+                   transition-colors shadow-sm focus:border-emerald-500 focus:ring-emerald-500/30"
                     disabled
                   />
                 </div>
+              </div>
+
+              {/* Profile Picture */}
+              <div className="flex flex-col items-center md:items-start">
+                <div className="mb-3">
+                  <h3 className="text-[15px] font-semibold text-slate-900 dark:text-white">
+                    Profile Picture
+                  </h3>
+                  <p className="text-[13px] text-slate-600 dark:text-slate-400">
+                    Upload your profile photo
+                  </p>
+                </div>
+
+                <AvatarUpload
+                  uploadData={avatarData}
+                  setUploadData={setAvatarData}
+                  fileId={avatarId}
+                  setFileId={setAvatarId}
+                  handleFileUpload={handleAvatarUpload}
+                  folder="Patient"
+                />
               </div>
 
               {/* Email */}
@@ -748,7 +791,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
           {/* Medical Information */}
           <section>
-            <h2 className="text-24-bold text-white mb-8">
+            <h2 className="text-24-bold text-slate-700 dark:text-slate-50 my-8">
               Medical Information
             </h2>
 
@@ -1167,7 +1210,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
           {/* Identification and Verification */}
           <section>
-            <h2 className="text-24-bold text-white mb-8">
+            <h2 className="text-24-bold text-slate-700 dark:text-slate-50 my-8">
               Identification and Verification
             </h2>
 
@@ -1258,7 +1301,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
           {/* Consent and Privacy */}
           <section>
-            <h2 className="text-24-bold text-white mb-8">
+            <h2 className="text-24-bold text-slate-700 dark:text-slate-50 my-8">
               Consent and Privacy
             </h2>
 
@@ -1313,7 +1356,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
           <div className="pt-8">
             <button
               onClick={handleSubmit}
-              className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-lg text-16-semibold transition-colors"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 px-6 rounded-lg text-16-semibold transition-colors dark:shadow-emerald-500/10 shadow-md"
             >
               Submit and continue
             </button>
@@ -1322,7 +1365,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
           {/* Back Link */}
           <button
             onClick={onBack}
-            className="mt-8 text-14-regular text-dark-600 hover:text-white transition-colors"
+            className="mt-8 text-14-regular text-slate-700 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
             ← Back to Home
           </button>

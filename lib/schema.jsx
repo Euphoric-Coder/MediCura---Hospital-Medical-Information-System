@@ -28,6 +28,7 @@ export const Patients = pgTable("patients", {
 
   // Profile
   name: varchar("name"),
+  avatarId: varchar("avatarId"),
   avatar: varchar("avatar"),
   email: varchar("email"),
   phone: varchar("phone"),
