@@ -17,6 +17,7 @@ const InputField = ({
   icon: Icon,
   disabled = false,
   readOnly = false,
+  required = false,
 }) => {
   return (
     <div className="w-full">
@@ -27,6 +28,7 @@ const InputField = ({
           className="block mb-2 text-[15px] font-medium text-slate-800 dark:text-slate-200"
         >
           {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
 

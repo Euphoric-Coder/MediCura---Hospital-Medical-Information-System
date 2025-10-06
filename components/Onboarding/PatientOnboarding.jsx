@@ -13,7 +13,6 @@ import {
   Search,
   Check,
   X,
-  HardDrive,
 } from "lucide-react";
 import FileUpload from "../FileUpload";
 import { useSession } from "next-auth/react";
@@ -502,8 +501,16 @@ const OnboardingPage = ({ onBack, onComplete }) => {
             </span>
           </div>
 
-          {/* Theme Toggle */}
-          <ModeToggle />
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <ModeToggle />
+            <button
+              onClick={handleSubmit}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 px-6 rounded-3xl text-16-semibold transition-colors dark:shadow-emerald-500/10 shadow-md"
+            >
+              Submit and continue
+            </button>
+          </div>
         </div>
       </div>
 
@@ -663,6 +670,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                 </div>
               </div>
 
+              {/* Date of Birth */}
               <InputField
                 type="date"
                 label="Date of Birth"
@@ -672,6 +680,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                 icon={Calendar}
                 addStyle="p-3"
                 error={errors.dateOfBirth}
+                required
               />
 
               {/* Gender */}
@@ -712,6 +721,11 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     <span className="text-14-regular">Other</span>
                   </label>
                 </div>
+                  {errors.gender && (
+                    <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                      {errors.gender}
+                    </p>
+                  )}
               </div>
 
               {/* Address */}
@@ -725,6 +739,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                 icon={MapPin}
                 addStyle="p-3"
                 error={errors.address}
+                required
               />
 
               {/* Occupation */}
@@ -738,23 +753,22 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                 icon={Briefcase}
                 addStyle="p-3"
                 error={errors.occupation}
+                required
               />
 
               {/* Emergency Contact Name */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Emergency contact name
-                </label>
-                <input
-                  type="text"
-                  name="emergencyContactName"
-                  value={formData.emergencyContactName}
-                  onChange={handleInputChange}
-                  placeholder="Guardian's name"
-                  className="shad-input w-full text-white rounded-2xl p-3"
-                  required
-                />
-              </div>
+              <InputField
+                type="text"
+                label="Emergency Contact Name"
+                name="emergencyContactName"
+                value={formData.emergencyContactName}
+                onChange={handleInputChange}
+                placeholder="Guardian's name"
+                icon={User}
+                addStyle="p-3"
+                error={errors.emergencyContactName}
+                required
+              />
 
               {/* Emergency Phone */}
               <div>
