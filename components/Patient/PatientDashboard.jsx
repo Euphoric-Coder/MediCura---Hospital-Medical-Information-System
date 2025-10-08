@@ -1034,115 +1034,134 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
               {/* Appointment List */}
               <div className="space-y-4">
-                {appointments.map((appointment) => (
+                {appointments.length === 0 ? (
                   <div
-                    key={appointment.id}
-                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+                    className="flex flex-col items-center justify-center p-10 rounded-2xl 
+      bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30
+      border border-gray-200 dark:border-dark-500/50 backdrop-blur-sm shadow-sm"
+                  >
+                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-500/20 mb-4">
+                      <Calendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      No Appointments Found
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-dark-600 text-center max-w-sm">
+                      You currently don’t have any scheduled appointments. When
+                      you book one, it will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  appointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
         backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
         rounded-2xl p-4 lg:p-6 transition-colors"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      {/* Doctor Info */}
-                      <div className="flex items-center gap-4 lg:gap-6">
-                        <img
-                          src={appointment.doctor.avatar}
-                          alt={appointment.doctor.name}
-                          className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
-                        />
-                        <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
-                            {appointment.doctor.name}
-                          </h3>
-                          <p className="text-14-regular text-blue-600 dark:text-blue-400 mb-2">
-                            {appointment.doctor.speciality}
-                          </p>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                              <span>{appointment.date}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                              <span>{appointment.time}</span>
-                            </div>
-                          </div>
-                          <div className="mt-2">
-                            <span className="text-12-regular text-gray-600 dark:text-dark-600">
-                              Type:{" "}
-                            </span>
-                            <span className="text-gray-900 dark:text-white">
-                              {appointment.type}
-                            </span>
-                          </div>
-
-                          {/* Status */}
-                          <div
-                            className={`mt-2 rounded-lg px-3 py-2 inline-block ${
-                              appointment.status === "cancelled"
-                                ? "bg-red-100 border border-red-300 text-red-600 dark:bg-red-500/20 dark:border-red-500/40 dark:text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                                : "bg-gray-100 text-gray-600 dark:bg-dark-500/30 dark:text-dark-600"
-                            }`}
-                          >
-                            <p className="text-10-regular lg:text-12-regular">
-                              <span
-                                className={
-                                  appointment.status === "cancelled"
-                                    ? "text-red-600 dark:text-red-300"
-                                    : "text-gray-900 dark:text-white"
-                                }
-                              >
-                                {appointment.status === "cancelled" &&
-                                  "Cancellation"}{" "}
-                                Reason:
-                              </span>{" "}
-                              {appointment.reason}
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        {/* Doctor Info */}
+                        <div className="flex items-center gap-4 lg:gap-6">
+                          <img
+                            src={appointment.doctor.avatar}
+                            alt={appointment.doctor.name}
+                            className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
+                          />
+                          <div>
+                            <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
+                              {appointment.doctor.name}
+                            </h3>
+                            <p className="text-14-regular text-blue-600 dark:text-blue-400 mb-2">
+                              {appointment.doctor.speciality}
                             </p>
-                          </div>
-
-                          {/* Notes */}
-                          {appointment.notes &&
-                            appointment.status !== "cancelled" && (
-                              <div className="bg-blue-100 dark:bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
-                                <p className="text-10-regular lg:text-12-regular text-blue-600 dark:text-blue-400">
-                                  <span className="text-gray-900 dark:text-white">
-                                    Notes:
-                                  </span>{" "}
-                                  {appointment.notes}
-                                </p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                                <span>{appointment.date}</span>
                               </div>
-                            )}
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                <span>{appointment.time}</span>
+                              </div>
+                            </div>
+                            <div className="mt-2">
+                              <span className="text-12-regular text-gray-600 dark:text-dark-600">
+                                Type:{" "}
+                              </span>
+                              <span className="text-gray-900 dark:text-white">
+                                {appointment.type}
+                              </span>
+                            </div>
+
+                            {/* Status */}
+                            <div
+                              className={`mt-2 rounded-lg px-3 py-2 inline-block ${
+                                appointment.status === "cancelled"
+                                  ? "bg-red-100 border border-red-300 text-red-600 dark:bg-red-500/20 dark:border-red-500/40 dark:text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                                  : "bg-gray-100 text-gray-600 dark:bg-dark-500/30 dark:text-dark-600"
+                              }`}
+                            >
+                              <p className="text-10-regular lg:text-12-regular">
+                                <span
+                                  className={
+                                    appointment.status === "cancelled"
+                                      ? "text-red-600 dark:text-red-300"
+                                      : "text-gray-900 dark:text-white"
+                                  }
+                                >
+                                  {appointment.status === "cancelled" &&
+                                    "Cancellation"}{" "}
+                                  Reason:
+                                </span>{" "}
+                                {appointment.reason}
+                              </p>
+                            </div>
+
+                            {/* Notes */}
+                            {appointment.notes &&
+                              appointment.status !== "cancelled" && (
+                                <div className="bg-blue-100 dark:bg-blue-500/20 rounded-lg px-3 py-2 inline-block ml-2">
+                                  <p className="text-10-regular lg:text-12-regular text-blue-600 dark:text-blue-400">
+                                    <span className="text-gray-900 dark:text-white">
+                                      Notes:
+                                    </span>{" "}
+                                    {appointment.notes}
+                                  </p>
+                                </div>
+                              )}
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
+                          {getStatusBadge(appointment.status, "appointment")}
+                          {appointment.status === "upcoming" && (
+                            <div className="flex gap-2 flex-wrap">
+                              <button
+                                className="text-12-medium lg:text-14-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-300 dark:border-blue-500/30 rounded-lg bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 transition-colors"
+                                onClick={() => {
+                                  setShowRescheduleModal(true);
+                                  setSelectedAppointment(appointment);
+                                }}
+                              >
+                                Reschedule
+                              </button>
+                              <button
+                                className="text-12-medium lg:text-14-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 px-3 lg:px-4 py-2 border border-red-300 dark:border-red-500/30 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
+                                onClick={() => {
+                                  setShowCancelModal(true);
+                                  setSelectedAppointment(appointment);
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
-
-                      {/* Actions */}
-                      <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
-                        {getStatusBadge(appointment.status, "appointment")}
-                        {appointment.status === "upcoming" && (
-                          <div className="flex gap-2 flex-wrap">
-                            <button
-                              className="text-12-medium lg:text-14-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-3 lg:px-4 py-2 border border-blue-300 dark:border-blue-500/30 rounded-lg bg-blue-100 dark:bg-blue-500/10 hover:bg-blue-200 dark:hover:bg-blue-500/20 transition-colors"
-                              onClick={() => {
-                                setShowRescheduleModal(true);
-                                setSelectedAppointment(appointment);
-                              }}
-                            >
-                              Reschedule
-                            </button>
-                            <button
-                              className="text-12-medium lg:text-14-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 px-3 lg:px-4 py-2 border border-red-300 dark:border-red-500/30 rounded-lg bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
-                              onClick={() => {
-                                setShowCancelModal(true);
-                                setSelectedAppointment(appointment);
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -1166,70 +1185,89 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
               {/* Prescription Cards */}
               <div className="space-y-4">
-                {prescriptions.map((prescription) => (
+                {prescriptions.length === 0 ? (
                   <div
-                    key={prescription.id}
-                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+                    className="flex flex-col items-center justify-center p-10 rounded-2xl 
+      bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30
+      border border-gray-200 dark:border-dark-500/50 backdrop-blur-sm shadow-sm"
+                  >
+                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-500/20 mb-4">
+                      <Pill className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      No Prescriptions Found
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-dark-600 text-center max-w-sm">
+                      You currently don’t have any active prescriptions. Once
+                      your doctor issues one, it will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  prescriptions.map((prescription) => (
+                    <div
+                      key={prescription.id}
+                      className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
         backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
         rounded-2xl p-4 lg:p-6 transition-colors"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      {/* Left Side */}
-                      <div className="flex items-center gap-4 lg:gap-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-500 dark:to-pink-600 rounded-2xl flex items-center justify-center">
-                          <Pill className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
-                            {prescription.medication}
-                          </h3>
-                          <p className="text-14-regular text-purple-700 dark:text-purple-400 mb-2">
-                            {prescription.dosage} - {prescription.frequency}
-                          </p>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
-                            <div>
-                              <span className="text-gray-900 dark:text-white">
-                                Prescribed by:
-                              </span>{" "}
-                              {prescription.doctorName}
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        {/* Left Side */}
+                        <div className="flex items-center gap-4 lg:gap-6">
+                          <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-500 dark:to-pink-600 rounded-2xl flex items-center justify-center">
+                            <Pill className="w-8 h-8 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
+                              {prescription.medication}
+                            </h3>
+                            <p className="text-14-regular text-purple-700 dark:text-purple-400 mb-2">
+                              {prescription.dosage} - {prescription.frequency}
+                            </p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700">
+                              <div>
+                                <span className="text-gray-900 dark:text-white">
+                                  Prescribed by:
+                                </span>{" "}
+                                {prescription.doctorName}
+                              </div>
+                              <div>
+                                <span className="text-gray-900 dark:text-white">
+                                  Date:
+                                </span>{" "}
+                                {prescription.appointmentDate}
+                              </div>
                             </div>
-                            <div>
+                            <div className="mt-2">
+                              <span className="text-12-regular text-gray-600 dark:text-dark-600">
+                                Refills remaining:{" "}
+                              </span>
                               <span className="text-gray-900 dark:text-white">
-                                Date:
-                              </span>{" "}
-                              {prescription.appointmentDate}
+                                {prescription.refills}
+                              </span>
                             </div>
                           </div>
-                          <div className="mt-2">
-                            <span className="text-12-regular text-gray-600 dark:text-dark-600">
-                              Refills remaining:{" "}
-                            </span>
-                            <span className="text-gray-900 dark:text-white">
-                              {prescription.refills}
-                            </span>
-                          </div>
                         </div>
-                      </div>
 
-                      {/* Right Side */}
-                      <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
-                        {getStatusBadge(prescription.status, "prescription")}
-                        {prescription.refills > 0 && (
-                          <button
-                            className="text-12-medium lg:text-14-medium 
+                        {/* Right Side */}
+                        <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
+                          {getStatusBadge(prescription.status, "prescription")}
+                          {prescription.refills > 0 && (
+                            <button
+                              className="text-12-medium lg:text-14-medium 
                 text-green-700 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 
                 px-3 lg:px-4 py-2 border border-green-300 dark:border-green-500/30 
                 rounded-lg bg-green-100 hover:bg-green-200 
                 dark:bg-green-500/10 dark:hover:bg-green-500/20 
                 transition-colors"
-                          >
-                            Request Refill
-                          </button>
-                        )}
+                            >
+                              Request Refill
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -1252,79 +1290,98 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
               {/* Lab Results Cards */}
               <div className="space-y-4">
-                {labResults.map((result) => (
+                {labResults.length === 0 ? (
                   <div
-                    key={result.id}
-                    className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
+                    className="flex flex-col items-center justify-center p-10 rounded-2xl 
+      bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30
+      border border-gray-200 dark:border-dark-500/50 backdrop-blur-sm shadow-sm"
+                  >
+                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 mb-4">
+                      <TestTube className="w-7 h-7 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      No Lab Results Found
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-dark-600 text-center max-w-sm">
+                      You don’t have any lab results yet. Once your test results
+                      are ready, they will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  labResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
         backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
         rounded-2xl p-4 lg:p-6 transition-colors"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      {/* Left Section */}
-                      <div className="flex items-center gap-4 lg:gap-6">
-                        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 dark:from-specialGreen-500 dark:to-specialBlue-600 rounded-2xl flex items-center justify-center">
-                          <TestTube className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
-                            {result.testName}
-                          </h3>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700 mb-2">
-                            <div>
-                              <span className="text-gray-900 dark:text-white">
-                                Date:
-                              </span>{" "}
-                              {result.date}
-                            </div>
-                            <div>
-                              <span className="text-gray-900 dark:text-white">
-                                Ordered by:
-                              </span>{" "}
-                              {result.doctor}
-                            </div>
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        {/* Left Section */}
+                        <div className="flex items-center gap-4 lg:gap-6">
+                          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 dark:from-specialGreen-500 dark:to-specialBlue-600 rounded-2xl flex items-center justify-center">
+                            <TestTube className="w-8 h-8 text-white" />
                           </div>
-                          {result.result && (
-                            <div className="bg-green-100 dark:bg-green-500/20 rounded-lg px-3 py-2 inline-block">
-                              <span className="text-12-regular text-green-700 dark:text-green-400">
-                                Result: {result.result} ({result.normalRange})
-                              </span>
+                          <div>
+                            <h3 className="text-16-bold lg:text-20-bold text-gray-900 dark:text-white mb-1">
+                              {result.testName}
+                            </h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-14-regular text-gray-700 dark:text-dark-700 mb-2">
+                              <div>
+                                <span className="text-gray-900 dark:text-white">
+                                  Date:
+                                </span>{" "}
+                                {result.date}
+                              </div>
+                              <div>
+                                <span className="text-gray-900 dark:text-white">
+                                  Ordered by:
+                                </span>{" "}
+                                {result.doctor}
+                              </div>
                             </div>
-                          )}
+                            {result.result && (
+                              <div className="bg-green-100 dark:bg-green-500/20 rounded-lg px-3 py-2 inline-block">
+                                <span className="text-12-regular text-green-700 dark:text-green-400">
+                                  Result: {result.result} ({result.normalRange})
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Right Section */}
-                      <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
-                        {getStatusBadge(result.status, "lab")}
-                        {result.status === "completed" && (
-                          <div className="flex gap-2">
-                            {/* View Button */}
-                            <button
-                              className="bg-blue-100 hover:bg-blue-200 text-blue-700 
+                        {/* Right Section */}
+                        <div className="flex flex-row lg:flex-col items-start lg:items-end gap-3">
+                          {getStatusBadge(result.status, "lab")}
+                          {result.status === "completed" && (
+                            <div className="flex gap-2">
+                              {/* View Button */}
+                              <button
+                                className="bg-blue-100 hover:bg-blue-200 text-blue-700 
                   dark:bg-gradient-to-r dark:from-blue-500 dark:to-blue-600 
                   dark:hover:from-blue-600 dark:hover:to-blue-700 
                   dark:text-white p-2 rounded-lg transition-all duration-300 
                   shadow-sm dark:shadow-lg dark:hover:shadow-blue-500/25"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
 
-                            {/* Download Button */}
-                            <button
-                              className="bg-green-100 hover:bg-green-200 text-green-700 
+                              {/* Download Button */}
+                              <button
+                                className="bg-green-100 hover:bg-green-200 text-green-700 
                   dark:bg-gradient-to-r dark:from-green-500 dark:to-green-600 
                   dark:hover:from-green-600 dark:hover:to-green-700 
                   dark:text-white p-2 rounded-lg transition-all duration-300 
                   shadow-sm dark:shadow-lg dark:hover:shadow-green-500/25"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
