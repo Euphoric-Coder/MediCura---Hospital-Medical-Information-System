@@ -13,6 +13,10 @@ import {
   Search,
   Check,
   X,
+  NotebookTabs,
+  ClipboardPlus,
+  Hospital,
+  IdCard,
 } from "lucide-react";
 import FileUpload from "../FileUpload";
 import { useSession } from "next-auth/react";
@@ -340,6 +344,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       ...prev,
       phone: `${phoneCountryCode} ${value}`,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      phone: "",
+    }));
   };
 
   const handleEmergencyNumberChange = (value) => {
@@ -347,6 +355,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     setFormData((prev) => ({
       ...prev,
       emergencyPhone: `${emergencyCountryCode} ${value}`,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      emergencyPhone: "",
     }));
   };
 
@@ -405,6 +417,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       insurancePolicyDocument: uploadData,
       insurancePolicyDocumentId: fileId,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      insurancePolicyDocument: "",
+    }));
   };
 
   const handlePhysicianSelect = (physician) => {
@@ -431,7 +447,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     const [phoneCode, phoneNumber] = formData.phone.trim().split(" ");
     const [emCode, emNumber] = formData.emergencyPhone.trim().split(" ");
 
-    // ✅ Personal Info
+    // Personal Info
     if (!formData.name.trim()) newErrors.name = "Full name is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
 
@@ -454,20 +470,33 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     if (!emNumber || emNumber.length < 5)
       newErrors.emergencyPhone = "Valid emergency phone number is required.";
 
-    // ✅ Medical Info
+    // Medical Info
     if (!formData.insuranceProvider.trim())
       newErrors.insuranceProvider = "Insurance provider is required.";
 
     if (!formData.insurancePolicyNumber.trim())
       newErrors.insurancePolicyNumber = "Insurance policy number is required.";
 
-    // ✅ Identification
+    if (!formData.insurancePolicyDocument)
+      newErrors.insurancePolicyDocument =
+        "Insurance policy document is required.";
+
+    // Identification
     if (!formData.identificationNumber.trim())
       newErrors.identificationNumber = "Identification number is required.";
 
-    // ✅ Consent
+    if (!formData.identificationDocument)
+      newErrors.identificationDocument = "Identification document is required.";
+
+    // Consent
+    if (!formData.treatmentConsent)
+      newErrors.treatmentConsent = "You must agree to the treatment policy.";
+
+    if (!formData.disclosureConsent)
+      newErrors.disclosureConsent = "You must agree to the privacy policy.";
+
     if (!formData.privacyConsent)
-      newErrors.privacyConsent = "You must agree to the privacy policy.";
+      newErrors.privacyConsent = "You must agree to the terms and conditions.";
 
     return newErrors;
   };
@@ -508,7 +537,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               onClick={handleSubmit}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 px-6 rounded-3xl text-16-semibold transition-colors dark:shadow-emerald-500/10 shadow-md"
             >
-              Submit and continue
+              Submit
             </button>
           </div>
         </div>
@@ -603,6 +632,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               <div>
                 <label className="shad-input-label block mb-2">
                   Phone number
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="flex gap-2">
                   {/* Country Code Dropdown */}
@@ -664,10 +694,25 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     value={phoneNumber}
                     onChange={(e) => handlePhoneNumberChange(e.target.value)}
                     placeholder="123 456 7890"
-                    className="shad-input rounded-2xl p-3 flex-1 text-white"
+                    className={`
+            w-full p-3 rounded-xl border-[2px] shadow-lg
+            ${
+              errors.phone
+                ? "input-error-field focus-visible:ring-red-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-red-400 focus-visible:ring-[4px]"
+                : "input-field focus-visible:ring-slate-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-gray-400 focus-visible:ring-[4px]"
+            }
+            bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
+            dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
+            transition-all duration-500 focus:outline-none
+          `}
                     required
                   />
                 </div>
+                {errors.phone && (
+                  <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                    {errors.phone}
+                  </p>
+                )}
               </div>
 
               {/* Date of Birth */}
@@ -685,7 +730,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
               {/* Gender */}
               <div>
-                <label className="shad-input-label block mb-2">Gender</label>
+                <label className="shad-input-label block mb-2">
+                  Gender
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
                     <input
@@ -721,11 +769,11 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                     <span className="text-14-regular">Other</span>
                   </label>
                 </div>
-                  {errors.gender && (
-                    <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
-                      {errors.gender}
-                    </p>
-                  )}
+                {errors.gender && (
+                  <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                    {errors.gender}
+                  </p>
+                )}
               </div>
 
               {/* Address */}
@@ -774,6 +822,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               <div>
                 <label className="shad-input-label block mb-2">
                   Emergency Phone number
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <div className="flex gap-2">
                   {/* Country Code Dropdown */}
@@ -840,10 +889,25 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                       handleEmergencyNumberChange(e.target.value)
                     }
                     placeholder="123 456 7890"
-                    className="shad-input flex-1 text-white p-3 rounded-2xl"
+                    className={`
+            w-full p-3 rounded-xl border-[2px] shadow-lg
+            ${
+              errors.emergencyPhone
+                ? "input-error-field focus-visible:ring-red-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-red-400 focus-visible:ring-[4px]"
+                : "input-field focus-visible:ring-slate-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-gray-400 focus-visible:ring-[4px]"
+            }
+            bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
+            dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
+            transition-all duration-500 focus:outline-none
+          `}
                     required
                   />
                 </div>
+                {errors.emergencyPhone && (
+                  <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                    {errors.emergencyPhone}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -937,40 +1001,37 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               </div>
 
               {/* Insurance Provider */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Insurance provider
-                </label>
-                <input
-                  type="text"
-                  name="insuranceProvider"
-                  value={formData.insuranceProvider}
-                  onChange={handleInputChange}
-                  placeholder="ex: BlueCross"
-                  className="shad-input w-full text-white p-3 rounded-2xl"
-                  required
-                />
-              </div>
+              <InputField
+                type="text"
+                label="Insurance provider"
+                name="insuranceProvider"
+                value={formData.insuranceProvider}
+                onChange={handleInputChange}
+                placeholder="ex: Star Health"
+                icon={Hospital}
+                addStyle="p-3"
+                error={errors.insuranceProvider}
+                required
+              />
 
               {/* Insurance Policy Number */}
-              <div>
-                <label className="shad-input-label block mb-2">
-                  Insurance policy number
-                </label>
-                <input
-                  type="text"
-                  name="insurancePolicyNumber"
-                  value={formData.insurancePolicyNumber}
-                  onChange={handleInputChange}
-                  placeholder="ex: ABC1234567"
-                  className="shad-input w-full text-white p-3 rounded-2xl"
-                  required
-                />
-              </div>
+              <InputField
+                type="text"
+                label="Insurance policy number"
+                name="insurancePolicyNumber"
+                value={formData.insurancePolicyNumber}
+                onChange={handleInputChange}
+                placeholder="ex: ABC1234567"
+                icon={ClipboardPlus}
+                addStyle="p-3"
+                error={errors.insurancePolicyNumber}
+                required
+              />
 
               <div className="md:col-span-2">
                 <label className="shad-input-label block mb-2">
                   Scanned Copy of Insurance Document
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <FileUpload
                   uploadData={insuranceUpload}
@@ -979,7 +1040,13 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   setFileId={setInsuranceFileId}
                   handleFileUpload={handleInsuranceFileUpload}
                   folder="Patient"
+                  error={errors.insurancePolicyDocument}
                 />
+                {errors.insurancePolicyDocument && (
+                  <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                    {errors.insurancePolicyDocument}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -1029,7 +1096,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   {/* Allergy Dropdown */}
                   {showAllergyDropdown &&
                     (allergySearch || filteredAllergies.length > 0) && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                         <div className="max-h-48 overflow-y-auto">
                           {allergySearch &&
                             !filteredAllergies.includes(allergySearch) && (
@@ -1041,7 +1108,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                                 className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
                               >
                                 <Plus className="w-4 h-4 text-green-500" />
-                                <span className="text-14-regular text-white">
+                                <span className="text-14-regular">
                                   Add "{allergySearch}"
                                 </span>
                               </button>
@@ -1050,12 +1117,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                             <button
                               key={allergy}
                               type="button"
-                              onMouseDown={() => handleAllergySelect(allergy)} // ✅ fires before blur
-                              className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                              onMouseDown={() => handleAllergySelect(allergy)}
+                              className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left"
                             >
-                              <span className="text-14-regular text-white">
-                                {allergy}
-                              </span>
+                              <span className="text-14-regular">{allergy}</span>
                             </button>
                           ))}
                         </div>
@@ -1329,16 +1394,16 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
               {/* Identification Number */}
               <div className="md:col-span-2">
-                <label className="shad-input-label block mb-2">
-                  Identification Number
-                </label>
-                <input
+                <InputField
                   type="text"
+                  label="Insurance policy number"
                   name="identificationNumber"
                   value={formData.identificationNumber}
                   onChange={handleInputChange}
                   placeholder="ex 1234567"
-                  className="shad-input w-full text-white p-3 rounded-2xl"
+                  icon={IdCard}
+                  addStyle="p-3"
+                  error={errors.identificationNumber}
                   required
                 />
               </div>
@@ -1347,6 +1412,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
               <div className="md:col-span-2">
                 <label className="shad-input-label block mb-2">
                   Scanned Copy of Identification Document
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 <FileUpload
                   uploadData={uploadData}
@@ -1355,7 +1421,13 @@ const OnboardingPage = ({ onBack, onComplete }) => {
                   setFileId={setFileId}
                   handleFileUpload={handleDocumentUpload}
                   folder="Patient"
+                  error={errors.identificationDocument}
                 />
+                {errors.identificationDocument && (
+                  <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                    {errors.identificationDocument}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -1367,49 +1439,120 @@ const OnboardingPage = ({ onBack, onComplete }) => {
             </h2>
 
             <div className="space-y-6">
-              <label className="flex items-start gap-3 cursor-pointer">
+              {/* Treatment Consent */}
+              <label
+                className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${
+                  errors.treatmentConsent
+                    ? "bg-red-50 dark:bg-[#2a0000] border border-red-400/40"
+                    : "hover:bg-slate-100 dark:hover:bg-dark-500"
+                }`}
+              >
                 <input
                   type="checkbox"
                   name="treatmentConsent"
                   checked={formData.treatmentConsent}
                   onChange={handleInputChange}
-                  className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
+                  className={`w-5 h-5 mt-0.5 rounded focus:ring-green-500 ${
+                    errors.treatmentConsent
+                      ? "border-red-500 text-red-500"
+                      : "text-green-500 bg-dark-400 border-dark-500"
+                  }`}
                 />
-                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
+                <span
+                  className={`text-14-regular transition-colors ${
+                    errors.treatmentConsent
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-slate-700 dark:text-slate-300"
+                  }`}
+                >
                   I consent to receive treatment for my health condition.
                 </span>
               </label>
+              {errors.treatmentConsent && (
+                <p className="text-red-500 dark:text-red-400 text-sm ml-8 -mt-3 font-medium tracking-wide">
+                  {errors.treatmentConsent}
+                </p>
+              )}
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              {/* Disclosure Consent */}
+              <label
+                className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${
+                  errors.disclosureConsent
+                    ? "bg-red-50 dark:bg-[#2a0000] border border-red-400/40"
+                    : "hover:bg-slate-100 dark:hover:bg-dark-500"
+                }`}
+              >
                 <input
                   type="checkbox"
                   name="disclosureConsent"
                   checked={formData.disclosureConsent}
                   onChange={handleInputChange}
-                  className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
+                  className={`w-5 h-5 mt-0.5 rounded focus:ring-green-500 ${
+                    errors.disclosureConsent
+                      ? "border-red-500 text-red-500"
+                      : "text-green-500 bg-dark-400 border-dark-500"
+                  }`}
                 />
-                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
+                <span
+                  className={`text-14-regular transition-colors ${
+                    errors.disclosureConsent
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-slate-700 dark:text-slate-300"
+                  }`}
+                >
                   I consent to the use and disclosure of my health information
                   for treatment purposes.
                 </span>
               </label>
+              {errors.disclosureConsent && (
+                <p className="text-red-500 dark:text-red-400 text-sm ml-8 -mt-3 font-medium tracking-wide">
+                  {errors.disclosureConsent}
+                </p>
+              )}
 
-              <label className="flex items-start gap-3 cursor-pointer">
+              {/* Privacy Consent */}
+              <label
+                className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${
+                  errors.privacyConsent
+                    ? "bg-red-50 dark:bg-[#2a0000] border border-red-400/40"
+                    : "hover:bg-slate-100 dark:hover:bg-dark-500"
+                }`}
+              >
                 <input
                   type="checkbox"
                   name="privacyConsent"
                   checked={formData.privacyConsent}
                   onChange={handleInputChange}
-                  className="w-5 h-5 mt-0.5 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
-                  required
+                  className={`w-5 h-5 mt-0.5 rounded focus:ring-green-500 ${
+                    errors.privacyConsent
+                      ? "border-red-500 text-red-500"
+                      : "text-green-500 bg-dark-400 border-dark-500"
+                  }`}
                 />
-                <span className="text-14-regular text-slate-700 dark:text-slate-300 transition-colors">
+                <span
+                  className={`text-14-regular transition-colors ${
+                    errors.privacyConsent
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-slate-700 dark:text-slate-300"
+                  }`}
+                >
                   I acknowledge that I have reviewed and agree to the{" "}
-                  <span className="text-green-500 underline">
+                  <span
+                    className={`underline ${
+                      errors.privacyConsent
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-green-500"
+                    }`}
+                  >
                     privacy policy
                   </span>
                 </span>
               </label>
+              {errors.privacyConsent && (
+                <p className="text-red-500 dark:text-red-400 text-sm ml-8 -mt-3 font-medium tracking-wide">
+                  {errors.privacyConsent}
+                </p>
+              )}
             </div>
           </section>
 

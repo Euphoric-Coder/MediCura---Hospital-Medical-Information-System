@@ -60,6 +60,7 @@ export default function FileUpload({
   setFileId,
   handleFileUpload,
   folder,
+  error = "",
 }) {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -117,20 +118,47 @@ export default function FileUpload({
           onDragLeave={() => setIsDragging(false)}
           className={`relative mt-5 flex flex-col items-center justify-center p-8 border-[3px] rounded-xl cursor-pointer transition-all shadow-md hover:shadow-lg
             ${
-              isDragging
-                ? "border-blue-600 bg-gradient-to-br from-cyan-100 to-indigo-200 dark:from-[#0f172a] dark:to-[#1e3a8a]"
-                : "border-blue-300 bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a]"
+              error
+                ? // ❌ Error mode colors
+                  "border-red-500 bg-gradient-to-br from-red-50 to-red-100 dark:from-[#2a0000] dark:to-[#400000]"
+                : isDragging
+                  ? "border-blue-600 bg-gradient-to-br from-cyan-100 to-indigo-200 dark:from-[#0f172a] dark:to-[#1e3a8a]"
+                  : "border-blue-300 bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a]"
             }`}
         >
-          <FiUploadCloud className="text-blue-600 dark:text-blue-400 text-6xl mb-4" />
+          <FiUploadCloud
+            className={`text-6xl mb-4 ${
+              error
+                ? "text-red-500 dark:text-red-400"
+                : "text-blue-600 dark:text-blue-400"
+            }`}
+          />
           <div className="text-center">
-            <p className="text-blue-800 dark:text-blue-300 text-lg font-semibold">
+            <p
+              className={`text-lg font-semibold ${
+                error
+                  ? "text-red-700 dark:text-red-300"
+                  : "text-blue-800 dark:text-blue-300"
+              }`}
+            >
               Drag & Drop your PDF here
             </p>
-            <p className="text-md text-indigo-500 dark:text-indigo-300 mt-1">
+            <p
+              className={`text-md mt-1 ${
+                error
+                  ? "text-red-500 dark:text-red-400"
+                  : "text-indigo-500 dark:text-indigo-300"
+              }`}
+            >
               or click to browse files
             </p>
-            <p className="text-sm text-red-500 dark:text-red-400 mt-1 font-medium">
+            <p
+              className={`text-sm mt-1 font-medium ${
+                error
+                  ? "text-red-600 dark:text-red-400"
+                  : "text-red-500 dark:text-red-400"
+              }`}
+            >
               Only PDF files (.pdf) are allowed
             </p>
           </div>
