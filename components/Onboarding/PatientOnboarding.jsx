@@ -162,7 +162,6 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
   const fetchOnboardingStatus = async () => {
     const data = await getOnboardingStatus(session?.user?.id);
-    console.log(data);
     if (data.length > 0) setOnboardingStatus(data[0].hasOnboarded);
   };
 
@@ -495,7 +494,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
     console.log("Form submitted:", formData);
     const load = toast.loading("Onboarding patient... Please wait...");
-    const data = await onboardPatient(session?.user?.id, {
+    const data = await onboardPatient({
       ...formData,
       userId: session?.user?.id,
       hasOnboarded: true,
@@ -549,7 +548,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
           {/* Welcome Section */}
           <div className="mb-12">
             <h1 className="text-36-bold text-slate-900 dark:text-white mb-2">
-              Welcome 👋
+              Welcome 👋, {`${session?.user?.name || "Patient"}`}
             </h1>
             <p className="text-16-regular text-slate-700 dark:text-slate-400">
               Let us know more about yourself
