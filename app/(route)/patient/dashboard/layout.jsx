@@ -50,6 +50,8 @@ export default function DashboardLayout({ children }) {
           setPatientData(patient[0]);
           console.log("Onboarding Status: ", patient[0].hasOnboarded);
           setOnboardingStatus(patient[0].hasOnboarded);
+        } else {
+          setOnboardingStatus(false);
         }
       }
     } catch (error) {
@@ -73,9 +75,7 @@ export default function DashboardLayout({ children }) {
   // 🔹 Loading state
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors"
-      >
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors">
         <div className="flex flex-col items-center">
           {/* Spinner */}
           <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>

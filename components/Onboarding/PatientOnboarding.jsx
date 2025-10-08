@@ -24,6 +24,10 @@ import { ModeToggle } from "../ThemeButton";
 import { fetchPhysicians } from "@/lib/patients/profile";
 import AvatarUpload from "../AvatarUpload";
 import InputField from "./OnboardingInput";
+import { Patients, Users } from "@/lib/schema";
+import { db } from "@/lib/dbConfig";
+import { eq } from "drizzle-orm";
+import OnboardingSuccess from "./OnboardingSuccess";
 
 const physicians = [
   {
@@ -170,6 +174,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     disclosureConsent: false,
     privacyConsent: false,
   });
+  const [onboardingStatus, setOnboardingStatus] = useState(false);
   const [physicians, setPhysicians] = useState([]);
   const [errors, setErrors] = useState({});
 
@@ -181,8 +186,18 @@ const OnboardingPage = ({ onBack, onComplete }) => {
       name: session?.user?.name || "",
       email: session?.user?.email || "",
     }));
+    fetchOnboardingStatus();
     fetchPhysician();
   }, [session?.user]);
+
+  const fetchOnboardingStatus = async () => {
+    const data = await db
+      .select()
+      .from(Patients)
+      .where(eq(Patients.userId, session?.user?.id));
+    console.log(data);
+    if (data.length > 0) setOnboardingStatus(data[0].hasOnboarded);
+  };
 
   const fetchPhysician = async () => {
     const data = await fetchPhysicians();
@@ -515,6 +530,10 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     console.log("Form submitted:", formData);
     setErrors({}); // clear any previous errors
   };
+
+  if (onboardingStatus) {
+    return <OnboardingSuccess />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-300 transition-colors duration-300">
