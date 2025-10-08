@@ -22,6 +22,7 @@ import {
 import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
 import { fetchPhysicians } from "@/lib/patients/profile";
+import ProfileField from "./ProfileInput";
 
 const commonAllergies = [
   "Penicillin",
@@ -273,47 +274,6 @@ const PatientProfile = ({ onBack }) => {
     }
   };
 
-  const ProfileField = ({
-    label,
-    name,
-    value,
-    type = "text",
-    icon: Icon,
-    isTextArea = false,
-  }) => (
-    <div>
-      <label className="shad-input-label block mb-2">{label}</label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="w-5 h-5 text-dark-600" />
-        </div>
-        {isTextArea ? (
-          <textarea
-            name={name}
-            value={isEditing ? editData[name] : value}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            className={`shad-textArea pl-10 w-full text-white min-h-[80px] resize-none ${
-              !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
-            }`}
-            rows={3}
-          />
-        ) : (
-          <input
-            type={type}
-            name={name}
-            value={isEditing ? editData[name] : value}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            className={`shad-input rounded-3xl pl-10 w-full text-white ${
-              !isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""
-            }`}
-          />
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-dark-300 dark:via-dark-200 dark:to-dark-400">
@@ -547,24 +507,38 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Full Name"
                   name="name"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.name}
                   icon={User}
+                  required
+                  readOnly
                 />
 
                 <ProfileField
                   label="Email Address"
                   name="email"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.email}
                   type="email"
                   icon={Mail}
+                  required
+                  readOnly
                 />
 
                 <ProfileField
                   label="Phone Number"
                   name="phone"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.phone}
-                  type="tel"
                   icon={Phone}
+                  required
+                  readOnly
                 />
 
                 <ProfileField
