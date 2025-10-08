@@ -26,6 +26,7 @@ import AvatarUpload from "../AvatarUpload";
 import InputField from "./OnboardingInput";
 import OnboardingSuccess from "./OnboardingSuccess";
 import { getOnboardingStatus, onboardPatient } from "@/lib/patients/onboarding";
+import { toast } from "sonner";
 
 const idTypes = [
   "Birth Certificate",
@@ -104,43 +105,45 @@ const countryCodes = [
   { code: "+7", country: "Russia", flag: "🇷🇺" },
 ];
 
+const initalFormData = {
+  // Personal Information
+  name: "",
+  email: "",
+  phone: "",
+  avatarId: null,
+  avatar: null,
+  dateOfBirth: "",
+  gender: "",
+  address: "",
+  occupation: "",
+  emergencyContactName: "",
+  emergencyPhone: "",
+
+  // Medical Information
+  primaryPhysician: "",
+  insuranceProvider: "",
+  insurancePolicyNumber: "",
+  insurancePolicyDocument: null,
+  insurancePolicyDocumentId: null,
+  allergies: [],
+  currentMedications: [],
+  familyMedicalHistory: [],
+  pastMedicalHistory: [],
+
+  // Identification
+  identificationType: "Birth Certificate",
+  identificationNumber: "",
+  identificationDocument: null,
+  identificationDocumentId: null,
+
+  // Consent
+  treatmentConsent: false,
+  disclosureConsent: false,
+  privacyConsent: false,
+};
+
 const OnboardingPage = ({ onBack, onComplete }) => {
-  const [formData, setFormData] = useState({
-    // Personal Information
-    name: "",
-    email: "",
-    phone: "",
-    avatarId: null,
-    avatar: null,
-    dateOfBirth: "",
-    gender: "",
-    address: "",
-    occupation: "",
-    emergencyContactName: "",
-    emergencyPhone: "",
-
-    // Medical Information
-    primaryPhysician: "",
-    insuranceProvider: "",
-    insurancePolicyNumber: "",
-    insurancePolicyDocument: null,
-    insurancePolicyDocumentId: null,
-    allergies: [],
-    currentMedications: [],
-    familyMedicalHistory: [],
-    pastMedicalHistory: [],
-
-    // Identification
-    identificationType: "Birth Certificate",
-    identificationNumber: "",
-    identificationDocument: null,
-    identificationDocumentId: null,
-
-    // Consent
-    treatmentConsent: false,
-    disclosureConsent: false,
-    privacyConsent: false,
-  });
+  const [formData, setFormData] = useState(initalFormData);
   const [onboardingStatus, setOnboardingStatus] = useState(false);
   const [physicians, setPhysicians] = useState([]);
   const [errors, setErrors] = useState({});
@@ -486,21 +489,26 @@ const OnboardingPage = ({ onBack, onComplete }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      console.log("Validation failed:", validationErrors);
-      console.log("Form data:", {
-        ...formData,
-        userId: session?.user?.id,
-        hasOnboarded: true,
-      });
-      await onboardPatient(session?.user?.id, {
-        ...formData,
-        userId: session?.user?.id,
-        hasOnboarded: true,
-      });
+      toast.error("Please fill the required fields.");
       return;
     }
 
     console.log("Form submitted:", formData);
+    const load = toast.loading("Onboarding patient... Please wait...");
+    const data = await onboardPatient(session?.user?.id, {
+      ...formData,
+      userId: session?.user?.id,
+      hasOnboarded: true,
+    });
+    toast.dismiss(load);
+
+    if (data.error) {
+      toast.error(data.error);
+      return;
+    }
+    toast.success("Patient onboarding successful!");
+    fetchOnboardingStatus();
+    setFormData(initalFormData);
     setErrors({}); // clear any previous errors
   };
 
