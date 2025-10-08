@@ -3,15 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { db } from "@/lib/dbConfig";
-import { Patients, Users } from "@/lib/schema";
-import { eq } from "drizzle-orm";
 import OnboardingRedirect from "@/components/Onboarding/OnboardingRedirect";
 import LoginRedirect from "@/components/Onboarding/LoginRedirect";
 import PatientSidebar from "@/components/Patient/PatientSidebar";
 import { Menu, Plus, ArrowRight, ShieldAlert } from "lucide-react";
 import { PatientProvider } from "@/contexts/PatientContext";
 import { ModeToggle } from "@/components/ThemeButton";
+import { getPatientData, getUserRole } from "@/lib/patients/onboarding";
 
 export default function DashboardLayout({ children }) {
   const { data: session, status } = useSession();
@@ -33,18 +31,12 @@ export default function DashboardLayout({ children }) {
     if (!userId || !userEmail) return;
 
     try {
-      const data = await db
-        .select()
-        .from(Users)
-        .where(eq(Users.email, userEmail));
+      const data = await getUserRole(userEmail);
 
       if (data.length > 0) {
         setRole(data[0].role);
 
-        const patient = await db
-          .select()
-          .from(Patients)
-          .where(eq(Patients.userId, userId));
+        const patient = await getPatientData(userId);
 
         if (patient.length > 0) {
           setPatientData(patient[0]);

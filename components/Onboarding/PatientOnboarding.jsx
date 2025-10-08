@@ -24,41 +24,8 @@ import { ModeToggle } from "../ThemeButton";
 import { fetchPhysicians } from "@/lib/patients/profile";
 import AvatarUpload from "../AvatarUpload";
 import InputField from "./OnboardingInput";
-import { Patients, Users } from "@/lib/schema";
-import { db } from "@/lib/dbConfig";
-import { eq } from "drizzle-orm";
 import OnboardingSuccess from "./OnboardingSuccess";
-
-const physicians = [
-  {
-    id: "1",
-    name: "Dr. Adam Smith",
-    avatar:
-      "https://images.pexels.com/photos/7089020/pexels-photo-7089020.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    speciality: "General Medicine",
-  },
-  {
-    id: "2",
-    name: "Dr. Sarah Johnson",
-    avatar:
-      "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    speciality: "Internal Medicine",
-  },
-  {
-    id: "3",
-    name: "Dr. Michael Brown",
-    avatar:
-      "https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    speciality: "Family Medicine",
-  },
-  {
-    id: "4",
-    name: "Dr. Emily Davis",
-    avatar:
-      "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-    speciality: "Cardiology",
-  },
-];
+import { getOnboardingStatus, onboardPatient } from "@/lib/patients/onboarding";
 
 const idTypes = [
   "Birth Certificate",
@@ -191,10 +158,7 @@ const OnboardingPage = ({ onBack, onComplete }) => {
   }, [session?.user]);
 
   const fetchOnboardingStatus = async () => {
-    const data = await db
-      .select()
-      .from(Patients)
-      .where(eq(Patients.userId, session?.user?.id));
+    const data = await getOnboardingStatus(session?.user?.id);
     console.log(data);
     if (data.length > 0) setOnboardingStatus(data[0].hasOnboarded);
   };
@@ -516,14 +480,23 @@ const OnboardingPage = ({ onBack, onComplete }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       console.log("Validation failed:", validationErrors);
-      console.log("Form data:", formData);
+      console.log("Form data:", {
+        ...formData,
+        userId: session?.user?.id,
+        hasOnboarded: true,
+      });
+      await onboardPatient(session?.user?.id, {
+        ...formData,
+        userId: session?.user?.id,
+        hasOnboarded: true,
+      });
       return;
     }
 
