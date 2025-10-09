@@ -119,7 +119,7 @@ export default function FileUpload({
           className={`relative mt-5 flex flex-col items-center justify-center p-8 border-[3px] rounded-xl cursor-pointer transition-all shadow-md hover:shadow-lg
             ${
               error
-                ? // ❌ Error mode colors
+                ?
                   "border-red-500 bg-gradient-to-br from-red-50 to-red-100 dark:from-[#2a0000] dark:to-[#400000]"
                 : isDragging
                   ? "border-blue-600 bg-gradient-to-br from-cyan-100 to-indigo-200 dark:from-[#0f172a] dark:to-[#1e3a8a]"
