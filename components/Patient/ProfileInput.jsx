@@ -64,6 +64,12 @@ const ProfileField = ({
         />
       )}
     </div>
+    {/* Error Message */}
+    {error && (
+      <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+        {error}
+      </p>
+    )}
   </div>
 );
 

@@ -23,6 +23,7 @@ import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
 import { fetchPhysicians } from "@/lib/patients/profile";
 import ProfileField from "./ProfileInput";
+import { toast } from "sonner";
 
 const commonAllergies = [
   "Penicillin",
@@ -76,6 +77,7 @@ const PatientProfile = ({ onBack }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const [errors, setErrors] = useState({});
 
   const { patientData, refreshPatientData } = usePatient();
 
@@ -245,8 +247,70 @@ const PatientProfile = ({ onBack }) => {
   const handleCancel = () => {
     setIsEditing(false);
     setEditData(profileData);
+    setErrors({});
     setMessage("");
     setMessageType("");
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // split phone & emergency phone by space ("+91 9876543210")
+    const [phoneCode, phoneNumber] = editData.phone.trim().split(" ");
+    const [emCode, emNumber] = editData.emergencyPhone.trim().split(" ");
+
+    // Personal Info
+    if (!editData.name.trim()) newErrors.name = "Full name is required.";
+    if (!editData.email.trim()) newErrors.email = "Email is required.";
+
+    if (!phoneNumber || phoneNumber.length < 5)
+      newErrors.phone = "Valid phone number is required.";
+
+    if (!editData.dateOfBirth)
+      newErrors.dateOfBirth = "Date of birth is required.";
+
+    if (!editData.gender) newErrors.gender = "Please select your gender.";
+
+    if (!editData.address.trim()) newErrors.address = "Address is required.";
+
+    if (!editData.occupation.trim())
+      newErrors.occupation = "Occupation is required.";
+
+    if (!editData.emergencyContactName.trim())
+      newErrors.emergencyContactName = "Emergency contact name is required.";
+
+    if (!emNumber || emNumber.length < 5)
+      newErrors.emergencyPhone = "Valid emergency phone number is required.";
+
+    // Medical Info
+    if (!editData.insuranceProvider.trim())
+      newErrors.insuranceProvider = "Insurance provider is required.";
+
+    if (!editData.insurancePolicyNumber.trim())
+      newErrors.insurancePolicyNumber = "Insurance policy number is required.";
+
+    if (!editData.insurancePolicyDocument)
+      newErrors.insurancePolicyDocument =
+        "Insurance policy document is required.";
+
+    // Identification
+    if (!editData.identificationNumber.trim())
+      newErrors.identificationNumber = "Identification number is required.";
+
+    if (!editData.identificationDocument)
+      newErrors.identificationDocument = "Identification document is required.";
+
+    // Consent
+    if (!editData.treatmentConsent)
+      newErrors.treatmentConsent = "You must agree to the treatment policy.";
+
+    if (!editData.disclosureConsent)
+      newErrors.disclosureConsent = "You must agree to the privacy policy.";
+
+    if (!editData.privacyConsent)
+      newErrors.privacyConsent = "You must agree to the terms and conditions.";
+
+    return newErrors;
   };
 
   const handleSave = async () => {
@@ -257,7 +321,15 @@ const PatientProfile = ({ onBack }) => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log("Edit Data:", editData);
+      const validationErrors = validateForm();
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        toast.error("Please fill the required fields.");
+        console.log(validationErrors);
+        console.log("Edit Data:", editData);
+        return;
+      }
       // setProfileData(editData);
       setIsEditing(false);
       setMessage("Profile updated successfully!");
@@ -505,38 +577,14 @@ const PatientProfile = ({ onBack }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
-                  label="Full Name"
-                  name="name"
-                  editData={editData}
-                  isEditing={isEditing}
-                  handleInputChange={handleInputChange}
-                  value={profileData.name}
-                  icon={User}
-                  required
-                  readOnly
-                />
-
-                <ProfileField
-                  label="Email Address"
-                  name="email"
-                  editData={editData}
-                  isEditing={isEditing}
-                  handleInputChange={handleInputChange}
-                  value={profileData.email}
-                  type="email"
-                  icon={Mail}
-                  required
-                  readOnly
-                />
-
-                <ProfileField
                   label="Phone Number"
                   name="phone"
                   editData={editData}
                   isEditing={isEditing}
                   handleInputChange={handleInputChange}
-                  value={profileData.phone}
+                  value={profileData.phone || ""}
                   icon={Phone}
+                  error={errors.phone}
                   required
                   readOnly
                 />
@@ -544,7 +592,12 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Date of Birth"
                   name="dateOfBirth"
-                  value={profileData.dateOfBirth}
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
+                  value={profileData.dateOfBirth || ""}
+                  error={errors.dateOfBirth}
+                  required
                   type="date"
                   icon={Calendar}
                 />
@@ -552,7 +605,12 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Occupation"
                   name="occupation"
-                  value={profileData.occupation}
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
+                  value={profileData.occupation || ""}
+                  error={errors.occupation}
+                  required
                   icon={Briefcase}
                 />
 
@@ -597,7 +655,12 @@ const PatientProfile = ({ onBack }) => {
                   <ProfileField
                     label="Address"
                     name="address"
-                    value={profileData.address}
+                    editData={editData}
+                    isEditing={isEditing}
+                    handleInputChange={handleInputChange}
+                    value={profileData.address || ""}
+                    error={errors.address}
+                    required
                     icon={MapPin}
                   />
                 </div>
@@ -634,13 +697,13 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Emergency Contact Name"
                   name="emergencyContactName"
-                  value={profileData.emergencyContactName}
+                  value={profileData.emergencyContactName || ""}
                   icon={User}
                 />
                 <ProfileField
                   label="Emergency Phone Number"
                   name="emergencyPhone"
-                  value={profileData.emergencyPhone}
+                  value={profileData.emergencyPhone || ""}
                   type="tel"
                   icon={Phone}
                 />
@@ -802,13 +865,13 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Insurance Provider"
                   name="insuranceProvider"
-                  value={profileData.insuranceProvider}
+                  value={profileData.insuranceProvider || ""}
                   icon={Shield}
                 />
                 <ProfileField
                   label="Insurance Policy Number"
                   name="insurancePolicyNumber"
-                  value={profileData.insurancePolicyNumber}
+                  value={profileData.insurancePolicyNumber || ""}
                   icon={Shield}
                 />
 
