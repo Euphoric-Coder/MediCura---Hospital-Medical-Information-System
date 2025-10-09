@@ -24,6 +24,7 @@ import { usePatient } from "@/contexts/PatientContext";
 import { fetchPhysicians } from "@/lib/patients/profile";
 import ProfileField from "./ProfileInput";
 import { toast } from "sonner";
+import AvatarUpload from "../AvatarUpload";
 
 const commonAllergies = [
   "Penicillin",
@@ -110,6 +111,7 @@ const PatientProfile = ({ onBack }) => {
 
   useEffect(() => {
     setProfileData(patientData);
+    setPreviousAvatarId(patientData.avatarId);
     prepareDefaultData();
     fetchPhysician();
   }, [patientData]);
@@ -144,6 +146,10 @@ const PatientProfile = ({ onBack }) => {
   const [medicationSearch, setMedicationSearch] = useState("");
   const [familyHistoryInput, setFamilyHistoryInput] = useState("");
   const [pastHistoryInput, setPastHistoryInput] = useState("");
+  const [avatarData, setAvatarData] = useState(null);
+  const [avatarId, setAvatarId] = useState(null);
+  const [previousAvatarId, setPreviousAvatarId] = useState(null);
+  const [editAvatar, setEditAvatar] = useState(false);
 
   const handlePhysicianSelect = (physician) => {
     setSelectedPhysician(physician);
@@ -331,6 +337,15 @@ const PatientProfile = ({ onBack }) => {
     setMessageType("");
   };
 
+  const handleAvatarUpload = (url, id) => {
+    console.log("Avatar uploaded:", url, id);
+    setEditData((prev) => ({
+      ...prev,
+      avatar: url,
+      avatarId: id,
+    }));
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -488,22 +503,59 @@ const PatientProfile = ({ onBack }) => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-6">
                 <div className="relative">
-                  <div
-                    className="w-24 h-24 rounded-3xl shadow-xl
+                  {!isEditing ? (
+                    <div
+                      className="w-24 h-24 rounded-3xl shadow-xl
                         bg-gradient-to-r from-emerald-500 to-sky-600
                         flex items-center justify-center"
-                  >
-                    <User className="w-12 h-12 text-white" />
-                  </div>
-                  <button
-                    className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full
+                    >
+                      {profileData.avatar ? (
+                        <img
+                          src={profileData.avatar}
+                          alt="Profile Avatar"
+                          className="w-full h-full object-fit rounded-3xl"
+                        />
+                      ) : (
+                        <User className="w-12 h-12 text-white" />
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {!editAvatar ? (
+                        <div className="relative">
+                          <div
+                            className="w-24 h-24 rounded-3xl shadow-xl
+                        bg-gradient-to-r from-emerald-500 to-sky-600
+                        flex items-center justify-center"
+                          >
+                            <img
+                              src={profileData.avatar}
+                              alt="Profile Avatar"
+                              className="w-full h-full object-fit rounded-3xl"
+                            />
+                          </div>
+                          <button
+                            className="absolute gap-2 -bottom-2 px-2 rounded-full
                      bg-emerald-500 hover:bg-emerald-600
                      border-2 border-white dark:border-slate-900
-                     flex items-center justify-center transition-colors"
-                    aria-label="Change avatar"
-                  >
-                    <Camera className="w-4 h-4 text-white" />
-                  </button>
+                     flex items-center justify-center transition-colors text-white"
+                            onClick={() => setEditAvatar(true)}
+                          >
+                            <Camera className="w-4 h-4 text-white" /> Reupload
+                          </button>
+                        </div>
+                      ) : (
+                        <AvatarUpload
+                          uploadData={avatarData}
+                          setUploadData={setAvatarData}
+                          fileId={avatarId}
+                          setFileId={setAvatarId}
+                          handleFileUpload={handleAvatarUpload}
+                          folder="Patient"
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -861,6 +913,7 @@ const PatientProfile = ({ onBack }) => {
                   error={errors.emergencyContactName}
                   icon={User}
                 />
+
                 {/* Emergency Phone */}
                 <div>
                   <label className="shad-input-label block mb-2">
@@ -877,7 +930,8 @@ const PatientProfile = ({ onBack }) => {
                             !showEmergencyCountryDropdown
                           )
                         }
-                        className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                        disabled={!isEditing}
+                        className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span>
                           {
@@ -932,6 +986,7 @@ const PatientProfile = ({ onBack }) => {
                         handleEmergencyNumberChange(e.target.value)
                       }
                       placeholder="123 456 7890"
+                      disabled={!isEditing}
                       className={`
                             w-full p-3 rounded-xl border-[2px] shadow-lg
                             ${
@@ -941,7 +996,7 @@ const PatientProfile = ({ onBack }) => {
                             }
                             bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
                             dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
-                            transition-all duration-500 focus:outline-none
+                            transition-all duration-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50
                           `}
                       required
                     />
@@ -1190,7 +1245,7 @@ const PatientProfile = ({ onBack }) => {
                       {/* Allergy Dropdown */}
                       {showAllergyDropdown &&
                         (allergySearch || filteredAllergies.length > 0) && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                             <div className="max-h-48 overflow-y-auto">
                               {allergySearch &&
                                 !filteredAllergies.includes(allergySearch) && (
@@ -1199,10 +1254,10 @@ const PatientProfile = ({ onBack }) => {
                                     onClick={() =>
                                       handleAllergySelect(allergySearch)
                                     }
-                                    className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
+                                    className="w-full p-3 flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
                                   >
                                     <Plus className="w-4 h-4 text-green-500" />
-                                    <span className="text-14-regular text-white">
+                                    <span className="text-14-regular">
                                       Add "{allergySearch}"
                                     </span>
                                   </button>
@@ -1214,9 +1269,9 @@ const PatientProfile = ({ onBack }) => {
                                   onMouseDown={() =>
                                     handleAllergySelect(allergy)
                                   }
-                                  className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                                  className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left"
                                 >
-                                  <span className="text-14-regular text-white">
+                                  <span className="text-14-regular">
                                     {allergy}
                                   </span>
                                 </button>
@@ -1231,7 +1286,7 @@ const PatientProfile = ({ onBack }) => {
                 {/* Current Medications */}
                 <div className="md:col-span-2">
                   <label className="shad-input-label block mb-2">
-                    Current medications
+                    Current medications (if any)
                   </label>
                   <div className="space-y-3">
                     {/* Selected Medications */}
@@ -1288,7 +1343,7 @@ const PatientProfile = ({ onBack }) => {
                       {showMedicationDropdown &&
                         (medicationSearch ||
                           filteredMedications.length > 0) && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
                             <div className="max-h-48 overflow-y-auto">
                               {medicationSearch &&
                                 !filteredMedications.includes(
@@ -1299,10 +1354,10 @@ const PatientProfile = ({ onBack }) => {
                                     onMouseDown={() =>
                                       handleMedicationSelect(medicationSearch)
                                     }
-                                    className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
+                                    className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left border-b border-dark-500"
                                   >
                                     <Plus className="w-4 h-4 text-green-500" />
-                                    <span className="text-14-regular text-white">
+                                    <span className="text-14-regular">
                                       Add "{medicationSearch}"
                                     </span>
                                   </button>
@@ -1314,9 +1369,9 @@ const PatientProfile = ({ onBack }) => {
                                   onClick={() =>
                                     handleMedicationSelect(medication)
                                   }
-                                  className="w-full p-3 flex items-center gap-3 hover:bg-dark-500 transition-colors text-left"
+                                  className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left"
                                 >
-                                  <span className="text-14-regular text-white">
+                                  <span className="text-14-regular">
                                     {medication}
                                   </span>
                                 </button>

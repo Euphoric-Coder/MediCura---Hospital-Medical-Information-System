@@ -58,8 +58,7 @@ const ProfileField = ({
             }
             bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
             dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
-            transition-all duration-500 focus:outline-none
-            ${disabled || readOnly ? "cursor-not-allowed opacity-70" : ""} 
+            transition-all duration-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50
               ${!isEditing ? "bg-dark-500/50 cursor-not-allowed" : ""}`}
         />
       )}
