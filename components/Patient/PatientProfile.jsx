@@ -71,6 +71,23 @@ const commonMedications = [
   "Insulin",
 ];
 
+const countryCodes = [
+  { code: "+1", country: "United States", flag: "🇺🇸" },
+  { code: "+1", country: "Canada", flag: "🇨🇦" },
+  { code: "+44", country: "United Kingdom", flag: "🇬🇧" },
+  { code: "+91", country: "India", flag: "🇮🇳" },
+  { code: "+86", country: "China", flag: "🇨🇳" },
+  { code: "+81", country: "Japan", flag: "🇯🇵" },
+  { code: "+49", country: "Germany", flag: "🇩🇪" },
+  { code: "+33", country: "France", flag: "🇫🇷" },
+  { code: "+39", country: "Italy", flag: "🇮🇹" },
+  { code: "+34", country: "Spain", flag: "🇪🇸" },
+  { code: "+61", country: "Australia", flag: "🇦🇺" },
+  { code: "+55", country: "Brazil", flag: "🇧🇷" },
+  { code: "+52", country: "Mexico", flag: "🇲🇽" },
+  { code: "+7", country: "Russia", flag: "🇷🇺" },
+];
+
 const PatientProfile = ({ onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -79,17 +96,35 @@ const PatientProfile = ({ onBack }) => {
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
   const [errors, setErrors] = useState({});
 
+  // Phone number states
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+91");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emergencyCountryCode, setEmergencyCountryCode] = useState("+91");
+  const [emergencyNumber, setEmergencyNumber] = useState("");
+  const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] =
+    useState(false);
+  const [showEmergencyCountryDropdown, setShowEmergencyCountryDropdown] =
+    useState(false);
+
   const { patientData, refreshPatientData } = usePatient();
 
   useEffect(() => {
     setProfileData(patientData);
+    prepareDefaultData();
     fetchPhysician();
   }, [patientData]);
 
+  const prepareDefaultData = () => {
+    setPhoneCountryCode(patientData.phone.split(" ")[0]);
+    setPhoneNumber(patientData.phone.split(" ").slice(1).join(" "));
+    setEmergencyCountryCode(patientData.emergencyPhone.split(" ")[0]);
+    setEmergencyNumber(
+      patientData.emergencyPhone.split(" ").slice(1).join(" ")
+    );
+  };
+
   const fetchPhysician = async () => {
     const data = await fetchPhysicians();
-    // if patientData isn't ready yet, bail early
-    if (!patientData?.primaryPhysician) return;
 
     // find returns a single object or undefined
     const match = data.find((p) => p.name === patientData.primaryPhysician);
@@ -217,6 +252,49 @@ const PatientProfile = ({ onBack }) => {
     }));
   };
 
+  // Phone number handlers
+  const handlePhoneNumberChange = (value) => {
+    setPhoneNumber(value);
+    setEditData((prev) => ({
+      ...prev,
+      phone: `${phoneCountryCode} ${value}`,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      phone: "",
+    }));
+  };
+
+  const handleEmergencyNumberChange = (value) => {
+    setEmergencyNumber(value);
+    setEditData((prev) => ({
+      ...prev,
+      emergencyPhone: `${emergencyCountryCode} ${value}`,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      emergencyPhone: "",
+    }));
+  };
+
+  const handlePhoneCountrySelect = (code) => {
+    setPhoneCountryCode(code);
+    setEditData((prev) => ({
+      ...prev,
+      phone: `${code} ${phoneNumber}`,
+    }));
+    setShowPhoneCountryDropdown(false);
+  };
+
+  const handleEmergencyCountrySelect = (code) => {
+    setEmergencyCountryCode(code);
+    setEditData((prev) => ({
+      ...prev,
+      emergencyPhone: `${code} ${emergencyNumber}`,
+    }));
+    setShowEmergencyCountryDropdown(false);
+  };
+
   const filteredAllergies = commonAllergies.filter(
     (allergy) =>
       allergy.toLowerCase().includes(allergySearch.toLowerCase()) &&
@@ -246,6 +324,7 @@ const PatientProfile = ({ onBack }) => {
 
   const handleCancel = () => {
     setIsEditing(false);
+    prepareDefaultData();
     setEditData(profileData);
     setErrors({});
     setMessage("");
@@ -330,6 +409,7 @@ const PatientProfile = ({ onBack }) => {
         console.log("Edit Data:", editData);
         return;
       }
+      console.log("Final Edit Data to be saved:", editData);
       // setProfileData(editData);
       setIsEditing(false);
       setMessage("Profile updated successfully!");
@@ -576,18 +656,95 @@ const PatientProfile = ({ onBack }) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ProfileField
-                  label="Phone Number"
-                  name="phone"
-                  editData={editData}
-                  isEditing={isEditing}
-                  handleInputChange={handleInputChange}
-                  value={profileData.phone || ""}
-                  icon={Phone}
-                  error={errors.phone}
-                  required
-                  readOnly
-                />
+                {/* Phone */}
+                <div>
+                  <label className="shad-input-label block mb-2">
+                    Phone number
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    {/* Country Code Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowPhoneCountryDropdown(!showPhoneCountryDropdown)
+                        }
+                        disabled={!isEditing}
+                        className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <span>
+                          {
+                            countryCodes.find(
+                              (c) => c.code === phoneCountryCode
+                            )?.flag
+                          }
+                        </span>
+                        <span className="text-14-regular">
+                          {phoneCountryCode}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-dark-600 transition-transform ${
+                            showPhoneCountryDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {showPhoneCountryDropdown && (
+                        <div className="absolute top-full left-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                          <div className="max-h-60 overflow-y-auto">
+                            {countryCodes.map((country, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() =>
+                                  handlePhoneCountrySelect(country.code)
+                                }
+                                className="w-full p-3 flex items-center gap-3 hover:bg-light-200 dark:hover:bg-dark-500 transition-colors text-left"
+                              >
+                                <span className="text-lg">{country.flag}</span>
+                                <div>
+                                  <div className="text-14-medium">
+                                    {country.code}
+                                  </div>
+                                  <div className="text-12-regular text-dark-400 dark:text-dark-600">
+                                    {country.country}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Phone Number Input */}
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                      placeholder="123 456 7890"
+                      className={`
+                            w-full p-3 rounded-xl border-[2px] shadow-lg
+                            ${
+                              errors.phone
+                                ? "input-error-field focus-visible:ring-red-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-red-400 focus-visible:ring-[4px]"
+                                : "input-field focus-visible:ring-slate-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-gray-400 focus-visible:ring-[4px]"
+                            }
+                            bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
+                            dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
+                            transition-all duration-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50
+                          `}
+                      disabled={!isEditing}
+                      required
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                      {errors.phone}
+                    </p>
+                  )}
+                </div>
 
                 <ProfileField
                   label="Date of Birth"
@@ -670,7 +827,7 @@ const PatientProfile = ({ onBack }) => {
             {/* Emergency Contact */}
             <div
               className="
-    rounded-3xl p-8 backdrop-blur-xl
+    rounded-3xl p-8
     bg-rose-50/80 dark:bg-rose-900/20
     border border-rose-200 dark:border-rose-700
     shadow-sm
@@ -697,16 +854,104 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Emergency Contact Name"
                   name="emergencyContactName"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.emergencyContactName || ""}
+                  error={errors.emergencyContactName}
                   icon={User}
                 />
-                <ProfileField
-                  label="Emergency Phone Number"
-                  name="emergencyPhone"
-                  value={profileData.emergencyPhone || ""}
-                  type="tel"
-                  icon={Phone}
-                />
+                {/* Emergency Phone */}
+                <div>
+                  <label className="shad-input-label block mb-2">
+                    Emergency Phone number
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    {/* Country Code Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowEmergencyCountryDropdown(
+                            !showEmergencyCountryDropdown
+                          )
+                        }
+                        className="bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
+                      >
+                        <span>
+                          {
+                            countryCodes.find(
+                              (c) => c.code === emergencyCountryCode
+                            )?.flag
+                          }
+                        </span>
+                        <span className="text-14-regular">
+                          {emergencyCountryCode}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-dark-600 transition-transform ${
+                            showEmergencyCountryDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {showEmergencyCountryDropdown && (
+                        <div className="absolute top-full left-0 mt-2 bg-slate-50 dark:bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden min-w-[200px]">
+                          <div className="max-h-60 overflow-y-auto">
+                            {countryCodes.map((country, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() =>
+                                  handleEmergencyCountrySelect(country.code)
+                                }
+                                className="w-full p-3 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors text-left"
+                              >
+                                <span className="text-lg">{country.flag}</span>
+                                <div>
+                                  <div className="text-14-medium">
+                                    {country.code}
+                                  </div>
+                                  <div className="text-12-regular text-slate-600 dark:text-dark-600">
+                                    {country.country}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Emergency Phone Number Input */}
+                    <input
+                      type="tel"
+                      value={emergencyNumber}
+                      onChange={(e) =>
+                        handleEmergencyNumberChange(e.target.value)
+                      }
+                      placeholder="123 456 7890"
+                      className={`
+                            w-full p-3 rounded-xl border-[2px] shadow-lg
+                            ${
+                              errors.emergencyPhone
+                                ? "input-error-field focus-visible:ring-red-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-red-400 focus-visible:ring-[4px]"
+                                : "input-field focus-visible:ring-slate-500 dark:focus-visible:ring-offset-gray-800 dark:focus-visible:ring-gray-400 focus-visible:ring-[4px]"
+                            }
+                            bg-white text-slate-900 placeholder:text-slate-400 border-slate-300
+                            dark:bg-dark-400 dark:text-white dark:placeholder:text-dark-600 dark:border-dark-500
+                            transition-all duration-500 focus:outline-none
+                          `}
+                      required
+                    />
+                  </div>
+                  {errors.emergencyPhone && (
+                    <p className="text-red-500 text-sm mt-1 font-medium tracking-wide">
+                      {errors.emergencyPhone}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -865,13 +1110,21 @@ const PatientProfile = ({ onBack }) => {
                 <ProfileField
                   label="Insurance Provider"
                   name="insuranceProvider"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.insuranceProvider || ""}
+                  error={errors.insuranceProvider}
                   icon={Shield}
                 />
                 <ProfileField
                   label="Insurance Policy Number"
                   name="insurancePolicyNumber"
+                  editData={editData}
+                  isEditing={isEditing}
+                  handleInputChange={handleInputChange}
                   value={profileData.insurancePolicyNumber || ""}
+                  error={errors.insurancePolicyNumber}
                   icon={Shield}
                 />
 
