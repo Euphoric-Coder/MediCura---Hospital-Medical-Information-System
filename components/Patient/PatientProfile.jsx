@@ -18,6 +18,7 @@ import {
   Search,
   ChevronDown,
   Check,
+  IdCard,
 } from "lucide-react";
 import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
@@ -91,6 +92,20 @@ const countryCodes = [
   { code: "+7", country: "Russia", flag: "🇷🇺" },
 ];
 
+const idTypes = [
+  "Birth Certificate",
+  "Driver's License",
+  "Medical Insurance Card/Policy",
+  "Military ID Card",
+  "National Identity Card",
+  "Passport",
+  "Resident Alien Card (Green Card)",
+  "Social Security Card",
+  "State ID Card",
+  "Student ID Card",
+  "Voter ID Card",
+];
+
 const PatientProfile = ({ onBack }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -152,6 +167,13 @@ const PatientProfile = ({ onBack }) => {
   const [avatarId, setAvatarId] = useState(null);
   const [previousAvatarId, setPreviousAvatarId] = useState(null);
   const [editAvatar, setEditAvatar] = useState(false);
+  const [uploadData, setUploadData] = useState(null);
+  const [fileId, setFileId] = useState(null);
+  const [editIdentity, setEditIdentity] = useState(false);
+  const [showIdTypeDropdown, setShowIdTypeDropdown] = useState(false);
+  const [insuranceUpload, setInsuranceUpload] = useState(null);
+  const [insuranceFileId, setInsuranceFileId] = useState(null);
+  const [editInsurance, setEditInsurance] = useState(false);
 
   const handlePhysicianSelect = (physician) => {
     setSelectedPhysician(physician);
@@ -159,7 +181,23 @@ const PatientProfile = ({ onBack }) => {
       ...prev,
       primaryPhysician: physician.name,
     }));
+    setEditData((prev) => ({
+      ...prev,
+      primaryPhysician: physician.name,
+    }));
     setShowPhysicianDropdown(false);
+  };
+
+  const handleIdTypeSelect = (idType) => {
+    setProfileData((prev) => ({
+      ...prev,
+      identificationType: idType,
+    }));
+    setEditData((prev) => ({
+      ...prev,
+      identificationType: idType,
+    }));
+    setShowIdTypeDropdown(false);
   };
 
   // Multi-select handlers
@@ -875,6 +913,74 @@ const PatientProfile = ({ onBack }) => {
                     error={errors.address}
                     required
                     icon={MapPin}
+                  />
+                </div>
+
+                {/* Identification Type */}
+                <div className="md:col-span-2">
+                  <label className="shad-input-label block mb-2">
+                    Identification type
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowIdTypeDropdown(!showIdTypeDropdown)}
+                      disabled={!isEditing}
+                      className="w-full bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg px-4 py-3 text-left flex items-center justify-between hover:border-emerald-500 transition-all duration-200shadow-sm focus:ring-2 focus:ring-emerald-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span className="text-slate-900 dark:text-white font-medium">
+                        {profileData.identificationType ||
+                          "Select Identification Type"}
+                      </span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-slate-600 dark:text-slate-300 transition-transform ${
+                          showIdTypeDropdown ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Dropdown */}
+                    {showIdTypeDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-dark-400 border border-slate-300 dark:border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden animate-fadeIn">
+                        <div className="p-3 border-b border-slate-200 dark:border-dark-500">
+                          <span className="text-14-medium text-slate-700 dark:text-slate-300">
+                            Identification Types
+                          </span>
+                        </div>
+
+                        <div className="max-h-60 overflow-y-auto">
+                          {idTypes.map((idType) => (
+                            <button
+                              key={idType}
+                              type="button"
+                              onClick={() => handleIdTypeSelect(idType)}
+                              className="w-full p-4 flex items-center justify-between hover:bg-slate-100 dark:hover:bg-dark-500 transition-colors text-left"
+                            >
+                              <span className="text-16-medium text-slate-900 dark:text-white font-medium">
+                                {idType}
+                              </span>
+                              {profileData.identificationType === idType && (
+                                <Check className="w-5 h-5 text-emerald-500" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <ProfileField
+                    label="Identification Number"
+                    name="identificationNumber"
+                    editData={editData}
+                    isEditing={isEditing}
+                    handleInputChange={handleInputChange}
+                    value={profileData.identificationNumber || ""}
+                    error={errors.identificationNumber}
+                    required
+                    icon={IdCard}
                   />
                 </div>
 
