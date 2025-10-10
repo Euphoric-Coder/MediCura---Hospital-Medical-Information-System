@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import AvatarUpload from "../AvatarUpload";
 import { FiFileText } from "react-icons/fi";
 import { Button } from "../ui/button";
+import FileUpload from "../FileUpload";
 
 const commonAllergies = [
   "Penicillin",
@@ -129,6 +130,8 @@ const PatientProfile = ({ onBack }) => {
   useEffect(() => {
     setProfileData(patientData);
     setPreviousAvatarId(patientData.avatarId);
+    setPreviousIdentityId(patientData.identificationDocumentId);
+    setPreviousInsuranceId(patientData.insurancePolicyDocumentId);
     prepareDefaultData();
     fetchPhysician();
   }, [patientData]);
@@ -170,9 +173,11 @@ const PatientProfile = ({ onBack }) => {
   const [uploadData, setUploadData] = useState(null);
   const [fileId, setFileId] = useState(null);
   const [editIdentity, setEditIdentity] = useState(false);
+  const [previousIdentityId, setPreviousIdentityId] = useState(null);
   const [showIdTypeDropdown, setShowIdTypeDropdown] = useState(false);
   const [insuranceUpload, setInsuranceUpload] = useState(null);
   const [insuranceFileId, setInsuranceFileId] = useState(null);
+  const [previousInsuranceId, setPreviousInsuranceId] = useState(null);
   const [editInsurance, setEditInsurance] = useState(false);
 
   const handlePhysicianSelect = (physician) => {
@@ -373,6 +378,7 @@ const PatientProfile = ({ onBack }) => {
     prepareDefaultData();
     setEditData(profileData);
     setEditAvatar(false);
+    setEditIdentity(false);
     setErrors({});
     setMessage("");
     setMessageType("");
@@ -384,6 +390,32 @@ const PatientProfile = ({ onBack }) => {
       ...prev,
       avatar: url,
       avatarId: id,
+    }));
+  };
+
+  const handleInsuranceFileUpload = (uploadData, fileId) => {
+    console.log("File uploaded:", fileId, uploadData);
+    setFormData((prev) => ({
+      ...prev,
+      insurancePolicyDocument: uploadData,
+      insurancePolicyDocumentId: fileId,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      insurancePolicyDocument: "",
+    }));
+  };
+
+  const handleDocumentUpload = (uploadData, fileId) => {
+    console.log("File uploaded:", fileId, uploadData);
+    setEditData((prev) => ({
+      ...prev,
+      identificationDocument: uploadData,
+      identificationDocumentId: fileId,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      identificationDocument: "",
     }));
   };
 
@@ -467,6 +499,8 @@ const PatientProfile = ({ onBack }) => {
       }
       console.log("Final Edit Data to be saved:", editData);
       console.log("Previous Avatar ID:", previousAvatarId);
+      console.log("Previous Identity ID:", previousIdentityId);
+      console.log("Previous Insurance ID:", previousInsuranceId);
       // setProfileData(editData);
       setIsEditing(false);
       setMessage("Profile updated successfully!");
@@ -985,35 +1019,64 @@ const PatientProfile = ({ onBack }) => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <div className="relative flex flex-col items-center gap-6 mt-4 p-6 border-2 border-dashed border-blue-300 rounded-2xl bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a] shadow-lg hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 text-blue-700 dark:text-blue-300">
-                      <FiFileText className="text-5xl" />
-                      <div className="text-left">
-                        <h3 className="text-lg font-semibold break-all">
-                          {`${profileData.name}'s Identity Document` ||
-                            "Uploaded File"}
-                        </h3>
-                      </div>
+                  {!editIdentity ? (
+                    <div>
+                      {/* In case there is no identity document uploaded or got removed by mistake */}
+                      {profileData.identificationDocument ? (
+                        <div className="relative flex flex-col items-center gap-6 mt-4 p-6 border-2 border-dashed border-blue-300 rounded-2xl bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a] shadow-lg hover:shadow-xl transition-all duration-300">
+                          <div className="flex items-center gap-3 text-blue-700 dark:text-blue-300">
+                            <FiFileText className="text-5xl" />
+                            <div className="text-left">
+                              <h3 className="text-lg font-semibold break-all">
+                                {`${profileData.name}'s Identity Document` ||
+                                  "Uploaded File"}
+                              </h3>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setEditIdentity(true);
+                            }}
+                            className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-medium px-5 py-2 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-transform duration-300"
+                            disabled={!isEditing}
+                          >
+                            Reupload PDF
+                          </Button>
+
+                          <a
+                            href={profileData.identificationDocument}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
+                          >
+                            View PDF
+                          </a>
+                        </div>
+                      ) : (
+                        <FileUpload
+                          uploadData={uploadData}
+                          setUploadData={setUploadData}
+                          fileId={fileId}
+                          setFileId={setFileId}
+                          handleFileUpload={handleDocumentUpload}
+                          folder="Patient"
+                          error={errors.identificationDocument}
+                        />
+                      )}
                     </div>
-
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
-                      className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-medium px-5 py-2 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-transform duration-300"
-                    >
-                      Reupload PDF
-                    </Button>
-
-                    <a
-                      href={profileData.identificationDocument}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
-                    >
-                      View PDF
-                    </a>
-                  </div>
+                  ) : (
+                    <FileUpload
+                      uploadData={uploadData}
+                      setUploadData={setUploadData}
+                      fileId={fileId}
+                      setFileId={setFileId}
+                      handleFileUpload={handleDocumentUpload}
+                      folder="Patient"
+                      error={errors.identificationDocument}
+                    />
+                  )}
                 </div>
               </div>
             </div>
