@@ -139,6 +139,7 @@ const PatientProfile = ({ onBack }) => {
 
   // Refresh Data and store the profile data
   const handleRefresh = async () => {
+    const loading = toast.loading("Refreshing data... Please wait.");
     await refreshPatientData();
     setProfileData(patientData);
     setPreviousAvatarId(patientData.avatarId);
@@ -146,6 +147,8 @@ const PatientProfile = ({ onBack }) => {
     setPreviousInsuranceId(patientData.insurancePolicyDocumentId);
     prepareDefaultData();
     fetchPhysician();
+    toast.dismiss(loading);
+    toast.success("Data refreshed successfully!");
   };
 
   const prepareDefaultData = () => {
