@@ -19,6 +19,7 @@ import {
   ChevronDown,
   Check,
   IdCard,
+  RefreshCcw,
 } from "lucide-react";
 import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
@@ -135,6 +136,17 @@ const PatientProfile = ({ onBack }) => {
     prepareDefaultData();
     fetchPhysician();
   }, [patientData]);
+
+  // Refresh Data and store the profile data
+  const handleRefresh = async () => {
+    await refreshPatientData();
+    setProfileData(patientData);
+    setPreviousAvatarId(patientData.avatarId);
+    setPreviousIdentityId(patientData.identificationDocumentId);
+    setPreviousInsuranceId(patientData.insurancePolicyDocumentId);
+    prepareDefaultData();
+    fetchPhysician();
+  };
 
   const prepareDefaultData = () => {
     setPhoneCountryCode(patientData.phone.split(" ")[0]);
@@ -385,6 +397,19 @@ const PatientProfile = ({ onBack }) => {
     setMessageType("");
   };
 
+  const deleteFile = async (fileId) => {
+    if (!fileId) return;
+    try {
+      await fetch("/api/delete-image", {
+        method: "POST",
+        body: JSON.stringify({ fileId }),
+      });
+      console.log("Deleted previous file:", fileId);
+    } catch (err) {
+      console.error("Delete failed", err);
+    }
+  };
+
   const handleAvatarUpload = (url, id) => {
     setEditData((prev) => ({
       ...prev,
@@ -491,28 +516,23 @@ const PatientProfile = ({ onBack }) => {
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
         toast.error("Please fill the required fields.");
-        console.log(validationErrors);
-        console.log("Edit Data:", editData);
         return;
       }
       console.log("Final Edit Data to be saved:", editData);
 
       if (avatarData) {
         console.log("Previous Avatar ID:", previousAvatarId);
-      } else {
-        console.log("Avatar not changed");
+        // await deleteFile(previousAvatarId);
       }
 
       if (uploadData) {
         console.log("Previous Identity ID:", previousIdentityId);
-      } else {
-        console.log("Identity document not changed");
+        // await deleteFile(previousIdentityId);
       }
 
       if (insuranceUpload) {
         console.log("Previous Insurance ID:", previousInsuranceId);
-      } else {
-        console.log("Insurance document not changed");
+        // await deleteFile(previousInsuranceId);
       }
 
       // setProfileData(editData);
@@ -775,6 +795,11 @@ const PatientProfile = ({ onBack }) => {
 
           {/* Profile Sections */}
           <div className="space-y-8 ">
+            <div className="flex justify-end">
+              <Button className="btn3" onClick={() => handleRefresh()}>
+                <RefreshCcw /> Refresh Data
+              </Button>
+            </div>
             {/* Personal Information */}
             <div
               className="
