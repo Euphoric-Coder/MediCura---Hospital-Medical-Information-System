@@ -379,6 +379,7 @@ const PatientProfile = ({ onBack }) => {
     setEditData(profileData);
     setEditAvatar(false);
     setEditIdentity(false);
+    setEditInsurance(false);
     setErrors({});
     setMessage("");
     setMessageType("");
@@ -395,7 +396,7 @@ const PatientProfile = ({ onBack }) => {
 
   const handleInsuranceFileUpload = (uploadData, fileId) => {
     console.log("File uploaded:", fileId, uploadData);
-    setFormData((prev) => ({
+    setEditData((prev) => ({
       ...prev,
       insurancePolicyDocument: uploadData,
       insurancePolicyDocumentId: fileId,
@@ -503,6 +504,8 @@ const PatientProfile = ({ onBack }) => {
       console.log("Previous Insurance ID:", previousInsuranceId);
       // setProfileData(editData);
       setIsEditing(false);
+      setEditInsurance(false);
+      setEditIdentity(false);
       setMessage("Profile updated successfully!");
       setMessageType("success");
     } catch (error) {
@@ -1387,36 +1390,52 @@ const PatientProfile = ({ onBack }) => {
                   error={errors.insurancePolicyNumber}
                   icon={Shield}
                 />
+
+                {/* Insurance Document */}
                 <div className="md:col-span-2">
-                  <div className="relative flex flex-col items-center gap-6 mt-4 p-6 border-2 border-dashed border-blue-300 rounded-2xl bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a] shadow-lg hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 text-blue-700 dark:text-blue-300">
-                      <FiFileText className="text-5xl" />
-                      <div className="text-left">
-                        <h3 className="text-lg font-semibold break-all">
-                          {`${profileData.name}'s Insurance Policy` ||
-                            "Uploaded File"}
-                        </h3>
+                  {!editInsurance ? (
+                    <div className="relative flex flex-col items-center gap-6 mt-4 p-6 border-2 border-dashed border-blue-300 rounded-2xl bg-gradient-to-br from-cyan-50 to-indigo-100 dark:from-[#1c1c1c] dark:to-[#0f172a] shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-center gap-3 text-blue-700 dark:text-blue-300">
+                        <FiFileText className="text-5xl" />
+                        <div className="text-left">
+                          <h3 className="text-lg font-semibold break-all">
+                            {`${profileData.name}'s Insurance Policy` ||
+                              "Uploaded File"}
+                          </h3>
+                        </div>
                       </div>
+
+                      <Button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditInsurance(true);
+                        }}
+                        className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-medium px-5 py-2 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-transform duration-300"
+                        disabled={!isEditing}
+                      >
+                        Reupload PDF
+                      </Button>
+
+                      <a
+                        href={profileData.insurancePolicyDocument}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
+                      >
+                        View PDF
+                      </a>
                     </div>
-
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
-                      className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-medium px-5 py-2 rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-transform duration-300"
-                    >
-                      Reupload PDF
-                    </Button>
-
-                    <a
-                      href={profileData.insurancePolicyDocument}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
-                    >
-                      View PDF
-                    </a>
-                  </div>
+                  ) : (
+                    <FileUpload
+                      uploadData={insuranceUpload}
+                      setUploadData={setInsuranceUpload}
+                      fileId={insuranceFileId}
+                      setFileId={setInsuranceFileId}
+                      handleFileUpload={handleInsuranceFileUpload}
+                      folder="Patient"
+                      error={errors.insurancePolicyDocument}
+                    />
+                  )}
                 </div>
 
                 {/* Allergies */}
