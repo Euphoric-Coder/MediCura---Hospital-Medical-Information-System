@@ -386,7 +386,6 @@ const PatientProfile = ({ onBack }) => {
   };
 
   const handleAvatarUpload = (url, id) => {
-    console.log("Avatar uploaded:", url, id);
     setEditData((prev) => ({
       ...prev,
       avatar: url,
@@ -395,7 +394,6 @@ const PatientProfile = ({ onBack }) => {
   };
 
   const handleInsuranceFileUpload = (uploadData, fileId) => {
-    console.log("File uploaded:", fileId, uploadData);
     setEditData((prev) => ({
       ...prev,
       insurancePolicyDocument: uploadData,
@@ -408,7 +406,6 @@ const PatientProfile = ({ onBack }) => {
   };
 
   const handleDocumentUpload = (uploadData, fileId) => {
-    console.log("File uploaded:", fileId, uploadData);
     setEditData((prev) => ({
       ...prev,
       identificationDocument: uploadData,
@@ -499,9 +496,25 @@ const PatientProfile = ({ onBack }) => {
         return;
       }
       console.log("Final Edit Data to be saved:", editData);
-      console.log("Previous Avatar ID:", previousAvatarId);
-      console.log("Previous Identity ID:", previousIdentityId);
-      console.log("Previous Insurance ID:", previousInsuranceId);
+
+      if (avatarData) {
+        console.log("Previous Avatar ID:", previousAvatarId);
+      } else {
+        console.log("Avatar not changed");
+      }
+
+      if (uploadData) {
+        console.log("Previous Identity ID:", previousIdentityId);
+      } else {
+        console.log("Identity document not changed");
+      }
+
+      if (insuranceUpload) {
+        console.log("Previous Insurance ID:", previousInsuranceId);
+      } else {
+        console.log("Insurance document not changed");
+      }
+
       // setProfileData(editData);
       setIsEditing(false);
       setEditInsurance(false);
@@ -509,7 +522,7 @@ const PatientProfile = ({ onBack }) => {
       setMessage("Profile updated successfully!");
       setMessageType("success");
     } catch (error) {
-      setMessage("Failed to update profile. Please try again.");
+      setMessage("Failed to update profile. Please try again. " + error);
       setMessageType("error");
     } finally {
       setIsSaving(false);
