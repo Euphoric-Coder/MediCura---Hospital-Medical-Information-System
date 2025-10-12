@@ -40,7 +40,6 @@ export default function DashboardLayout({ children }) {
 
         if (patient.length > 0) {
           setPatientData(patient[0]);
-          console.log("Onboarding Status: ", patient[0].hasOnboarded);
           setOnboardingStatus(patient[0].hasOnboarded);
         } else {
           setOnboardingStatus(false);
