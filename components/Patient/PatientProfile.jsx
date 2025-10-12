@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import UpdatePassword from "../UpdatePassword";
 import { usePatient } from "@/contexts/PatientContext";
-import { fetchPhysicians } from "@/lib/patients/profile";
+import { fetchPhysicians, profileUpdate } from "@/lib/patients/profile";
 import ProfileField from "./ProfileInput";
 import { toast } from "sonner";
 import AvatarUpload from "../AvatarUpload";
@@ -523,20 +523,21 @@ const PatientProfile = ({ onBack }) => {
       }
       console.log("Final Edit Data to be saved:", editData);
 
+      await profileUpdate({ profileData: editData });
+
       if (avatarData) {
-        console.log("Previous Avatar ID:", previousAvatarId);
-        // await deleteFile(previousAvatarId);
+        await deleteFile(previousAvatarId);
       }
 
       if (uploadData) {
-        console.log("Previous Identity ID:", previousIdentityId);
-        // await deleteFile(previousIdentityId);
+        await deleteFile(previousIdentityId);
       }
 
       if (insuranceUpload) {
-        console.log("Previous Insurance ID:", previousInsuranceId);
-        // await deleteFile(previousInsuranceId);
+        await deleteFile(previousInsuranceId);
       }
+
+      await handleRefresh();
 
       // setProfileData(editData);
       setIsEditing(false);
@@ -547,6 +548,7 @@ const PatientProfile = ({ onBack }) => {
     } catch (error) {
       setMessage("Failed to update profile. Please try again. " + error);
       setMessageType("error");
+      console.error("Save failed:", error);
     } finally {
       setIsSaving(false);
       setTimeout(() => {
