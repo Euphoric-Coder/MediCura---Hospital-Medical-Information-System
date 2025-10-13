@@ -1046,7 +1046,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-dark-300 dark:via-dark-200 dark:to-dark-400">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
         {/* Header */}
         <div className="mb-8">

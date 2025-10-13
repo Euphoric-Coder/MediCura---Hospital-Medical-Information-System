@@ -135,7 +135,7 @@ const BillingHistory = ({ onBack }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
         {/* Header */}
         <div className="bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-6 py-4">
@@ -145,7 +145,9 @@ const BillingHistory = ({ onBack }) => {
               </div>
               <div>
                 <span className="text-24-bold text-white">Billing History</span>
-                <p className="text-14-regular text-dark-700">View and manage your medical bills</p>
+                <p className="text-14-regular text-dark-700">
+                  View and manage your medical bills
+                </p>
               </div>
             </div>
           </div>
@@ -160,8 +162,12 @@ const BillingHistory = ({ onBack }) => {
                   <DollarSign className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <div className="text-32-bold text-white">${totalAmount.toFixed(0)}</div>
-                  <div className="text-14-regular text-green-400">Total Paid</div>
+                  <div className="text-32-bold text-white">
+                    ${totalAmount.toFixed(0)}
+                  </div>
+                  <div className="text-14-regular text-green-400">
+                    Total Paid
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,7 +179,9 @@ const BillingHistory = ({ onBack }) => {
                 </div>
                 <div>
                   <div className="text-32-bold text-white">{paidCount}</div>
-                  <div className="text-14-regular text-blue-400">Paid Bills</div>
+                  <div className="text-14-regular text-blue-400">
+                    Paid Bills
+                  </div>
                 </div>
               </div>
             </div>
@@ -245,19 +253,24 @@ const BillingHistory = ({ onBack }) => {
 
             <div className="space-y-4">
               {filteredBills.map((bill) => (
-                <div key={bill.id} className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-6 hover:border-dark-500/80 transition-all duration-300">
+                <div
+                  key={bill.id}
+                  className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-6 hover:border-dark-500/80 transition-all duration-300"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
                         <Receipt className="w-8 h-8 text-white" />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex items-center gap-4">
-                          <h3 className="text-20-bold text-white">Bill #{bill.id}</h3>
+                          <h3 className="text-20-bold text-white">
+                            Bill #{bill.id}
+                          </h3>
                           {getStatusBadge(bill.status)}
                         </div>
-                        
+
                         <div className="flex items-center gap-6 text-14-regular text-dark-700">
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-blue-400" />
@@ -268,17 +281,19 @@ const BillingHistory = ({ onBack }) => {
                             <span>Amount: ${bill.total.toFixed(2)}</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-6 text-14-regular text-dark-700">
                           <div>
-                            <span className="text-white">Doctor:</span> {bill.doctor}
+                            <span className="text-white">Doctor:</span>{" "}
+                            {bill.doctor}
                           </div>
                           <div>
-                            <span className="text-white">Department:</span> {bill.department}
+                            <span className="text-white">Department:</span>{" "}
+                            {bill.department}
                           </div>
                         </div>
-                        
-                        {bill.status === 'paid' && bill.paymentMethod && (
+
+                        {bill.status === "paid" && bill.paymentMethod && (
                           <div className="bg-green-500/20 rounded-lg px-3 py-2 inline-block">
                             <div className="flex items-center gap-2">
                               <CreditCard className="w-4 h-4 text-green-400" />
@@ -288,16 +303,16 @@ const BillingHistory = ({ onBack }) => {
                             </div>
                           </div>
                         )}
-                        
-                        {bill.status === 'overdue' && (
+
+                        {bill.status === "overdue" && (
                           <div className="bg-red-500/20 rounded-lg px-3 py-2 inline-block">
                             <span className="text-12-regular text-red-400">
                               Due: {bill.dueDate}
                             </span>
                           </div>
                         )}
-                        
-                        {bill.status === 'pending' && (
+
+                        {bill.status === "pending" && (
                           <div className="bg-yellow-500/20 rounded-lg px-3 py-2 inline-block">
                             <span className="text-12-regular text-yellow-400">
                               Due: {bill.dueDate}
@@ -306,7 +321,7 @@ const BillingHistory = ({ onBack }) => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleViewBill(bill)}
@@ -315,7 +330,7 @@ const BillingHistory = ({ onBack }) => {
                         <Eye className="w-4 h-4" />
                         View
                       </button>
-                      
+
                       <button
                         onClick={() => handleDownloadPDF(bill.id)}
                         className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg text-14-medium transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
@@ -323,8 +338,8 @@ const BillingHistory = ({ onBack }) => {
                         <Download className="w-4 h-4" />
                         PDF
                       </button>
-                      
-                      {bill.status !== 'paid' && (
+
+                      {bill.status !== "paid" && (
                         <button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg text-14-medium transition-all duration-300 shadow-lg hover:shadow-purple-500/25">
                           Pay Now
                         </button>
@@ -342,7 +357,8 @@ const BillingHistory = ({ onBack }) => {
                 </div>
                 <h3 className="text-24-bold text-white mb-4">No bills found</h3>
                 <p className="text-16-regular text-dark-700 max-w-md mx-auto">
-                  No bills match your search criteria. Try adjusting your filters.
+                  No bills match your search criteria. Try adjusting your
+                  filters.
                 </p>
               </div>
             )}
@@ -377,25 +393,33 @@ const BillingHistory = ({ onBack }) => {
               <div className="bg-dark-500/30 rounded-2xl p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-20-bold text-white">Invoice #{selectedBill.id}</h3>
-                    <p className="text-14-regular text-dark-700">Date: {selectedBill.date}</p>
+                    <h3 className="text-20-bold text-white">
+                      Invoice #{selectedBill.id}
+                    </h3>
+                    <p className="text-14-regular text-dark-700">
+                      Date: {selectedBill.date}
+                    </p>
                   </div>
                   {getStatusBadge(selectedBill.status)}
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 text-14-regular text-dark-700">
                   <div>
-                    <span className="text-white">Doctor:</span> {selectedBill.doctor}
+                    <span className="text-white">Doctor:</span>{" "}
+                    {selectedBill.doctor}
                   </div>
                   <div>
-                    <span className="text-white">Department:</span> {selectedBill.department}
+                    <span className="text-white">Department:</span>{" "}
+                    {selectedBill.department}
                   </div>
                   <div>
-                    <span className="text-white">Due Date:</span> {selectedBill.dueDate}
+                    <span className="text-white">Due Date:</span>{" "}
+                    {selectedBill.dueDate}
                   </div>
                   {selectedBill.paidDate && (
                     <div>
-                      <span className="text-white">Paid Date:</span> {selectedBill.paidDate}
+                      <span className="text-white">Paid Date:</span>{" "}
+                      {selectedBill.paidDate}
                     </div>
                   )}
                 </div>
@@ -403,17 +427,26 @@ const BillingHistory = ({ onBack }) => {
 
               {/* Bill Items */}
               <div className="mb-6">
-                <h4 className="text-18-bold text-white mb-4">Services & Items</h4>
+                <h4 className="text-18-bold text-white mb-4">
+                  Services & Items
+                </h4>
                 <div className="space-y-3">
                   {selectedBill.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between bg-dark-500/30 rounded-lg p-4">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-dark-500/30 rounded-lg p-4"
+                    >
                       <div className="flex-1">
-                        <div className="text-16-medium text-white">{item.description}</div>
+                        <div className="text-16-medium text-white">
+                          {item.description}
+                        </div>
                         <div className="text-14-regular text-dark-700">
                           Qty: {item.quantity} × ${item.unitPrice.toFixed(2)}
                         </div>
                       </div>
-                      <div className="text-16-semibold text-white">${item.total.toFixed(2)}</div>
+                      <div className="text-16-semibold text-white">
+                        ${item.total.toFixed(2)}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -455,8 +488,8 @@ const BillingHistory = ({ onBack }) => {
                   <Download className="w-5 h-5" />
                   Download PDF
                 </button>
-                
-                {selectedBill.status !== 'paid' && (
+
+                {selectedBill.status !== "paid" && (
                   <button className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg text-16-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2">
                     <CreditCard className="w-5 h-5" />
                     Pay Now

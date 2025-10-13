@@ -560,7 +560,7 @@ const PatientProfile = ({ onBack }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-dark-300 dark:via-dark-200 dark:to-dark-400">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
         {/* Header */}
         <div
           className="
