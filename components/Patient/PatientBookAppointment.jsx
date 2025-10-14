@@ -398,6 +398,7 @@ const appointmentTypes = [
 ];
 
 const PatientBookAppointment = ({ onBack, patientData }) => {
+  console.log(patientData);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("book");
