@@ -5,7 +5,6 @@ import React from "react";
 
 const page = () => {
   const { doctorData } = useDoctor();
-  console.log("Doctor Data in Page:", doctorData);
 
   return <div>page</div>;
 };

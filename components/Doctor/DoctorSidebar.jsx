@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { ModeToggle } from "../ThemeButton";
 
 const DoctorSidebar = ({
   currentPage,
@@ -143,18 +144,21 @@ const DoctorSidebar = ({
 
         {/* Header */}
         <div className="p-4 lg:p-6 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Stethoscope className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Stethoscope className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-16-bold lg:text-20-bold text-slate-900 dark:text-white">
+                  Doctor Portal
+                </h2>
+                <p className="text-10-regular lg:text-12-regular text-slate-500 dark:text-slate-400">
+                  Medical Practice Dashboard
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-16-bold lg:text-20-bold text-slate-900 dark:text-white">
-                Doctor Portal
-              </h2>
-              <p className="text-10-regular lg:text-12-regular text-slate-500 dark:text-slate-400">
-                Medical Practice Dashboard
-              </p>
-            </div>
+            <ModeToggle />
           </div>
 
           {/* Doctor Info */}

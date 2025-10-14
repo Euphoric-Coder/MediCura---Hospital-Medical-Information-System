@@ -135,16 +135,16 @@ const DynamicListSection = ({
               color === "blue"
                 ? "bg-blue-500 hover:bg-blue-600 text-white"
                 : color === "green"
-                ? "bg-green-500 hover:bg-green-600 text-white"
-                : color === "yellow"
-                ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                : color === "purple"
-                ? "bg-purple-500 hover:bg-purple-600 text-white"
-                : color === "red"
-                ? "bg-red-500 hover:bg-red-600 text-white"
-                : color === "teal"
-                ? "bg-teal-500 hover:bg-teal-600 text-white"
-                : "bg-orange-500 hover:bg-orange-600 text-white"
+                  ? "bg-green-500 hover:bg-green-600 text-white"
+                  : color === "yellow"
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : color === "purple"
+                      ? "bg-purple-500 hover:bg-purple-600 text-white"
+                      : color === "red"
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : color === "teal"
+                          ? "bg-teal-500 hover:bg-teal-600 text-white"
+                          : "bg-orange-500 hover:bg-orange-600 text-white"
             }`}
           >
             Add
@@ -668,8 +668,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                     isActive
                       ? "text-green-400"
                       : isCompleted
-                      ? "text-green-500"
-                      : "text-dark-600"
+                        ? "text-green-500"
+                        : "text-dark-600"
                   }`}
                 >
                   {/* Step Circle */}
@@ -678,8 +678,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       isActive
                         ? "border-green-400 bg-green-500/20 animate-pulse"
                         : isCompleted
-                        ? "border-green-500 bg-green-500/20"
-                        : "border-dark-500 bg-dark-500/20"
+                          ? "border-green-500 bg-green-500/20"
+                          : "border-dark-500 bg-dark-500/20"
                     }`}
                   >
                     {isCompleted ? (
@@ -701,8 +701,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                         isCompleted
                           ? "bg-green-500"
                           : isActive
-                          ? "bg-green-400 animate-pulse"
-                          : "bg-dark-500/50"
+                            ? "bg-green-400 animate-pulse"
+                            : "bg-dark-500/50"
                       }`}
                     ></div>
                   )}
@@ -837,7 +837,6 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       });
 
       refreshPatientAppointment(selectedPatient.appointmentId);
-      
     } catch (error) {
       setMessage("Error saving consultation");
       setMessageType("error");
