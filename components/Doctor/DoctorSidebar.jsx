@@ -58,20 +58,20 @@ const DoctorSidebar = ({
       href: "/doctor/dashboard/consultations",
       description: "Write Notes & Prescriptions",
     },
-    {
-      id: "availability",
-      label: "Availability",
-      icon: Clock,
-      href: "/doctor/dashboard/availability",
-      description: "Set Consultation Hours",
-    },
-    {
-      id: "consultation-fee",
-      label: "Consultation Fee",
-      icon: DollarSign,
-      href: "/doctor/dashboard/consultation-fee",
-      description: "Update Pricing",
-    },
+    // {
+    //   id: "availability",
+    //   label: "Availability",
+    //   icon: Clock,
+    //   href: "/doctor/dashboard/availability",
+    //   description: "Set Consultation Hours",
+    // },
+    // {
+    //   id: "consultation-fee",
+    //   label: "Consultation Fee",
+    //   icon: DollarSign,
+    //   href: "/doctor/dashboard/consultation-fee",
+    //   description: "Update Pricing",
+    // },
   ];
 
   const quickActions = [
@@ -182,12 +182,12 @@ const DoctorSidebar = ({
               <Link
                 href={`${item.href}`}
                 key={item.id}
-                // onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group ${
                   currentPage === item.id
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
                     : "text-dark-700 hover:bg-dark-400/50 hover:text-white"
                 }`}
+                onClick={() => onToggle()}
               >
                 <div
                   className={`w-8 h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
