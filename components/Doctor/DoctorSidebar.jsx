@@ -20,6 +20,7 @@ import {
   User,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 const DoctorSidebar = ({
   currentPage,
@@ -33,50 +34,44 @@ const DoctorSidebar = ({
       id: "dashboard",
       label: "Dashboard",
       icon: Home,
-      description: "Overview & Today's Schedule",
+      href: "/doctor/dashboard",
+      description: "Overview & Today’s Schedule",
     },
     {
       id: "appointments",
       label: "Appointments",
       icon: Calendar,
+      href: "/doctor/dashboard/appointments",
       description: "Weekly Schedule & Availability",
     },
     {
       id: "patients",
       label: "My Patients",
       icon: Users,
+      href: "/doctor/dashboard/patients",
       description: "Patient List & Records",
     },
     {
       id: "consultations",
       label: "Consultations",
       icon: FileText,
+      href: "/doctor/dashboard/consultations",
       description: "Write Notes & Prescriptions",
     },
-    // {
-    //   id: "prescriptions",
-    //   label: "Prescriptions",
-    //   icon: Pill,
-    //   description: "Manage Prescriptions",
-    // },
-    // {
-    //   id: "lab-orders",
-    //   label: "Lab Orders",
-    //   icon: TestTube,
-    //   description: "Order & Review Tests",
-    // },
-    // {
-    //   id: "admissions",
-    //   label: "Admissions",
-    //   icon: Bed,
-    //   description: "Hospital Admissions",
-    // },
-    // {
-    //   id: "reports",
-    //   label: "Reports",
-    //   icon: BarChart3,
-    //   description: "Patient Reports & Analytics",
-    // },
+    {
+      id: "availability",
+      label: "Availability",
+      icon: Clock,
+      href: "/doctor/dashboard/availability",
+      description: "Set Consultation Hours",
+    },
+    {
+      id: "consultation-fee",
+      label: "Consultation Fee",
+      icon: DollarSign,
+      href: "/doctor/dashboard/consultation-fee",
+      description: "Update Pricing",
+    },
   ];
 
   const quickActions = [
@@ -184,9 +179,10 @@ const DoctorSidebar = ({
             </div>
 
             {menuItems.map((item) => (
-              <button
+              <Link
+                href={`${item.href}`}
                 key={item.id}
-                onClick={() => handleNavigate(item.id)}
+                // onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group ${
                   currentPage === item.id
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
@@ -228,11 +224,11 @@ const DoctorSidebar = ({
                     {item.description}
                   </div>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
 
-            {/* TODO: Add Quick Actions */}
+          {/* TODO: Add Quick Actions */}
           {/* Quick Actions */}
           {/* <div className="mt-8 space-y-2">
             <div className="text-10-semibold lg:text-12-semibold text-dark-600 uppercase tracking-wider px-3 py-2">

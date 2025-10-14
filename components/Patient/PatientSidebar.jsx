@@ -5,18 +5,21 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   Calendar,
-  NotebookTabs,
-  User,
+  Users,
+  FileText,
+  Clock,
+  DollarSign,
   Settings,
   LogOut,
+  Stethoscope,
   Heart,
+  User,
   X,
-  Receipt,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { ModeToggle } from "../ThemeButton";
 
-const PatientSidebar = ({ isOpen = true, onToggle }) => {
+const DoctorSidebar = ({ isOpen = true, onToggle }) => {
   const { data: session } = useSession();
   const pathname = usePathname();
 
@@ -28,36 +31,43 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
       id: "dashboard",
       label: "Dashboard",
       icon: Home,
-      href: "/patient/dashboard",
-      description: "Overview & Health Summary",
+      href: "/doctor/dashboard",
+      description: "Overview & Today’s Schedule",
     },
     {
       id: "appointments",
       label: "Appointments",
       icon: Calendar,
-      href: "/patient/dashboard/appointments",
-      description: "Book & Manage Appointments",
+      href: "/doctor/dashboard/appointments",
+      description: "Weekly Schedule & Availability",
     },
     {
-      id: "prescriptions",
-      label: "Prescriptions",
-      icon: NotebookTabs,
-      href: "/patient/dashboard/prescriptions",
-      description: "Consultation Details",
+      id: "patients",
+      label: "My Patients",
+      icon: Users,
+      href: "/doctor/dashboard/patients",
+      description: "Patient List & Records",
     },
     {
-      id: "billing",
-      label: "Billing",
-      icon: Receipt,
-      href: "/patient/dashboard/billing",
-      description: "Manage Billing & Payments",
+      id: "consultations",
+      label: "Consultations",
+      icon: FileText,
+      href: "/doctor/dashboard/consultations",
+      description: "Write Notes & Prescriptions",
     },
     {
-      id: "profile",
-      label: "Profile",
-      icon: User,
-      href: "/patient/dashboard/profile",
-      description: "Personal Information",
+      id: "availability",
+      label: "Availability",
+      icon: Clock,
+      href: "/doctor/dashboard/availability",
+      description: "Set Consultation Hours",
+    },
+    {
+      id: "consultation-fee",
+      label: "Consultation Fee",
+      icon: DollarSign,
+      href: "/doctor/dashboard/consultation-fee",
+      description: "Update Pricing",
     },
   ];
 
@@ -73,37 +83,35 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
 
       {/* Sidebar */}
       <div
-        className={`
-          fixed xl:static inset-y-0 left-0 z-50 
-          w-80 xl:w-96 
-          h-screen bg-gradient-to-b from-white to-gray-100 
-          dark:from-slate-900 dark:via-slate-950 dark:to-slate-900
-          border-r border-gray-200 dark:border-dark-500/50 
-          flex flex-col
-          transform transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full xl:translate-x-0"}
-        `}
+        className={`fixed xl:static inset-y-0 left-0 z-50 
+        w-80 xl:w-96 
+        h-screen bg-gradient-to-b from-white to-gray-100 
+        dark:from-dark-200 dark:via-dark-300 dark:to-dark-400
+        border-r border-gray-200 dark:border-dark-500/50 
+        flex flex-col
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full xl:translate-x-0"}`}
       >
         {/* Header */}
         <div className="p-4 xl:p-6 border-b border-gray-200 dark:border-dark-500/50">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Heart className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
+                <Stethoscope className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
               </div>
               <div>
                 <h2 className="text-16-bold xl:text-20-bold text-gray-900 dark:text-white">
-                  Patient Portal
+                  Doctor Portal
                 </h2>
                 <p className="text-10-regular xl:text-12-regular text-gray-500 dark:text-dark-700">
-                  Your Health Dashboard
+                  Medical Practice Dashboard
                 </p>
               </div>
             </div>
             <ModeToggle />
           </div>
 
-          {/* Patient Info */}
+          {/* Doctor Info */}
           <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-sm border border-green-500/20 rounded-2xl p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 xl:w-10 xl:h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -111,11 +119,10 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
               </div>
               <div>
                 <h3 className="text-14-semibold xl:text-16-semibold text-gray-900 dark:text-white">
-                  {userName}
+                  {userName || "Doctor"}
                 </h3>
                 <p className="flex items-center gap-1 text-xs xl:text-sm text-green-600 dark:text-green-400">
-                  Patient ID:
-                  <span className="text-[9px] md:text-[11px]">{userId}</span>
+                  ID: <span className="text-[10px]">{userId}</span>
                 </p>
               </div>
             </div>
@@ -131,6 +138,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
 
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.id}
@@ -149,7 +157,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
                         : "bg-gray-200 dark:bg-dark-400/50 group-hover:bg-gray-300 dark:group-hover:bg-dark-400/70"
                     }`}
                   >
-                    <item.icon
+                    <Icon
                       className={`w-4 h-4 xl:w-5 xl:h-5 ${
                         isActive
                           ? "text-white"
@@ -186,7 +194,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
         {/* Footer Actions */}
         <div className="p-3 xl:p-4 border-t border-gray-200 dark:border-dark-500/50 space-y-2">
           <Link
-            href="/patient/dashboard/settings"
+            href="/doctor/dashboard/settings"
             onClick={onToggle}
             className="w-full flex items-center gap-3 xl:gap-4 px-3 xl:px-4 py-2.5 xl:py-3 rounded-xl text-left transition-all duration-300 group text-gray-700 dark:text-dark-700 hover:bg-gray-200 dark:hover:bg-dark-400/50 hover:text-gray-900 dark:hover:text-white"
           >
@@ -198,7 +206,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
                 Settings
               </div>
               <div className="text-10-regular xl:text-12-regular text-gray-500 dark:text-dark-600 hidden sm:block">
-                App Preferences
+                Preferences
               </div>
             </div>
           </Link>
@@ -215,7 +223,7 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
                 Sign Out
               </div>
               <div className="text-10-regular xl:text-12-regular text-red-500 dark:text-red-400/70 hidden sm:block">
-                Exit Patient Portal
+                Exit Doctor Portal
               </div>
             </div>
           </button>
@@ -225,4 +233,4 @@ const PatientSidebar = ({ isOpen = true, onToggle }) => {
   );
 };
 
-export default PatientSidebar;
+export default DoctorSidebar;
