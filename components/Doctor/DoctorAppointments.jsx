@@ -625,7 +625,7 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-dark-300 via-dark-200 to-dark-400">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
         {/* Header */}
         <div className="bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
@@ -750,10 +750,10 @@ const DoctorAppointments = ({ onBack, doctorData }) => {
                   {currentWeek === 0
                     ? "This Week"
                     : currentWeek > 0
-                    ? `${currentWeek} Week${currentWeek > 1 ? "s" : ""} Ahead`
-                    : `${Math.abs(currentWeek)} Week${
-                        Math.abs(currentWeek) > 1 ? "s" : ""
-                      } Ago`}
+                      ? `${currentWeek} Week${currentWeek > 1 ? "s" : ""} Ahead`
+                      : `${Math.abs(currentWeek)} Week${
+                          Math.abs(currentWeek) > 1 ? "s" : ""
+                        } Ago`}
                 </span>
                 <button
                   onClick={() => handleWeekChange("next")}
