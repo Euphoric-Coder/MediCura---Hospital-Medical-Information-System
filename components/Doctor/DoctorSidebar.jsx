@@ -22,6 +22,7 @@ import {
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { ModeToggle } from "../ThemeButton";
+import { usePathname } from "next/navigation";
 
 const DoctorSidebar = ({
   currentPage,
@@ -30,6 +31,8 @@ const DoctorSidebar = ({
   onToggle,
   doctorData,
 }) => {
+  const pathname = usePathname();
+
   const menuItems = [
     {
       id: "dashboard",
@@ -186,54 +189,57 @@ const DoctorSidebar = ({
               Main Menu
             </div>
 
-            {menuItems.map((item) => (
-              <Link
-                href={`${item.href}`}
-                key={item.id}
-                className={`w-full flex items-center gap-3 lg:gap-4 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-left transition-all duration-300 group ${
-                  currentPage === item.id
-                    ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white"
-                }`}
-                onClick={() => onToggle && onToggle()}
-              >
-                <div
-                  className={`w-8 h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                    currentPage === item.id
-                      ? "bg-white/20"
-                      : "bg-slate-200 dark:bg-slate-800 group-hover:bg-slate-300 dark:group-hover:bg-slate-700"
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={onToggle}
+                  className={`w-full flex items-center gap-3 xl:gap-4 px-3 xl:px-4 py-2.5 xl:py-3 rounded-xl text-left transition-all duration-300 group ${
+                    isActive
+                      ? "bg-gradient-to-r from-green-500 to-green-600 dark:from-specialGreen-500 dark:to-specialGreen-600 text-white shadow-lg shadow-green-500/25"
+                      : "text-gray-700 dark:text-dark-700 hover:bg-gray-200 dark:hover:bg-dark-500/50 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <item.icon
-                    className={`w-4 h-4 lg:w-5 lg:h-5 ${
-                      currentPage === item.id
-                        ? "text-white"
-                        : "text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white"
-                    }`}
-                  />
-                </div>
-                <div className="flex-1">
                   <div
-                    className={`text-12-semibold lg:text-14-semibold ${
-                      currentPage === item.id
-                        ? "text-white"
-                        : "group-hover:text-slate-900 dark:group-hover:text-white"
+                    className={`w-8 h-8 xl:w-10 xl:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      isActive
+                        ? "bg-white/20"
+                        : "bg-gray-200 dark:bg-dark-400/50 group-hover:bg-gray-300 dark:group-hover:bg-dark-400/70"
                     }`}
                   >
-                    {item.label}
+                    <item.icon
+                      className={`w-4 h-4 xl:w-5 xl:h-5 ${
+                        isActive
+                          ? "text-white"
+                          : "text-gray-500 dark:text-dark-600 group-hover:text-gray-900 dark:group-hover:text-white"
+                      }`}
+                    />
                   </div>
-                  <div
-                    className={`text-10-regular lg:text-12-regular hidden sm:block ${
-                      currentPage === item.id
-                        ? "text-white/70"
-                        : "text-slate-500 dark:text-slate-400"
-                    }`}
-                  >
-                    {item.description}
+                  <div className="flex-1">
+                    <div
+                      className={`text-12-semibold xl:text-14-semibold ${
+                        isActive
+                          ? "text-white"
+                          : "text-gray-700 dark:text-dark-700 group-hover:text-gray-900 dark:group-hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </div>
+                    <div
+                      className={`text-10-regular xl:text-12-regular hidden sm:block ${
+                        isActive
+                          ? "text-white/70"
+                          : "text-gray-500 dark:text-dark-600 group-hover:text-gray-700 dark:group-hover:text-dark-600"
+                      }`}
+                    >
+                      {item.description}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Quick Actions */}
