@@ -57,6 +57,7 @@ const AvailabilityModal = ({
   };
 
   const handleSave = () => {
+    console.log("timeSlots to save:", timeSlots);
     onSaveAvailability(selectedDate, timeSlots);
     onClose();
   };
