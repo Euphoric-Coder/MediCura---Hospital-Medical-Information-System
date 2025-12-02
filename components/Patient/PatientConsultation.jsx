@@ -344,8 +344,15 @@ const PatientConsultation = ({ onBack, patientData }) => {
     []
   );
   const [loading, setLoading] = useState(true);
+
+  // Collapse state for each consultation
   const [collapsed, setCollapsed] = useState({});
+
+  // Collapse state for all consultations
   const [allCollapsed, setAllCollapsed] = useState(false);
+
+  // State for expanded prescription
+  const [expandedPrescription, setExpandedPrescription] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -771,6 +778,10 @@ const PatientConsultation = ({ onBack, patientData }) => {
     const newMap = {};
     consultationPrescriptions.forEach((c) => (newMap[c.id] = newState));
     setCollapsed(newMap);
+  };
+
+  const togglePrescriptionExpand = (id) => {
+    setExpandedPrescription((prev) => (prev === id ? null : id));
   };
 
   if (loading) {
@@ -1228,6 +1239,16 @@ const PatientConsultation = ({ onBack, patientData }) => {
                         <h4 className="text-[16px] lg:text-[18px] font-bold text-slate-900 dark:text-white mb-4">
                           Prescribed Medications
                         </h4>
+
+                        <button
+                          onClick={() =>
+                            togglePrescriptionExpand(consultation.id)
+                          }
+                        >
+                          {expandedPrescription === consultation.id
+                            ? "Collapse"
+                            : "Expand"}
+                        </button>
 
                         {filteredPrescriptions.map((prescription) => (
                           <div
