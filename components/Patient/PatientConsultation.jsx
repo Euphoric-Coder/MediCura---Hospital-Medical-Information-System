@@ -351,8 +351,13 @@ const PatientConsultation = ({ onBack, patientData }) => {
   // Collapse state for all consultations
   const [allCollapsed, setAllCollapsed] = useState(false);
 
-  // State for expanded prescription
-  const [expandedPrescription, setExpandedPrescription] = useState(null);
+  // Collapse state for each prescription
+  const [collapsedPrescriptions, setCollapsedPrescriptions] = useState({});
+
+  // Collapse state for all prescriptions
+  const [collapsedAllPrescriptions, setCollapsedAllPrescriptions] = useState(
+    {}
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -780,8 +785,29 @@ const PatientConsultation = ({ onBack, patientData }) => {
     setCollapsed(newMap);
   };
 
-  const togglePrescriptionExpand = (id) => {
-    setExpandedPrescription((prev) => (prev === id ? null : id));
+  const togglePrescriptionCollapse = (id) => {
+    setCollapsedPrescriptions((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const toggleCollapseAllPrescriptions = (consultationId) => {
+    const newState = !collapsedAllPrescriptions[consultationId];
+
+    setCollapsedAllPrescriptions((prev) => ({
+      ...prev,
+      [consultationId]: newState,
+    }));
+
+    const newCollapsed = { ...collapsedPrescriptions };
+    consultationPrescriptions
+      .find((c) => c.id === consultationId)
+      .prescriptions.forEach((p) => {
+        newCollapsed[p.id] = newState;
+      });
+
+    setCollapsedPrescriptions(newCollapsed);
   };
 
   if (loading) {
@@ -949,14 +975,23 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
                         <button
                           onClick={() => toggleCollapse(consultation.id)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg border dark:border-slate-700 text-xs font-medium
-             text-emerald-800 dark:text-emerald-200 bg-emerald-50/80 dark:bg-emerald-900/30
-             hover:bg-emerald-100 dark:hover:bg-emerald-800/40 transition-all"
+                          className={`
+    flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium
+    transition-all duration-200
+
+    bg-emerald-50 text-emerald-800 border border-emerald-300
+    dark:bg-emerald-900/40 dark:text-emerald-100 dark:border-emerald-800
+
+    hover:bg-emerald-100 dark:hover:bg-emerald-900/60
+
+    focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2
+    dark:focus:ring-offset-slate-900
+  `}
                         >
                           {collapsed[consultation.id] ? (
-                            <Expand className="w-5 h-5" />
+                            <Expand className="w-5 h-5 text-inherit" />
                           ) : (
-                            <BiCollapse className="w-6 h-6" />
+                            <BiCollapse className="w-6 h-6 text-inherit" />
                           )}
                           {collapsed[consultation.id] ? "Expand" : "Collapse"}
                         </button>
@@ -1236,223 +1271,272 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
                       {/* Prescriptions from this consultation */}
                       <div className="space-y-4">
-                        <h4 className="text-[16px] lg:text-[18px] font-bold text-slate-900 dark:text-white mb-4">
-                          Prescribed Medications
-                        </h4>
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-[16px] lg:text-[18px] font-bold text-slate-900 dark:text-white">
+                            Prescribed Medications
+                          </h4>
 
-                        <button
-                          onClick={() =>
-                            togglePrescriptionExpand(consultation.id)
-                          }
-                        >
-                          {expandedPrescription === consultation.id
-                            ? "Collapse"
-                            : "Expand"}
-                        </button>
+                          <button
+                            onClick={() =>
+                              toggleCollapseAllPrescriptions(consultation.id)
+                            }
+                            className={`
+    flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium
+    transition-all duration-200
 
-                        {filteredPrescriptions.map((prescription) => (
-                          <div
-                            key={prescription.id}
-                            className="
+    bg-emerald-50 text-emerald-800 border border-emerald-300
+    dark:bg-emerald-900/40 dark:text-emerald-100 dark:border-emerald-800
+
+    hover:bg-emerald-100 dark:hover:bg-emerald-900/60
+
+    focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2
+    dark:focus:ring-offset-slate-900
+  `}
+                          >
+                            {collapsedAllPrescriptions[consultation.id] ? (
+                              <>
+                                <Expand className="w-4 h-4 text-inherit" />
+                                Expand All Meds
+                              </>
+                            ) : (
+                              <>
+                                <BiCollapse className="w-5 h-5 text-inherit" />
+                                Collapse All Meds
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {filteredPrescriptions.map((prescription) => {
+                          const isCollapsed =
+                            collapsedPrescriptions[prescription.id];
+
+                          return (
+                            <div
+                              key={prescription.id}
+                              className="
         rounded-2xl p-4 lg:p-6 transition-all duration-300
         bg-white/80 dark:bg-slate-900/60
         border border-slate-200 dark:border-slate-700
         hover:bg-slate-50 dark:hover:bg-slate-800/70
       "
-                          >
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                              <div className="flex items-center gap-4">
-                                <div
-                                  className="
+                            >
+                              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                  <div
+                                    className="
               w-12 h-12 lg:w-16 lg:h-16 rounded-2xl
               flex items-center justify-center shadow-lg
               bg-gradient-to-r from-violet-500 to-violet-600 text-white
             "
-                                >
-                                  <Pill className="w-6 h-6 lg:w-8 lg:h-8" />
-                                </div>
-
-                                <div>
-                                  <h3 className="text-[16px] lg:text-[18px] font-bold text-slate-900 dark:text-white">
-                                    {prescription.medication}
-                                  </h3>
-                                  <p className="text-xs lg:text-sm text-violet-700 dark:text-violet-300">
-                                    {prescription.dosage} -{" "}
-                                    {prescription.frequency}
-                                  </p>
-                                  <p className="text-xs lg:text-sm text-slate-600 dark:text-slate-400">
-                                    Duration: {prescription.duration}
-                                  </p>
-
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <span
-                                      className={[
-                                        "px-3 py-1 rounded-full text-[12px] font-medium border",
-                                        // Base neutral so your getStatusColor can focus on color accents
-                                        "bg-white/70 dark:bg-slate-800/50 border-slate-300 dark:border-slate-700",
-                                        getStatusColor(prescription.status), // keep your color util
-                                        "flex items-center gap-1",
-                                      ].join(" ")}
-                                    >
-                                      {getStatusIcon(prescription.status)}
-                                    </span>
+                                  >
+                                    <Pill className="w-6 h-6 lg:w-8 lg:h-8" />
                                   </div>
 
-                                  {/* Active details */}
-                                  {prescription.status === "active" && (
-                                    <div
-                                      className="
+                                  <div>
+                                    <h3 className="text-[16px] lg:text-[18px] font-bold text-slate-900 dark:text-white">
+                                      {prescription.medication}
+                                    </h3>
+                                    <p className="text-xs lg:text-sm text-violet-700 dark:text-violet-300">
+                                      {prescription.dosage} -{" "}
+                                      {prescription.frequency}
+                                    </p>
+                                    <p className="text-xs lg:text-sm text-slate-600 dark:text-slate-400">
+                                      Duration: {prescription.duration}
+                                    </p>
+
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <span
+                                        className={[
+                                          "px-3 py-1 rounded-full text-[12px] font-medium border",
+                                          // Base neutral so your getStatusColor can focus on color accents
+                                          "bg-white/70 dark:bg-slate-800/50 border-slate-300 dark:border-slate-700",
+                                          getStatusColor(prescription.status), // keep your color util
+                                          "flex items-center gap-1",
+                                        ].join(" ")}
+                                      >
+                                        {getStatusIcon(prescription.status)}
+                                      </span>
+                                    </div>
+
+                                    {/* Active details */}
+                                    {prescription.status === "active" &&
+                                      !isCollapsed && (
+                                        <div
+                                          className="
                   mt-4 rounded-2xl p-4 lg:p-6
                   bg-violet-50/70 dark:bg-violet-900/20
                   border border-violet-200 dark:border-violet-700
                 "
-                                    >
-                                      <h4 className="text-sm lg:text-base font-semibold text-violet-700 dark:text-violet-300 mb-4">
-                                        Prescription Details
-                                      </h4>
+                                        >
+                                          <h4 className="text-sm lg:text-base font-semibold text-violet-700 dark:text-violet-300 mb-4">
+                                            Prescription Details
+                                          </h4>
 
-                                      <div
-                                        className="
+                                          <div
+                                            className="
                     grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4
                     text-xs lg:text-sm text-slate-600 dark:text-slate-300
                   "
-                                      >
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-900 dark:text-white">
-                                            Cost
-                                          </span>
-                                          <span className="text-violet-700 dark:text-violet-300">
-                                            ₹{prescription.cost || "N/A"}
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-900 dark:text-white">
-                                            Dispensed Duration
-                                          </span>
-                                          <span className="text-violet-700 dark:text-violet-300">
-                                            {prescription.dispensedDuration ||
-                                              "N/A"}
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-900 dark:text-white">
-                                            Next Refill Date
-                                          </span>
-                                          <span className="text-violet-700 dark:text-violet-300">
-                                            {prescription.nextRefillDate ||
-                                              "N/A"}
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-900 dark:text-white">
-                                            Last Dispensed
-                                          </span>
-                                          <span className="text-violet-700 dark:text-violet-300">
-                                            {prescription.lastDispensedDate ||
-                                              "N/A"}
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                          <span className="text-slate-900 dark:text-white">
-                                            Refills Remaining
-                                          </span>
-                                          <span
-                                            className={
-                                              prescription.refillsRemaining ===
-                                              0
-                                                ? "text-rose-600 dark:text-rose-400 font-semibold"
-                                                : "text-violet-700 dark:text-violet-300"
-                                            }
                                           >
-                                            {prescription.refillsRemaining ?? 0}
-                                          </span>
+                                            <div className="flex flex-col">
+                                              <span className="text-slate-900 dark:text-white">
+                                                Cost
+                                              </span>
+                                              <span className="text-violet-700 dark:text-violet-300">
+                                                ₹{prescription.cost || "N/A"}
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                              <span className="text-slate-900 dark:text-white">
+                                                Dispensed Duration
+                                              </span>
+                                              <span className="text-violet-700 dark:text-violet-300">
+                                                {prescription.dispensedDuration ||
+                                                  "N/A"}
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                              <span className="text-slate-900 dark:text-white">
+                                                Next Refill Date
+                                              </span>
+                                              <span className="text-violet-700 dark:text-violet-300">
+                                                {prescription.nextRefillDate ||
+                                                  "N/A"}
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                              <span className="text-slate-900 dark:text-white">
+                                                Last Dispensed
+                                              </span>
+                                              <span className="text-violet-700 dark:text-violet-300">
+                                                {prescription.lastDispensedDate ||
+                                                  "N/A"}
+                                              </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                              <span className="text-slate-900 dark:text-white">
+                                                Refills Remaining
+                                              </span>
+                                              <span
+                                                className={
+                                                  prescription.refillsRemaining ===
+                                                  0
+                                                    ? "text-rose-600 dark:text-rose-400 font-semibold"
+                                                    : "text-violet-700 dark:text-violet-300"
+                                                }
+                                              >
+                                                {prescription.refillsRemaining ??
+                                                  0}
+                                              </span>
+                                            </div>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </div>
-                                  )}
+                                      )}
 
-                                  {/* Pending */}
-                                  {prescription.status === "pending" && (
-                                    <div
-                                      className="
+                                    {/* Pending */}
+                                    {prescription.status === "pending" &&
+                                      !isCollapsed && (
+                                        <div
+                                          className="
                   mt-3 rounded-xl p-3
                   bg-amber-50/80 dark:bg-amber-900/20
                   border border-amber-200 dark:border-amber-700
                   text-xs lg:text-sm text-amber-800 dark:text-amber-300
                 "
-                                    >
-                                      <p>
-                                        <span className="font-medium">
-                                          Pending Reason:
-                                        </span>{" "}
-                                        {prescription.pharmacistNotes ||
-                                          "No reason provided"}
-                                      </p>
-                                    </div>
-                                  )}
+                                        >
+                                          <p>
+                                            <span className="font-medium">
+                                              Pending Reason:
+                                            </span>{" "}
+                                            {prescription.pharmacistNotes ||
+                                              "No reason provided"}
+                                          </p>
+                                        </div>
+                                      )}
 
-                                  {/* Advised Discontinued */}
-                                  {prescription.status ===
-                                    "advised-discontinued" && (
-                                    <div
-                                      className="
+                                    {/* Advised Discontinued */}
+                                    {prescription.status ===
+                                      "advised-discontinued" &&
+                                      !isCollapsed && (
+                                        <div
+                                          className="
                   mt-3 rounded-xl p-3
                   bg-rose-50/80 dark:bg-rose-900/20
                   border border-rose-200 dark:border-rose-700
                   text-xs lg:text-sm text-rose-800 dark:text-rose-300
                 "
-                                    >
-                                      <p>
-                                        <span className="font-medium">
-                                          Discontinuation Advise Reason:
-                                        </span>{" "}
-                                        {prescription.pharmacistNotes ||
-                                          "No reason provided"}
-                                      </p>
-                                    </div>
-                                  )}
+                                        >
+                                          <p>
+                                            <span className="font-medium">
+                                              Discontinuation Advise Reason:
+                                            </span>{" "}
+                                            {prescription.pharmacistNotes ||
+                                              "No reason provided"}
+                                          </p>
+                                        </div>
+                                      )}
+                                  </div>
                                 </div>
-                              </div>
 
-                              {/* Actions */}
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() =>
-                                    handleViewDetails(prescription)
-                                  }
-                                  className="
+                                {/* Actions */}
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() =>
+                                      togglePrescriptionCollapse(
+                                        prescription.id
+                                      )
+                                    }
+                                    className="p-2 lg:p-3 rounded-xl text-[12px] lg:text-[14px] font-medium
+              bg-gradient-to-r from-violet-600 to-violet-700
+              hover:from-violet-700 hover:to-violet-800
+              text-white transition-all duration-300
+              shadow-lg hover:shadow-violet-500/25"
+                                  >
+                                    {isCollapsed ? (
+                                      <Expand />
+                                    ) : (
+                                      <BiCollapse className="size-7" />
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleViewDetails(prescription)
+                                    }
+                                    className="
               p-2 lg:p-3 rounded-xl text-[12px] lg:text-[14px] font-medium
               bg-gradient-to-r from-sky-600 to-sky-700
               hover:from-sky-700 hover:to-sky-800
               text-white transition-all duration-300
               shadow-lg hover:shadow-sky-500/25
             "
-                                >
-                                  <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
-                                </button>
+                                  >
+                                    <Eye className="w-4 h-4 lg:w-5 lg:h-5" />
+                                  </button>
 
-                                {/* Request Refill */}
-                                {(() => {
-                                  const todayIST =
-                                    new Date().toLocaleDateString("en-CA", {
-                                      timeZone: "Asia/Kolkata",
-                                    });
+                                  {/* Request Refill */}
+                                  {(() => {
+                                    const todayIST =
+                                      new Date().toLocaleDateString("en-CA", {
+                                        timeZone: "Asia/Kolkata",
+                                      });
 
-                                  if (
-                                    prescription.refillsRemaining > 0 &&
-                                    prescription.nextRefillDate === todayIST &&
-                                    prescription.status !== "request-refill"
-                                  ) {
-                                    return (
-                                      <div className="flex justify-end">
-                                        <button
-                                          onClick={() =>
-                                            updatePrescriptionStatus(
-                                              prescription.id,
-                                              "request-refill"
-                                            )
-                                          }
-                                          className="
+                                    if (
+                                      prescription.refillsRemaining > 0 &&
+                                      prescription.nextRefillDate ===
+                                        todayIST &&
+                                      prescription.status !== "request-refill"
+                                    ) {
+                                      return (
+                                        <div className="flex justify-end">
+                                          <button
+                                            onClick={() =>
+                                              updatePrescriptionStatus(
+                                                prescription.id,
+                                                "request-refill"
+                                              )
+                                            }
+                                            className="
                       px-4 py-2 lg:px-6 lg:py-3 rounded-xl text-[12px] lg:text-[14px] font-medium
                       bg-gradient-to-r from-sky-600 to-sky-700
                       hover:from-sky-700 hover:to-sky-800
@@ -1460,76 +1544,77 @@ const PatientConsultation = ({ onBack, patientData }) => {
                       shadow-lg hover:shadow-sky-500/25
                       flex items-center gap-2
                     "
-                                        >
-                                          <RefreshCw className="w-4 h-4" />
-                                          Request Refill
-                                        </button>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                })()}
+                                          >
+                                            <RefreshCw className="w-4 h-4" />
+                                            Request Refill
+                                          </button>
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
 
-                                {/* Recommended */}
-                                {prescription.status === "recommended" && (
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      onClick={() =>
-                                        orderMedicine(
-                                          prescription.id,
-                                          prescription.medication
-                                        )
-                                      }
-                                      className="
+                                  {/* Recommended */}
+                                  {prescription.status === "recommended" && (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        onClick={() =>
+                                          orderMedicine(
+                                            prescription.id,
+                                            prescription.medication
+                                          )
+                                        }
+                                        className="
                   flex items-center gap-2
                   bg-gradient-to-r from-emerald-500 to-emerald-600
                   hover:from-emerald-600 hover:to-emerald-700
                   text-white px-3 py-2 rounded-lg shadow-md
                   transition-all duration-300
                 "
-                                    >
-                                      <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
-                                      Order Medicine
-                                    </Button>
+                                      >
+                                        <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5" />
+                                        Order Medicine
+                                      </Button>
 
-                                    <Button
-                                      onClick={() =>
-                                        requestCancellation(prescription.id)
-                                      }
-                                      className="
+                                      <Button
+                                        onClick={() =>
+                                          requestCancellation(prescription.id)
+                                        }
+                                        className="
                   flex items-center gap-2
                   bg-gradient-to-r from-rose-500 to-rose-600
                   hover:from-rose-600 hover:to-rose-700
                   text-white px-3 py-2 rounded-lg shadow-md
                   transition-all duration-300
                 "
-                                    >
-                                      <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
-                                      Cancel Medicine
-                                    </Button>
-                                  </div>
-                                )}
+                                      >
+                                        <CircleX className="w-4 h-4 lg:w-5 lg:h-5" />
+                                        Cancel Medicine
+                                      </Button>
+                                    </div>
+                                  )}
 
-                                {/* Active quick actions (example: download) */}
-                                {prescription.status === "active" && (
-                                  <div className="flex items-center gap-2 lg:gap-3">
-                                    <button
-                                      className="
+                                  {/* Active quick actions (example: download) */}
+                                  {prescription.status === "active" && (
+                                    <div className="flex items-center gap-2 lg:gap-3">
+                                      <button
+                                        className="
                   p-2 lg:p-3 rounded-xl
                   bg-gradient-to-r from-emerald-500 to-emerald-600
                   hover:from-emerald-600 hover:to-emerald-700
                   text-white transition-all duration-300
                   shadow-lg hover:shadow-emerald-500/25
                 "
-                                    >
-                                      <Download className="w-4 h-4 lg:w-5 lg:h-5" />
-                                    </button>
-                                  </div>
-                                )}
+                                      >
+                                        <Download className="w-4 h-4 lg:w-5 lg:h-5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {/* No Results */}
