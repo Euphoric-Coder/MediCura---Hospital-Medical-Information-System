@@ -137,7 +137,7 @@ const BillingHistory = ({ onBack }) => {
     <>
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
         {/* Header */}
-        <div className="bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-10">
+        <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-700">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -212,7 +212,7 @@ const BillingHistory = ({ onBack }) => {
           </div>
 
           {/* Filters */}
-          <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 mb-8">
+          <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm mb-8">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
@@ -224,7 +224,7 @@ const BillingHistory = ({ onBack }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by bill ID, doctor, or department..."
-                  className="shad-input pl-10 w-full text-white"
+                  className="w-full pl-10 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5"
                 />
               </div>
 
@@ -232,7 +232,7 @@ const BillingHistory = ({ onBack }) => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="shad-select-trigger text-white"
+                className="w-full md:w-64 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5 px-3"
               >
                 <option value="all">All Status</option>
                 <option value="paid">Paid</option>
@@ -255,7 +255,12 @@ const BillingHistory = ({ onBack }) => {
               {filteredBills.map((bill) => (
                 <div
                   key={bill.id}
-                  className="bg-gradient-to-r from-dark-300/50 to-dark-400/30 backdrop-blur-sm border border-dark-500/50 rounded-2xl p-6 hover:border-dark-500/80 transition-all duration-300"
+                  className="group relative transition-all duration-300
+            rounded-2xl p-4 lg:p-6 backdrop-blur
+            border
+            bg-white/80 border-slate-200 hover:border-emerald-500/60
+            shadow-sm hover:shadow-md
+            dark:bg-slate-800/70 dark:border-slate-700 dark:hover:border-emerald-400/50"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
