@@ -1,112 +1,179 @@
-import React, { useState } from 'react';
-import { Plus, Receipt, Search, Download, Eye, Calendar, DollarSign, CreditCard, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Plus,
+  Receipt,
+  Search,
+  Download,
+  Eye,
+  Calendar,
+  DollarSign,
+  CreditCard,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  ChevronDown,
+  Check,
+} from "lucide-react";
 
 const BillingHistory = ({ onBack }) => {
   const [bills] = useState([
     {
-      id: 'INV-2024-001',
-      date: '2024-01-15',
-      dueDate: '2024-02-15',
+      id: "INV-2024-001",
+      date: "2024-01-15",
+      dueDate: "2024-02-15",
       items: [
-        { description: 'General Consultation', quantity: 1, unitPrice: 150.00, total: 150.00 },
-        { description: 'Blood Test - Complete Panel', quantity: 1, unitPrice: 85.00, total: 85.00 },
-        { description: 'Prescription - Lisinopril', quantity: 30, unitPrice: 2.50, total: 75.00 }
+        {
+          description: "General Consultation",
+          quantity: 1,
+          unitPrice: 150.0,
+          total: 150.0,
+        },
+        {
+          description: "Blood Test - Complete Panel",
+          quantity: 1,
+          unitPrice: 85.0,
+          total: 85.0,
+        },
+        {
+          description: "Prescription - Lisinopril",
+          quantity: 30,
+          unitPrice: 2.5,
+          total: 75.0,
+        },
       ],
-      subtotal: 310.00,
-      tax: 24.80,
-      discount: 15.00,
-      total: 319.80,
-      status: 'paid',
-      paymentMethod: 'Credit Card',
-      paidDate: '2024-01-16',
-      doctor: 'Dr. Sarah Safari',
-      department: 'General Medicine'
+      subtotal: 310.0,
+      tax: 24.8,
+      discount: 15.0,
+      total: 319.8,
+      status: "paid",
+      paymentMethod: "Credit Card",
+      paidDate: "2024-01-16",
+      doctor: "Dr. Sarah Safari",
+      department: "General Medicine",
     },
     {
-      id: 'INV-2024-002',
-      date: '2024-01-10',
-      dueDate: '2024-02-10',
+      id: "INV-2024-002",
+      date: "2024-01-10",
+      dueDate: "2024-02-10",
       items: [
-        { description: 'Cardiology Consultation', quantity: 1, unitPrice: 200.00, total: 200.00 },
-        { description: 'ECG Test', quantity: 1, unitPrice: 120.00, total: 120.00 }
+        {
+          description: "Cardiology Consultation",
+          quantity: 1,
+          unitPrice: 200.0,
+          total: 200.0,
+        },
+        {
+          description: "ECG Test",
+          quantity: 1,
+          unitPrice: 120.0,
+          total: 120.0,
+        },
       ],
-      subtotal: 320.00,
-      tax: 25.60,
+      subtotal: 320.0,
+      tax: 25.6,
       discount: 0,
-      total: 345.60,
-      status: 'paid',
-      paymentMethod: 'Insurance',
-      paidDate: '2024-01-12',
-      doctor: 'Dr. Ava Williams',
-      department: 'Cardiology'
+      total: 345.6,
+      status: "paid",
+      paymentMethod: "Insurance",
+      paidDate: "2024-01-12",
+      doctor: "Dr. Ava Williams",
+      department: "Cardiology",
     },
     {
-      id: 'INV-2024-003',
-      date: '2024-01-20',
-      dueDate: '2024-02-20',
+      id: "INV-2024-003",
+      date: "2024-01-20",
+      dueDate: "2024-02-20",
       items: [
-        { description: 'Emergency Room Visit', quantity: 1, unitPrice: 500.00, total: 500.00 },
-        { description: 'X-Ray Chest', quantity: 1, unitPrice: 150.00, total: 150.00 },
-        { description: 'Medication - Antibiotics', quantity: 7, unitPrice: 8.50, total: 59.50 }
+        {
+          description: "Emergency Room Visit",
+          quantity: 1,
+          unitPrice: 500.0,
+          total: 500.0,
+        },
+        {
+          description: "X-Ray Chest",
+          quantity: 1,
+          unitPrice: 150.0,
+          total: 150.0,
+        },
+        {
+          description: "Medication - Antibiotics",
+          quantity: 7,
+          unitPrice: 8.5,
+          total: 59.5,
+        },
       ],
-      subtotal: 709.50,
+      subtotal: 709.5,
       tax: 56.76,
-      discount: 50.00,
+      discount: 50.0,
       total: 716.26,
-      status: 'pending',
-      doctor: 'Dr. Adam Smith',
-      department: 'Emergency'
+      status: "pending",
+      doctor: "Dr. Adam Smith",
+      department: "Emergency",
     },
     {
-      id: 'INV-2023-045',
-      date: '2023-12-15',
-      dueDate: '2024-01-15',
+      id: "INV-2023-045",
+      date: "2023-12-15",
+      dueDate: "2024-01-15",
       items: [
-        { description: 'Annual Physical Exam', quantity: 1, unitPrice: 180.00, total: 180.00 },
-        { description: 'Vaccination - Flu Shot', quantity: 1, unitPrice: 25.00, total: 25.00 }
+        {
+          description: "Annual Physical Exam",
+          quantity: 1,
+          unitPrice: 180.0,
+          total: 180.0,
+        },
+        {
+          description: "Vaccination - Flu Shot",
+          quantity: 1,
+          unitPrice: 25.0,
+          total: 25.0,
+        },
       ],
-      subtotal: 205.00,
-      tax: 16.40,
-      discount: 10.00,
-      total: 211.40,
-      status: 'overdue',
-      doctor: 'Dr. Sarah Safari',
-      department: 'General Medicine'
-    }
+      subtotal: 205.0,
+      tax: 16.4,
+      discount: 10.0,
+      total: 211.4,
+      status: "overdue",
+      doctor: "Dr. Sarah Safari",
+      department: "General Medicine",
+    },
   ]);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedBill, setSelectedBill] = useState(null);
   const [showBillDetails, setShowBillDetails] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-  const filteredBills = bills.filter(bill => {
-    const matchesSearch = bill.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         bill.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         bill.department.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || bill.status === statusFilter;
-    
+  const filteredBills = bills.filter((bill) => {
+    const matchesSearch =
+      bill.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bill.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bill.department.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || bill.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'paid':
+      case "paid":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
             <CheckCircle className="w-3 h-3" />
             <span className="text-12-medium text-green-400">Paid</span>
           </div>
         );
-      case 'pending':
+      case "pending":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
             <Clock className="w-3 h-3" />
             <span className="text-12-medium text-yellow-400">Pending</span>
           </div>
         );
-      case 'overdue':
+      case "overdue":
         return (
           <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full">
             <AlertTriangle className="w-3 h-3" />
@@ -128,10 +195,12 @@ const BillingHistory = ({ onBack }) => {
     console.log(`Downloading PDF for bill ${billId}`);
   };
 
-  const paidCount = bills.filter(b => b.status === 'paid').length;
-  const pendingCount = bills.filter(b => b.status === 'pending').length;
-  const overdueCount = bills.filter(b => b.status === 'overdue').length;
-  const totalAmount = bills.filter(b => b.status === 'paid').reduce((sum, bill) => sum + bill.total, 0);
+  const paidCount = bills.filter((b) => b.status === "paid").length;
+  const pendingCount = bills.filter((b) => b.status === "pending").length;
+  const overdueCount = bills.filter((b) => b.status === "overdue").length;
+  const totalAmount = bills
+    .filter((b) => b.status === "paid")
+    .reduce((sum, bill) => sum + bill.total, 0);
 
   return (
     <>
@@ -212,7 +281,7 @@ const BillingHistory = ({ onBack }) => {
           </div>
 
           {/* Filters */}
-          <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm mb-8">
+          <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm mb-8">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
@@ -224,21 +293,76 @@ const BillingHistory = ({ onBack }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by bill ID, doctor, or department..."
-                  className="w-full pl-10 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5"
+                  className="w-full pl-10 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-colors py-2.5"
                 />
               </div>
 
               {/* Status Filter */}
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full md:w-64 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5 px-3"
-              >
-                <option value="all">All Status</option>
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-                <option value="overdue">Overdue</option>
-              </select>
+              <div className="relative w-full md:w-64">
+                <button
+                  type="button"
+                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                  onBlur={() =>
+                    setTimeout(() => {
+                      setShowStatusDropdown(false);
+                    }, 150)
+                  }
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl
+               bg-white/70 dark:bg-slate-800/70
+               border border-slate-300 dark:border-slate-700
+               text-slate-900 dark:text-slate-100
+               hover:border-blue-500 focus:border-blue-500
+               focus:outline-none focus:ring-2 focus:ring-blue-500/60
+               transition-all"
+                >
+                  <span className="text-sm">
+                    {statusFilter.charAt(0).toUpperCase() +
+                      statusFilter.slice(1)}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform text-slate-600 dark:text-slate-300 ${
+                      showStatusDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showStatusDropdown && (
+                  <div
+                    className="absolute left-0 right-0 mt-2 rounded-xl shadow-lg z-20 overflow-hidden
+                    bg-white/90 dark:bg-slate-900/90
+                    border border-slate-300 dark:border-slate-700"
+                  >
+                    <div className="max-h-60 z-30 overflow-y-auto py-1">
+                      {[
+                        { label: "All Status", value: "all" },
+                        { label: "Paid", value: "paid" },
+                        { label: "Pending", value: "pending" },
+                        { label: "Overdue", value: "overdue" },
+                      ].map((item) => (
+                        <button
+                          key={item.value}
+                          type="button"
+                          onClick={() => {
+                            setStatusFilter(item.value);
+                            setShowStatusDropdown(false);
+                          }}
+                          className={`
+              w-full px-4 py-3 flex items-center justify-between text-sm
+              transition-colors text-slate-900 dark:text-slate-100
+              hover:bg-blue-50 dark:hover:bg-slate-800/80
+              ${statusFilter === item.value ? "bg-blue-100/60 dark:bg-blue-900/30" : ""}
+            `}
+                        >
+                          {item.label}
+                          {statusFilter === item.value && (
+                            <Check className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

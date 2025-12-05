@@ -421,6 +421,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [showSpecialtyDropdown, setShowSpecialtyDropdown] = useState(false);
 
   useEffect(() => {
     fetchDoctors();
@@ -1177,7 +1178,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             {step === "select-doctor" && (
               <>
                 {/* Filters */}
-                <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm ">
+                <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm ">
                   <div className="flex flex-col md:flex-row gap-4">
                     {/* Search */}
                     <div className="flex-1 relative">
@@ -1190,28 +1191,83 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search doctors by name or speciality..."
-                        className="w-full pl-10 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5"
+                        className="w-full pl-10 rounded-3xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500/60 focus:border-green-500 transition-colors py-2.5"
                       />
                     </div>
 
                     {/* Specialty filter */}
-                    <select
-                      value={specialtyFilter}
-                      onChange={(e) => setSpecialtyFilter(e.target.value)}
-                      className="w-full md:w-64 rounded-xl bg-white/70 dark:bg-slate-800/70 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500 transition-colors py-2.5 px-3"
-                    >
-                      {specialties.map((speciality) => (
-                        <option
-                          key={speciality}
-                          value={speciality}
-                          className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                        >
-                          {speciality === "all"
+                    <div className="relative w-full md:w-64">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowSpecialtyDropdown(!showSpecialtyDropdown)
+                        }
+                        onBlur={() =>
+                          setTimeout(() => {
+                            setShowSpecialtyDropdown(false);
+                          }, 150)
+                        }
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl
+               bg-white/70 dark:bg-slate-800/70
+               border border-slate-300 dark:border-slate-700
+               text-slate-900 dark:text-slate-100
+               hover:border-blue-500 focus:border-blue-500
+               focus:outline-none focus:ring-2 focus:ring-blue-500/60
+               transition-all"
+                      >
+                        <span className="text-sm capitalize">
+                          {specialtyFilter === "all"
                             ? "All Specialties"
-                            : speciality}
-                        </option>
-                      ))}
-                    </select>
+                            : specialtyFilter.replace("_", " ")}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform text-slate-600 dark:text-slate-300 ${
+                            showSpecialtyDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {showSpecialtyDropdown && (
+                        <div
+                          className="absolute left-0 right-0 mt-2 rounded-xl shadow-xl z-20 overflow-hidden
+                 bg-white/95 dark:bg-slate-900/90
+                 border border-slate-300 dark:border-slate-700
+                 backdrop-blur-md"
+                        >
+                          <div className="max-h-60 overflow-y-auto py-1">
+                            {specialties.map((speciality) => (
+                              <button
+                                key={speciality}
+                                type="button"
+                                onClick={() => {
+                                  setSpecialtyFilter(speciality);
+                                  setShowSpecialtyDropdown(false);
+                                }}
+                                className={`
+              w-full px-4 py-3 flex items-center justify-between text-sm capitalize
+              text-slate-900 dark:text-slate-100
+              transition-colors
+              hover:bg-blue-50 dark:hover:bg-slate-800/80
+              ${
+                specialtyFilter === speciality
+                  ? "bg-blue-100/60 dark:bg-blue-900/30"
+                  : ""
+              }
+            `}
+                              >
+                                {speciality === "all"
+                                  ? "All Specialties"
+                                  : speciality}
+
+                                {specialtyFilter === speciality && (
+                                  <Check className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
