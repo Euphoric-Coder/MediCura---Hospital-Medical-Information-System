@@ -311,8 +311,8 @@ const BillingHistory = ({ onBack }) => {
                bg-white/70 dark:bg-slate-800/70
                border border-slate-300 dark:border-slate-700
                text-slate-900 dark:text-slate-100
-               hover:border-blue-500 focus:border-blue-500
-               focus:outline-none focus:ring-2 focus:ring-blue-500/60
+               hover:border-green-500 focus:border-green-500
+               focus:outline-none focus:ring-2 focus:ring-green-500/60
                transition-all"
                 >
                   <span className="text-sm">
@@ -355,7 +355,7 @@ const BillingHistory = ({ onBack }) => {
                         >
                           {item.label}
                           {statusFilter === item.value && (
-                            <Check className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                            <Check className="w-5 h-5 text-green-500 dark:text-green-400" />
                           )}
                         </button>
                       ))}

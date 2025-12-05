@@ -1178,7 +1178,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             {step === "select-doctor" && (
               <>
                 {/* Filters */}
-                <div className="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-3xl p-4 lg:p-6 shadow-sm ">
+                <div className="bg-white/80 dark:bg-slate-900/60 border-2 border-green-200 dark:border-green-700 rounded-3xl p-4 lg:p-6 shadow-sm ">
                   <div className="flex flex-col md:flex-row gap-4">
                     {/* Search */}
                     <div className="flex-1 relative">
@@ -1211,8 +1211,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                bg-white/70 dark:bg-slate-800/70
                border border-slate-300 dark:border-slate-700
                text-slate-900 dark:text-slate-100
-               hover:border-blue-500 focus:border-blue-500
-               focus:outline-none focus:ring-2 focus:ring-blue-500/60
+               hover:border-green-500 focus:border-green-500
+               focus:outline-none focus:ring-2 focus:ring-green-500/60
                transition-all"
                       >
                         <span className="text-sm capitalize">
@@ -1260,7 +1260,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                   : speciality}
 
                                 {specialtyFilter === speciality && (
-                                  <Check className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                                  <Check className="w-5 h-5 text-green-500 dark:text-green-400" />
                                 )}
                               </button>
                             ))}
@@ -1439,27 +1439,60 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             {step === "select-time" && selectedDoctor && (
               <>
                 {/* Selected Doctor Info */}
-                <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
+                <div
+                  className="
+    border border-green-400 rounded-3xl p-4 lg:p-6 shadow-sm bg-gradient-to-r from-green-100 to-white dark:bg-gradient-to-r dark:from-green-500/10 dark:to-green-600/5 dark:border-green-500/30 dark:shadow-none
+  "
+                >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <img
                       src={selectedDoctor.avatar}
                       alt={selectedDoctor.name}
                       className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                     />
+
                     <div className="flex-1">
-                      <h3 className="text-16-bold lg:text-20-bold text-white">
+                      <h3
+                        className="
+          text-16-bold lg:text-20-bold text-slate-900 
+          dark:text-white
+        "
+                      >
                         {selectedDoctor.name}
                       </h3>
-                      <p className="text-14-regular text-green-400">
+
+                      <p
+                        className="
+          text-14-regular text-green-700 
+          dark:text-green-400
+        "
+                      >
                         {selectedDoctor.speciality}
                       </p>
-                      <p className="text-12-regular lg:text-14-regular text-dark-700 hidden sm:block">
+
+                      <p
+                        className="
+          text-12-regular lg:text-14-regular hidden sm:block 
+          text-slate-600 
+          dark:text-dark-700
+        "
+                      >
                         {selectedDoctor.location}
                       </p>
                     </div>
+
                     <button
                       onClick={() => setStep("select-doctor")}
-                      className="text-12-medium lg:text-14-medium text-green-400 hover:text-green-300 px-3 lg:px-4 py-2 border border-green-500/30 rounded-lg bg-green-500/10 hover:bg-green-500/20 transition-colors"
+                      className="
+        text-green-700 border border-green-400/50 
+        bg-green-100 hover:bg-green-200
+        dark:text-green-300 dark:bg-green-500/10
+        dark:border-green-500/40 dark:hover:bg-green-500/20
+
+        transition-colors
+        text-12-medium lg:text-14-medium rounded-lg
+        px-3 lg:px-4 py-2
+      "
                     >
                       <span className="hidden sm:inline">Change Doctor</span>
                       <span className="sm:hidden">Change</span>
@@ -1468,7 +1501,15 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 </div>
 
                 {/* Calendar */}
-                <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
+                <div
+                  className="
+    bg-gradient-to-r from-white to-slate-50
+    border border-slate-200
+    rounded-3xl p-6 lg:p-8 shadow-sm
+    dark:bg-gradient-to-r dark:from-dark-400/30 dark:to-dark-300/30
+    dark:border-dark-500/50 dark:shadow-none
+  "
+                >
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-20-bold lg:text-24-bold text-white">
                       Select Date & Time
