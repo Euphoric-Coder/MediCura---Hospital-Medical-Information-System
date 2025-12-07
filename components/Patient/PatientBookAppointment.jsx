@@ -1510,32 +1510,42 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
     dark:border-dark-500/50 dark:shadow-none
   "
                 >
-                  <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-20-bold lg:text-24-bold text-white">
-                      Select Date & Time
-                    </h2>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => handleWeekChange("prev", selectedDoctor)}
-                        className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors disabled:opacity-50"
-                        disabled={currentWeek === 0}
-                      >
-                        <ChevronLeft className="w-5 h-5 text-white" />
-                      </button>
-                      <span className="text-14-medium lg:text-16-medium text-white px-2 lg:px-4 text-center">
-                        {currentWeek === 0
-                          ? "This Week"
-                          : `${currentWeek} Week${
-                              currentWeek > 1 ? "s" : ""
-                            } Ahead`}
-                      </span>
-                      <button
-                        onClick={() => handleWeekChange("next", selectedDoctor)}
-                        className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5 text-white" />
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-end gap-4 mb-6">
+                    {/* Prev Button */}
+                    <button
+                      onClick={() => handleWeekChange("prev", selectedDoctor)}
+                      disabled={currentWeek === 0}
+                      className="
+          p-2 rounded-xl border transition-colors disabled:opacity-50
+          bg-slate-100 hover:bg-slate-200 border-slate-300
+          dark:bg-dark-400 dark:hover:bg-dark-300 dark:border-dark-500
+        "
+                    >
+                      <ChevronLeft className="w-5 h-5 text-slate-900 dark:text-white" />
+                    </button>
+
+                    <span
+                      className="
+          text-14-medium lg:text-16-medium text-slate-800 
+          dark:text-white
+        "
+                    >
+                      {currentWeek === 0
+                        ? "This Week"
+                        : `${currentWeek} Week${currentWeek > 1 ? "s" : ""} Ahead`}
+                    </span>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={() => handleWeekChange("next", selectedDoctor)}
+                      className="
+          p-2 rounded-xl border transition-colors
+          bg-slate-100 hover:bg-slate-200 border-slate-300
+          dark:bg-dark-400 dark:hover:bg-dark-300 dark:border-dark-500
+        "
+                    >
+                      <ChevronRight className="w-5 h-5 text-slate-900 dark:text-white" />
+                    </button>
                   </div>
 
                   {/* Calendar Grid */}
@@ -1543,7 +1553,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                     {weekSchedule.map((day, dayIndex) => (
                       <div
                         key={dayIndex}
-                        className="bg-gray-50 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
+                        className="bg-gray-100 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
                  rounded-xl lg:rounded-2xl p-2 lg:p-4 transition-colors"
                       >
                         {/* Header */}
