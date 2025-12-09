@@ -1516,7 +1516,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                       onClick={() => handleWeekChange("prev", selectedDoctor)}
                       disabled={currentWeek === 0}
                       className="
-          p-2 rounded-xl border transition-colors disabled:opacity-50
+          p-2 rounded-xl border transition-colors disabled:opacity-0
           bg-slate-100 hover:bg-slate-200 border-slate-300
           dark:bg-dark-400 dark:hover:bg-dark-300 dark:border-dark-500
         "
@@ -1553,7 +1553,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                     {weekSchedule.map((day, dayIndex) => (
                       <div
                         key={dayIndex}
-                        className="bg-gray-100 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
+                        className="bg-gray-50 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
                  rounded-xl lg:rounded-2xl p-2 lg:p-4 transition-colors"
                       >
                         {/* Header */}
@@ -1624,22 +1624,49 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
             {step === "confirm" && selectedDoctor && (
               <>
                 {/* Appointment Summary */}
-                <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/5 backdrop-blur-xl border border-blue-500/20 rounded-3xl p-6 lg:p-8">
+                <div
+                  className="
+    bg-gradient-to-r from-blue-50 to-blue-100/50
+    border border-blue-200 shadow-sm
+    dark:bg-gradient-to-r dark:from-blue-500/10 dark:to-blue-600/5
+    dark:border-blue-500/20
+    backdrop-blur-xl rounded-3xl p-6 lg:p-8
+  "
+                >
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <div
+                      className="
+        w-10 h-10 flex items-center justify-center rounded-xl
+        bg-gradient-to-r from-blue-500 to-blue-600
+      "
+                    >
                       <Check className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-20-bold lg:text-24-bold text-white">
+
+                    <h2
+                      className="
+        text-20-bold lg:text-24-bold
+        text-slate-900
+        dark:text-white
+      "
+                    >
                       Confirm Appointment
                     </h2>
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Doctor Info */}
-                    <div className="bg-dark-400/50 rounded-2xl p-4 lg:p-6">
-                      <h3 className="text-16-bold lg:text-18-bold text-white mb-4">
+                    <div
+                      className="
+        bg-white border border-slate-200
+        dark:bg-dark-400/50 dark:border-dark-500/50
+        rounded-2xl p-4 lg:p-6 transition-colors
+      "
+                    >
+                      <h3 className="text-16-bold lg:text-18-bold text-slate-900 dark:text-white mb-4">
                         Doctor Information
                       </h3>
+
                       <div className="flex items-center gap-4 mb-4">
                         <img
                           src={selectedDoctor.avatar}
@@ -1647,38 +1674,48 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
                         />
                         <div>
-                          <h4 className="text-14-semibold lg:text-16-semibold text-white">
+                          <h4 className="text-14-semibold lg:text-16-semibold text-slate-900 dark:text-white">
                             {selectedDoctor.name}
                           </h4>
-                          <p className="text-14-regular text-blue-400">
+                          <p className="text-14-regular text-blue-600 dark:text-blue-400">
                             {selectedDoctor.speciality}
                           </p>
+
                           <div className="flex items-center gap-2 mt-1">
                             {renderStars(selectedDoctor.rating)}
-                            <span className="text-12-regular text-white ml-1">
+                            <span className="text-12-regular text-slate-700 dark:text-white ml-1">
                               {selectedDoctor.rating}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="space-y-2 text-12-regular lg:text-14-regular text-dark-700">
-                        <div className="items-center gap-2 hidden sm:flex">
-                          <Phone className="w-4 h-4 text-blue-400" />
+
+                      <div className="space-y-2 text-12-regular lg:text-14-regular">
+                        <div className="items-center gap-2 hidden sm:flex text-slate-700 dark:text-dark-700">
+                          <Phone className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                           <span>{selectedDoctor.phone}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Appointment Details */}
-                    <div className="bg-dark-400/50 rounded-2xl p-4 lg:p-6">
-                      <h3 className="text-16-bold lg:text-18-bold text-white mb-4">
+                    <div
+                      className="
+        bg-white border border-slate-200
+        dark:bg-dark-400/50 dark:border-dark-500/50
+        rounded-2xl p-4 lg:p-6 transition-colors
+      "
+                    >
+                      <h3 className="text-16-bold lg:text-18-bold text-slate-900 dark:text-white mb-4">
                         Appointment Details
                       </h3>
+
                       <div className="space-y-4">
+                        {/* Date */}
                         <div className="flex items-center gap-4">
-                          <Calendar className="w-5 h-5 text-green-400" />
+                          <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
                           <div>
-                            <div className="text-14-semibold lg:text-16-semibold text-white">
+                            <div className="text-14-semibold lg:text-16-semibold text-slate-900 dark:text-white">
                               {new Date(selectedDate).toLocaleDateString(
                                 "en-US",
                                 {
@@ -1689,29 +1726,37 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                 }
                               )}
                             </div>
-                            <div className="text-14-regular text-dark-700">
+                            <div className="text-14-regular text-slate-600 dark:text-dark-700">
                               Date
                             </div>
                           </div>
                         </div>
 
+                        {/* Time */}
                         <div className="flex items-center gap-4">
-                          <Clock className="w-5 h-5 text-purple-400" />
+                          <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                           <div>
-                            <div className="text-14-semibold lg:text-16-semibold text-white">
+                            <div className="text-14-semibold lg:text-16-semibold text-slate-900 dark:text-white">
                               {selectedTime}
                             </div>
-                            <div className="text-14-regular text-dark-700">
+                            <div className="text-14-regular text-slate-600 dark:text-dark-700">
                               Time
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-green-500/20 rounded-lg px-4 py-3">
-                          <div className="text-14-semibold lg:text-16-semibold text-green-400">
+                        {/* Fee */}
+                        <div
+                          className="
+            bg-green-100 text-green-700 border border-green-300
+            dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30
+            rounded-lg px-4 py-3
+          "
+                        >
+                          <div className="text-14-semibold lg:text-16-semibold">
                             Consultation Fee: ₹{selectedDoctor.consultationFee}
                           </div>
-                          <div className="text-12-regular text-green-300">
+                          <div className="text-12-regular dark:text-green-300">
                             Payment due after service
                           </div>
                         </div>
@@ -1721,12 +1766,22 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 </div>
 
                 {/* Appointment Details Form */}
-                <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-6 lg:p-8">
-                  <h2 className="text-20-bold lg:text-24-bold text-white mb-6">
+                <div
+                  className="
+   from-slate-50 to-slate-100/60
+    border border-slate-200 shadow-sm
+    dark:bg-gradient-to-r dark:from-dark-400/30 dark:to-dark-300/30
+    dark:border-dark-500/50
+    backdrop-blur-xl rounded-3xl p-6 lg:p-8
+    relative z-0
+  "
+                >
+                  <h2 className="text-20-bold lg:text-24-bold text-slate-900 dark:text-white mb-6">
                     Appointment Information
                   </h2>
 
                   <div className="space-y-6">
+                    {/* Appointment Type Dropdown */}
                     <div className="mt-6">
                       <label className="shad-input-label block mb-2">
                         Appointment Type
@@ -1739,29 +1794,50 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               !showAppointmentTypeDropdown
                             )
                           }
-                          onBlur={
-                            () =>
-                              setTimeout(() => {
-                                setShowAppointmentTypeDropdown(false);
-                              }, 150) // delay in ms (100–200ms usually works well)
+                          onBlur={() =>
+                            setTimeout(() => {
+                              setShowAppointmentTypeDropdown(false);
+                            }, 150)
                           }
-                          className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+                          className="
+            w-full bg-white border border-slate-300 text-slate-900
+            hover:border-green-500
+            dark:bg-slate-900 dark:border-dark-600 dark:text-white
+            dark:hover:border-green-500
+            rounded-lg px-4 py-3 text-left flex items-center justify-between
+            transition-colors
+          "
                         >
-                          <span className="text-white">{appointmentType}</span>
+                          <span>{appointmentType}</span>
                           <ChevronDown
-                            className={`w-5 h-5 text-dark-600 transition-transform ${
+                            className={`w-5 h-5 text-slate-600 dark:text-dark-600 transition-transform ${
                               showAppointmentTypeDropdown ? "rotate-180" : ""
                             }`}
                           />
                         </button>
 
+                        {/* Dropdown */}
                         {showAppointmentTypeDropdown && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden">
-                            <div className="p-3 border-b border-dark-500">
-                              <span className="text-14-medium text-dark-700">
+                          <div
+                            className="
+              absolute top-full left-0 right-0 mt-2 z-50
+              bg-white border border-slate-300 text-slate-900 shadow-xl
+              dark:bg-slate-900 dark:border-dark-600 dark:text-white
+              rounded-lg overflow-hidden
+            "
+                          >
+                            <div
+                              className="
+                p-3 border-b
+                border-slate-300 text-slate-700
+                dark:border-dark-500 dark:text-dark-700
+              "
+                            >
+                              <span className="text-14-medium">
                                 Select Appointment Type
                               </span>
                             </div>
+
                             <div className="max-h-60 overflow-y-auto">
                               {appointmentTypes.map((type) => (
                                 <button
@@ -1771,13 +1847,16 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                     setAppointmentType(type);
                                     setShowAppointmentTypeDropdown(false);
                                   }}
-                                  className="w-full p-4 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                                  className="
+                    w-full p-4 flex items-center justify-between text-left
+                    hover:bg-slate-100
+                    dark:hover:bg-slate-800
+                    transition-colors
+                  "
                                 >
-                                  <span className="text-16-medium text-white">
-                                    {type}
-                                  </span>
+                                  <span className="text-16-medium">{type}</span>
                                   {appointmentType === type && (
-                                    <Check className="w-5 h-5 text-green-500" />
+                                    <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
                                   )}
                                 </button>
                               ))}
@@ -1787,6 +1866,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                       </div>
                     </div>
 
+                    {/* Reason */}
                     <div>
                       <label className="shad-input-label block mb-2">
                         Reason for appointment *
@@ -1794,13 +1874,16 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                       <textarea
                         value={appointmentReason}
                         onChange={(e) => setAppointmentReason(e.target.value)}
-                        placeholder="Please describe the reason for your visit (e.g., annual check-up, follow-up, specific symptoms)"
-                        className="shad-textArea w-full text-white min-h-[100px] resize-none"
-                        rows={3}
+                        placeholder="Describe reason for visit"
                         required
+                        className="
+          shad-textArea resize-none min-h-[100px] w-full
+          text-slate-900 dark:text-white
+        "
                       />
                     </div>
 
+                    {/* Additional Notes */}
                     <div>
                       <label className="shad-input-label block mb-2">
                         Additional notes (optional)
@@ -1808,9 +1891,11 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                       <textarea
                         value={additionalNotes}
                         onChange={(e) => setAdditionalNotes(e.target.value)}
-                        placeholder="Any additional information you'd like the doctor to know (e.g., preferred appointment time, specific concerns)"
-                        className="shad-textArea w-full text-white min-h-[80px] resize-none"
-                        rows={2}
+                        placeholder="Add any helpful details"
+                        className="
+          shad-textArea resize-none min-h-[80px] w-full
+          text-slate-900 dark:text-white
+        "
                       />
                     </div>
                   </div>
@@ -1835,7 +1920,21 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                       handleConfirmBooking();
                     }}
                     disabled={!appointmentReason.trim()}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 w-full sm:w-auto"
+                    className={`w-full sm:w-auto
+    px-6 lg:px-8 py-3 lg:py-4 rounded-xl
+    text-14-semibold lg:text-16-semibold
+    transition-all duration-300 shadow-lg
+    bg-gradient-to-r from-green-500 to-green-600
+    hover:from-green-600 hover:to-green-700
+    text-white
+    disabled:from-gray-300 disabled:to-gray-400 disabled:text-gray-500
+    dark:from-emerald-500 dark:to-emerald-600
+    dark:hover:from-emerald-600 dark:hover:to-emerald-700
+    dark:text-white
+    dark:disabled:from-dark-600 dark:disabled:to-dark-700 dark:disabled:text-dark-400
+    disabled:cursor-not-allowed
+    hover:shadow-green-500/25 dark:hover:shadow-emerald-500/25
+  `}
                   >
                     Confirm Appointment
                   </button>
@@ -2068,7 +2167,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="mt-6 lg:mt-8 text-12-regular lg:text-16-regular text-dark-600 hover:text-white transition-colors"
+          className="
+    mt-6 lg:mt-8
+    text-12-regular lg:text-16-regular
+    transition-colors
+    text-gray-600 hover:text-gray-900
+    dark:text-dark-600 dark:hover:text-white
+  "
         >
           <span className="hidden sm:inline">← Back to Dashboard</span>
           <span className="sm:hidden">← Back</span>

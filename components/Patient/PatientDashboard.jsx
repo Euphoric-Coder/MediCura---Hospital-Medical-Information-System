@@ -1006,7 +1006,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
           {activeTab === "appointments" && (
             <div
-              className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
+              className="bg-gradient-to-r from-white to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
   backdrop-blur-xl border border-gray-200 dark:border-dark-500/50 
   rounded-3xl p-6 lg:p-8 transition-colors"
             >
@@ -1036,9 +1036,9 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
               <div className="space-y-4">
                 {appointments.length === 0 ? (
                   <div
-                    className="flex flex-col items-center justify-center p-10 rounded-2xl 
-      bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30
-      border border-gray-200 dark:border-dark-500/50 backdrop-blur-sm shadow-sm"
+                    className="flex flex-col items-center justify-center p-10 rounded-3xl 
+      bg-gradient-to-r from-gray-100 to-gray-200 dark:bg-gradient-to-r dark:from-slate-900 dark:to-dark-400/30
+      border-2 border-gray-500 dark:border-dark-600/50 shadow-sm"
                   >
                     <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-500/20 mb-4">
                       <Calendar className="w-7 h-7 text-blue-600 dark:text-blue-400" />
@@ -1055,8 +1055,8 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
                   appointments.map((appointment) => (
                     <div
                       key={appointment.id}
-                      className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-300/50 dark:to-dark-400/30 
-        backdrop-blur-sm border border-gray-200 dark:border-dark-500/50 
+                      className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-slate-900 dark:to-dark-400/30 
+        backdrop-blur-sm border border-gray-500 dark:border-dark-600/50 
         rounded-2xl p-4 lg:p-6 transition-colors"
                     >
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1168,7 +1168,7 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
           {activeTab === "prescriptions" && (
             <div
-              className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
+              className="bg-gradient-to-r from-white to-gray-100 dark:from-dark-400/30 dark:to-dark-300/30 
   backdrop-blur-xl border border-gray-200 dark:border-dark-500/50 
   rounded-3xl p-6 lg:p-8 transition-colors"
             >
