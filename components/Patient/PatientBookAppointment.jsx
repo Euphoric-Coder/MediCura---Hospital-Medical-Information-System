@@ -1033,14 +1033,17 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-100 
+          dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 transition-colors"
+      >
         <div className="flex flex-col items-center">
           {/* Spinner */}
           <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
 
           {/* Text */}
           <p className="text-gray-800 dark:text-white text-lg">
-            Loading your data...
+            Loading your Appointments...
           </p>
         </div>
       </div>

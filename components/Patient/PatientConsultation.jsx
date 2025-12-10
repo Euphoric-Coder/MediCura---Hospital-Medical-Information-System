@@ -812,11 +812,14 @@ const PatientConsultation = ({ onBack, patientData }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-300">
+      <div
+        className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-100 
+          dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
+      >
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-white text-lg font-bold">
-            Loading your prescriptions...
+            Loading your Prescriptions...
           </p>
         </div>
       </div>

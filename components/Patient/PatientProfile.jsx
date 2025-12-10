@@ -30,6 +30,7 @@ import AvatarUpload from "../AvatarUpload";
 import { FiFileText } from "react-icons/fi";
 import { Button } from "../ui/button";
 import FileUpload from "../FileUpload";
+import Link from "next/link";
 
 const commonAllergies = [
   "Penicillin",
@@ -127,6 +128,8 @@ const PatientProfile = ({ onBack }) => {
     useState(false);
 
   const { patientData, refreshPatientData } = usePatient();
+
+  console.log("Patient Data in Profile:", patientData);
 
   useEffect(() => {
     setProfileData(patientData);
@@ -1091,14 +1094,14 @@ const PatientProfile = ({ onBack }) => {
                             Reupload PDF
                           </Button>
 
-                          <a
-                            href={profileData.identificationDocument}
+                          <Link
+                            href={profileData?.identificationDocument || "#"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
+                            className="cursor-pointer text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
                           >
                             View PDF
-                          </a>
+                          </Link>
                         </div>
                       ) : (
                         <FileUpload
@@ -1459,14 +1462,14 @@ const PatientProfile = ({ onBack }) => {
                         Reupload PDF
                       </Button>
 
-                      <a
-                        href={profileData.insurancePolicyDocument}
+                      <Link
+                        href={profileData?.insurancePolicyDocument || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
+                        className="cursor-pointer text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800 dark:hover:text-blue-300"
                       >
                         View PDF
-                      </a>
+                      </Link>
                     </div>
                   ) : (
                     <FileUpload
