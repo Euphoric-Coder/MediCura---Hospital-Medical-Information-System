@@ -1294,13 +1294,13 @@ const PatientDashboard = ({ onBookAppointment, patientData }) => {
 
               {/* Lab Results Cards */}
               <div className="space-y-4">
-                {labResults.length  ? (
+                {labResults.length === 0  ? (
                   <div
                     className="flex flex-col items-center justify-center p-10 rounded-2xl 
       bg-gradient-to-r from-green-100 to-blue-50 dark:from-specialGreen-600/50 dark:to-slate-800/30
       border border-gray-200 dark:border-dark-500/50 backdrop-blur-sm shadow-sm"
                   >
-                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 mb-4">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 mb-4 border-2 border-green-500 dark:border-green-400">
                       <TestTube className="w-7 h-7 text-green-600 dark:text-green-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-green-900 dark:text-green-400 mb-1">

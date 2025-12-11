@@ -343,19 +343,26 @@
 
   .shad-textArea {
   @apply
+    /* Light mode */
     bg-white text-slate-900
     placeholder:text-slate-500
-    border border-slate-300
-    focus:border-blue-500
+    border-2 border-slate-300
+    focus:border-green-500
+    focus:outline-none focus:ring-0
+
+    /* Dark mode */
     dark:bg-slate-900 dark:text-white
     dark:placeholder:text-dark-600
     dark:border-dark-600
     dark:focus:border-green-500
-    rounded-2xl p-2
-    focus-visible:ring-0 focus-visible:ring-offset-0
+    dark:focus:outline-none dark:focus:ring-0
+
+    /* Shared */
+    rounded-2xl p-3
     transition-colors duration-200
     !important;
 }
+
 
 
   .shad-combobox-item {

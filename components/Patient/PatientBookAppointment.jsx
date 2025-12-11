@@ -1978,7 +1978,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 return (
                   <div
                     key={appointment.id}
-                    className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-4 lg:p-6 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300"
+                    className="bg-sky-50 dark:bg-slate-900/60 backdrop-blur-sm border-2 border-blue-200 dark:border-slate-700 rounded-2xl p-4 lg:p-6 hover:border-sky-300 dark:hover:border-slate-600 transition-all duration-300"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       {/* Left: Doctor + meta */}
@@ -2082,7 +2082,19 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                 onClick={() =>
                                   handleRescheduleClick(appointment)
                                 }
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-sky-500/25 flex items-center justify-center gap-2"
+                                className="
+                                flex-1 lg:flex-none
+                                text-white
+                                px-3 lg:px-4 py-2
+                                rounded-lg text-[11px] lg:text-sm font-medium
+                                transition-all duration-300
+                                flex items-center justify-center gap-2
+                                bg-gradient-to-r from-sky-600 to-sky-800
+                                hover:from-sky-700 hover:to-sky-800
+                                shadow-lg hover:shadow-sky-500/25
+                                dark:from-sky-700 dark:to-sky-500
+                                dark:hover:from-sky-600 dark:hover:to-sky-700
+                                dark:shadow-sky-500/20 dark:hover:shadow-sky-500/40"
                               >
                                 <Edit className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">
@@ -2090,9 +2102,22 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                                 </span>
                                 <span className="sm:hidden">Edit</span>
                               </button>
+
                               <button
                                 onClick={() => handleCancelClick(appointment)}
-                                className="flex-1 lg:flex-none bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-3 lg:px-4 py-2 rounded-lg text-[11px] lg:text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-rose-500/25 flex items-center justify-center gap-2"
+                                className="
+                                flex-1 lg:flex-none
+                                text-white
+                                px-3 lg:px-4 py-2
+                                rounded-lg text-[11px] lg:text-sm font-medium
+                                transition-all duration-300
+                                flex items-center justify-center gap-2
+                                bg-gradient-to-r from-rose-500 to-rose-600
+                                hover:from-rose-600 hover:to-rose-700
+                                shadow-lg hover:shadow-rose-500/25
+                                dark:from-rose-500 dark:to-rose-600
+                                dark:hover:from-rose-500 dark:hover:to-rose-700
+                                dark:shadow-rose-500/20 dark:hover:shadow-rose-500/40"
                               >
                                 <Trash2 className="w-3 h-3 lg:w-4 lg:h-4" />
                                 <span className="hidden sm:inline">Cancel</span>
