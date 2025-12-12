@@ -856,7 +856,17 @@ const PatientConsultation = ({ onBack, patientData }) => {
             onClick={toggleCollapseAll}
             className="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl px-4 py-2 flex items-center gap-2 transition"
           >
-            {allCollapsed ? "Expand All" : "Collapse All"}
+            {allCollapsed ? (
+              <>
+                <Expand className="w-5 h-5 text-inherit" />
+                Expand All
+              </>
+            ) : (
+              <>
+                <BiCollapse className="w-7 h-7 text-inherit" />
+                Collapse All
+              </>
+            )}
           </Button>
 
           <Button

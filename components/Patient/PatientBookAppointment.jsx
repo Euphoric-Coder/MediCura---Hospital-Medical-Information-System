@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Plus,
   Calendar,
@@ -14,9 +14,9 @@ import {
   Phone,
   Edit,
   Trash2,
-  AlertTriangle,
   CheckCircle,
   X,
+  AlertTriangle,
   RefreshCcw,
 } from "lucide-react";
 import {
@@ -28,6 +28,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { db } from "@/lib/dbConfig";
 import { Appointments, Doctors, Patients } from "@/lib/schema";
 import { desc, eq } from "drizzle-orm";
@@ -52,28 +53,78 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
     setReason("");
   };
 
+  const contentRef = useRef(null);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-dark-400 border border-dark-500 rounded-3xl text-white">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className="text-20-bold lg:text-24-bold">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        // allows opening
+        if (open) return;
+
+        // Allow only if triggered from INSIDE dialog (X button or your buttons)
+        const active = document.activeElement;
+
+        // Close only if focus is inside dialog content
+        if (contentRef.current?.contains(active)) {
+          onClose();
+        }
+      }}
+    >
+      <DialogContent
+        ref={contentRef}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="
+    rounded-3xl 
+    bg-white text-slate-900 border border-slate-200 
+    dark:bg-slate-950 dark:text-white dark:border-dark-500
+    p-6 lg:p-8
+  "
+      >
+        {/* Header */}
+        <DialogHeader className="flex flex-row items-center justify-between mb-4">
+          <DialogTitle className="text-24-bold lg:text-28-bold">
             Cancel Appointment
           </DialogTitle>
         </DialogHeader>
 
-        <DialogDescription className="text-dark-700 text-14-regular lg:text-16-regular mb-6">
-          Are you sure you want to cancel your appointment with{" "}
-          <span className="text-white font-semibold">
-            {appointment?.doctorName}
-          </span>
-          ?
-        </DialogDescription>
+        {/* Alert Box for Warning */}
+        <Alert
+          variant="destructive"
+          className="
+      border-2 border-red-300 bg-red-50 text-red-700
+      dark:border-red-600 dark:bg-red-900/20 dark:text-red-300
+      rounded-2xl mb-6 p-4
+    "
+        >
+          <AlertTriangle className="h-5 w-5 dark:text-red-400" />
+          <AlertTitle className="text-[16px] lg:text-[18px] font-semibold">
+            Are you sure?
+          </AlertTitle>
+          <AlertDescription className="text-[14px] lg:text-[16px] mt-1">
+            You are cancelling your appointment with{" "}
+            <span className="font-semibold text-slate-900 dark:text-white">
+              {appointment?.doctorName}
+            </span>
+            . This action cannot be undone.
+          </AlertDescription>
+        </Alert>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Reason Input */}
           <div>
-            <label className="shad-input-label block mb-2">
+            <label
+              className="
+          block mb-2 
+          text-[15px] lg:text-[16px] font-semibold
+          text-slate-800 dark:text-slate-200
+        "
+            >
               Reason for cancellation
             </label>
+
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -84,19 +135,36 @@ const CancelModal = ({ isOpen, onClose, onCancel, appointment }) => {
             />
           </div>
 
+          {/* Buttons */}
           <DialogFooter className="flex gap-4">
-            <DialogClose asChild>
-              <button
-                type="button"
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
-              >
-                Keep Appointment
-              </button>
-            </DialogClose>
+            {/* Keep Appointment */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+          flex-1 rounded-3xl py-3 px-4 
+          text-14-semibold lg:text-16-semibold 
+          bg-gray-200 hover:bg-gray-300 text-slate-900 
+          dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white
+          transition-colors
+        "
+            >
+              Keep Appointment
+            </button>
+
+            {/* Confirm Cancellation */}
             <button
               type="submit"
-              className="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-700 disabled:cursor-not-allowed text-white py-3 px-4 rounded-3xl text-14-semibold lg:text-16-semibold transition-colors"
               disabled={!reason}
+              className="
+          flex-1 rounded-3xl py-3 px-4 
+          text-14-semibold lg:text-16-semibold 
+          bg-red-600 hover:bg-red-700 text-white
+          disabled:opacity-50 disabled:hover:bg-red-600 disabled:cursor-not-allowed
+          dark:bg-red-700 dark:hover:bg-red-600
+          dark:disabled:hover:bg-red-700
+          transition-colors
+        "
             >
               Cancel Appointment
             </button>
@@ -237,41 +305,63 @@ const RescheduleModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div
+        className="
+      w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl
+      bg-white border border-slate-200 
+      dark:bg-slate-950 dark:border-dark-500
+    "
+      >
         <div className="p-6 lg:p-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-20-bold lg:text-24-bold text-white">
+            <h2 className="text-20-bold lg:text-24-bold text-slate-900 dark:text-white">
               Reschedule Appointment
             </h2>
             <button
               onClick={onClose}
-              className="text-dark-600 hover:text-white transition-colors"
+              className="text-slate-600 hover:text-slate-900 dark:text-dark-600 dark:hover:text-white transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Current Appointment Info */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 lg:p-6 mb-8">
-            <h3 className="text-16-semibold lg:text-18-semibold text-white mb-4">
+          <div
+            className="
+          rounded-2xl p-4 lg:p-6 mb-8
+          bg-blue-50 border border-blue-200 
+          dark:bg-blue-500/10 dark:border-blue-500/30
+        "
+          >
+            <h3 className="text-16-semibold lg:text-18-semibold text-slate-900 dark:text-white mb-4">
               Current Appointment
             </h3>
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <img
                 src={appointment?.doctor.avatar}
                 alt={appointment?.doctor.name}
                 className="w-12 h-12 lg:w-16 lg:h-16 rounded-2xl object-cover"
               />
+
               <div className="flex-1">
-                <h4 className="text-14-semibold lg:text-16-semibold text-white">
+                <h4 className="text-14-semibold lg:text-16-semibold text-slate-900 dark:text-white">
                   {appointment?.doctor.name}
                 </h4>
-                <p className="text-14-regular text-blue-400">
+
+                <p className="text-14-regular text-blue-600 dark:text-blue-400">
                   {appointment?.doctor.speciality}
                 </p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-12-regular lg:text-14-regular text-dark-700 mt-2">
+
+                <div
+                  className="
+                flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2
+                text-12-regular lg:text-14-regular 
+                text-slate-700 dark:text-dark-700
+              "
+                >
                   <span>{appointment?.date}</span>
                   <span>{appointment?.time}</span>
                 </div>
@@ -282,28 +372,39 @@ const RescheduleModal = ({
           {/* New Time Selection */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-18-bold lg:text-20-bold text-white">
+              <h3 className="text-18-bold lg:text-20-bold text-slate-900 dark:text-white">
                 Select New Date & Time
               </h3>
+
               <div className="flex items-center gap-2 lg:gap-4">
                 <button
                   onClick={() => handleWeekChange("prev")}
-                  className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
+                  className="
+                p-2 rounded-xl border transition-colors
+                bg-slate-200 hover:bg-slate-300 border-slate-300 text-slate-900
+                dark:bg-dark-400 dark:hover:bg-dark-300 dark:border-dark-500 dark:text-white
+              "
                 >
-                  <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                  <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
-                <span className="text-12-medium lg:text-14-medium text-white px-2 text-center">
+
+                <span className="text-12-medium lg:text-14-medium text-slate-800 dark:text-white px-2 text-center">
                   {currentWeek === 0
                     ? "This Week"
                     : currentWeek > 0
                       ? `${currentWeek}w ahead`
                       : `${Math.abs(currentWeek)}w ago`}
                 </span>
+
                 <button
                   onClick={() => handleWeekChange("next")}
-                  className="p-2 rounded-xl bg-dark-400 hover:bg-dark-300 border border-dark-500 transition-colors"
+                  className="
+                p-2 rounded-xl border transition-colors
+                bg-slate-200 hover:bg-slate-300 border-slate-300 text-slate-900
+                dark:bg-dark-400 dark:hover:bg-dark-300 dark:border-dark-500 dark:text-white
+              "
                 >
-                  <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                  <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
               </div>
             </div>
@@ -313,8 +414,11 @@ const RescheduleModal = ({
               {weekSchedule.map((day, dayIndex) => (
                 <div
                   key={dayIndex}
-                  className="bg-gray-50 dark:bg-dark-400/50 border border-gray-200 dark:border-dark-500/50 
-                 rounded-xl p-2 lg:p-3 transition-colors"
+                  className="
+                rounded-xl p-2 lg:p-3 transition-colors
+                bg-gray-50 border border-gray-200 
+                dark:bg-dark-400/50 dark:border-dark-500/50
+              "
                 >
                   {/* Header */}
                   <div className="text-center mb-2 lg:mb-3">
@@ -339,14 +443,18 @@ const RescheduleModal = ({
                             }
                           }}
                           disabled={!slot.available}
-                          className={`w-full p-1 rounded text-[10px] sm:text-xs lg:text-sm border transition-all duration-200
-                ${
-                  selectedDate === day.fullDate && selectedTime === slot.time
-                    ? "bg-blue-500 text-white border-blue-500 shadow-sm dark:from-specialBlue-500 dark:to-specialBlue-600"
-                    : slot.available
-                      ? "bg-green-100 text-green-600 hover:bg-green-200 border-green-300 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30 dark:hover:bg-green-500/30"
-                      : "bg-red-100 text-red-600 border-red-300 cursor-not-allowed dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
-                }`}
+                          className={`
+                        w-full p-1 rounded border transition-all duration-200
+                        text-[10px] sm:text-xs lg:text-sm
+                        ${
+                          selectedDate === day.fullDate &&
+                          selectedTime === slot.time
+                            ? "bg-blue-500 text-white border-blue-500 shadow-sm"
+                            : slot.available
+                              ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-300 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30 dark:hover:bg-green-500/30"
+                              : "bg-red-100 text-red-600 border-red-300 cursor-not-allowed dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30"
+                        }
+                      `}
                         >
                           {slot.time}
                         </button>
@@ -367,17 +475,31 @@ const RescheduleModal = ({
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-4"
           >
+            {/* Cancel Button */}
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-colors"
+              className="
+            flex-1 py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold 
+            bg-gray-200 text-slate-900 hover:bg-gray-300
+            dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500
+            transition-colors
+          "
             >
               Cancel
             </button>
+
+            {/* Reschedule Button */}
             <button
               type="submit"
               disabled={!selectedDate || !selectedTime}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+              className="
+            flex-1 py-3 px-4 rounded-lg text-14-semibold lg:text-16-semibold 
+            bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 
+            text-white
+            disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed
+            transition-all duration-300 shadow-lg hover:shadow-blue-500/25
+          "
             >
               Reschedule Appointment
             </button>
@@ -1978,7 +2100,7 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                 return (
                   <div
                     key={appointment.id}
-                    className="bg-sky-50 dark:bg-slate-900/60 backdrop-blur-sm border-2 border-blue-200 dark:border-slate-700 rounded-2xl p-4 lg:p-6 hover:border-sky-300 dark:hover:border-slate-600 transition-all duration-300"
+                    className="bg-sky-50 dark:bg-slate-950/60 backdrop-blur-sm border-2 border-blue-200 dark:border-slate-600 rounded-2xl p-4 lg:p-6 hover:border-sky-400 dark:hover:border-sky-600 transition-all duration-300"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       {/* Left: Doctor + meta */}
@@ -1999,10 +2121,10 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
                         <div className="space-y-2 lg:space-y-3">
                           <div>
-                            <h3 className="text-base lg:text-xl font-semibold text-slate-900 dark:text-white mb-1">
+                            <h3 className="text-base lg:text-xl font-semibold text-sky-900 dark:text-white mb-1">
                               {appointment.doctor.name}
                             </h3>
-                            <p className="text-xs lg:text-sm text-emerald-700 dark:text-emerald-300">
+                            <p className="text-xs font-bold lg:text-sm text-emerald-700 dark:text-emerald-300">
                               {appointment.doctor.speciality}
                             </p>
                           </div>
@@ -2011,11 +2133,15 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6 text-xs lg:text-sm">
                             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                               <Calendar className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                              <span>{appointment.date}</span>
+                              <span className="font-bold">
+                                {appointment.date}
+                              </span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                               <Clock className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                              <span>{appointment.time}</span>
+                              <span className="font-bold">
+                                {appointment.time}
+                              </span>
                             </div>
                           </div>
 
@@ -2024,13 +2150,13 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                             className={[
                               "rounded-lg px-3 py-2 inline-block border",
                               appointment.status === "cancelled"
-                                ? "bg-rose-50/70 dark:bg-rose-900/20 border-rose-300/60 dark:border-rose-400/30 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
-                                : "bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700",
+                                ? "bg-rose-50/70 dark:bg-rose-900/20 border-2 border-rose-300/60 dark:border-rose-400/30 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
+                                : "bg-slate-50/70 dark:bg-slate-800/50 border-2 border-gray-400 dark:border-slate-600 shadow-gray-300 dark:shadow-gray-700 shadow-md",
                             ].join(" ")}
                           >
                             <p
                               className={[
-                                "text-[11px] lg:text-xs",
+                                "text-[11px] font-bold lg:text-xs",
                                 appointment.status === "cancelled"
                                   ? "text-rose-700 dark:text-rose-300"
                                   : "text-slate-600 dark:text-slate-300",
@@ -2039,8 +2165,8 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
                               <span
                                 className={
                                   appointment.status === "cancelled"
-                                    ? "text-rose-800 dark:text-rose-200 font-medium"
-                                    : "text-slate-900 dark:text-white font-medium"
+                                    ? "text-rose-800 dark:text-rose-200 font-extrabold text-[12.5px]"
+                                    : "text-slate-800 dark:text-slate-200 font-extrabold text-[12.5px]"
                                 }
                               >
                                 {appointment.status === "cancelled" &&
@@ -2053,9 +2179,9 @@ const PatientBookAppointment = ({ onBack, patientData }) => {
 
                           {appointment.notes &&
                             appointment.status !== "cancelled" && (
-                              <div className="bg-sky-50/70 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-700 rounded-lg px-3 py-2 inline-block ml-0 sm:ml-2">
-                                <p className="text-[11px] lg:text-xs text-sky-800 dark:text-sky-300">
-                                  <span className="text-slate-900 dark:text-white font-medium">
+                              <div className="bg-sky-50/70 dark:bg-sky-900/20 border-2 border-sky-400 dark:border-sky-700 shadow-md shadow-sky-300 dark:shadow-sky-700 rounded-lg px-3 py-2 inline-block ml-0 sm:ml-2">
+                                <p className="text-[11px] font-bold lg:text-xs text-sky-800 dark:text-sky-300">
+                                  <span className="text-sky-900 text-[12.5px] dark:text-sky-200 font-extrabold">
                                     Notes:
                                   </span>{" "}
                                   {appointment.notes}

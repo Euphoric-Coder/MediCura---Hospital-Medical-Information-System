@@ -346,7 +346,7 @@
     /* Light mode */
     bg-white text-slate-900
     placeholder:text-slate-500
-    border-2 border-slate-300
+    border-[3px] border-slate-300
     focus:border-green-500
     focus:outline-none focus:ring-0
 
@@ -358,7 +358,7 @@
     dark:focus:outline-none dark:focus:ring-0
 
     /* Shared */
-    rounded-2xl p-3
+    rounded-3xl p-3
     transition-colors duration-200
     !important;
 }
