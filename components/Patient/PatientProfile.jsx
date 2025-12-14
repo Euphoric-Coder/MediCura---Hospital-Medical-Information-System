@@ -622,7 +622,7 @@ const PatientProfile = ({ onBack }) => {
         <div className="max-w-4xl mx-auto px-6 py-8">
           {/* Profile Header */}
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6">
               <div className="flex items-center gap-6">
                 <div className="relative">
                   {!isEditing ? (
@@ -699,7 +699,7 @@ const PatientProfile = ({ onBack }) => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col mt-10 md:mt-0 md:flex-row items-center gap-3">
                 {!isEditing ? (
                   <>
                     <button
