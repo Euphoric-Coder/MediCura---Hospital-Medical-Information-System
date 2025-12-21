@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import SessionWatcher from "@/components/SessionWatcher";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +33,10 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <SessionWatcher />
+          </Providers>
           <Toaster richColors />
         </ThemeProvider>
       </body>

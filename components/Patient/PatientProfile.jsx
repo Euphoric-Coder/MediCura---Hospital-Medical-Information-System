@@ -1860,7 +1860,7 @@ const PatientProfile = ({ onBack }) => {
           <div className="bg-dark-400 border border-dark-500 rounded-3xl w-full max-w-md relative">
             <button
               onClick={() => setShowPasswordModal(false)}
-              className="absolute top-4 right-4 text-dark-600 hover:text-white transition-colors z-10"
+              className="absolute top-4 right-4 text-dark-600 hover:text-black dark:hover:text-white transition-colors z-10"
             >
               <X className="w-6 h-6" />
             </button>

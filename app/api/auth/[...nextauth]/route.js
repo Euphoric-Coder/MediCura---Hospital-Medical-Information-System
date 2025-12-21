@@ -6,7 +6,16 @@ import { db } from "@/lib/dbConfig";
 import { Users } from "@/lib/schema";
 
 const handler = NextAuth({
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 0, // prevent silent refresh
+  },
+
+  jwt: {
+    maxAge: 24 * 60 * 60,
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -36,25 +45,60 @@ const handler = NextAuth({
       },
     }),
   ],
+
   pages: {
     signIn: "/sign-in",
   },
+
   callbacks: {
     async jwt({ token, user }) {
+      // First login: attach expiry metadata
       if (user) {
+        const exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 24h expiry
         token.id = user.id;
         token.name = user.name;
+        token.email = user.email;
+        token.realExp = exp;
       }
+
+      // Hard expiry check
+      if (token.realExp && Date.now() / 1000 > token.realExp) {
+        console.warn("MediCura JWT expired — clearing session");
+        return {}; // clear token
+      }
+
       return token;
     },
+
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
+      if (token?.id) {
+        session.user = {
+          id: token.id,
+          name: token.name,
+          email: token.email,
+        };
+
+        session.realExpiry = new Date(token.realExp * 1000).toISOString();
+      } else {
+        session = null; // On expiration of token session drops
       }
+
       return session;
     },
   },
+
+  cookies: {
+    sessionToken: {
+      name: "medicura.session-token",
+      options: { httpOnly: true, sameSite: "lax", path: "/" },
+    },
+    csrfToken: {
+      name: "medicura.csrf-token",
+      options: { httpOnly: true, sameSite: "lax", path: "/" },
+    },
+  },
+
+  secret: process.env.NEXTAUTH_SECRET || "medicura-dev-secret",
 });
 
 export { handler as GET, handler as POST };

@@ -30,8 +30,6 @@ export default function DashboardLayout({ children }) {
   const refreshPatientData = useCallback(async () => {
     if (!userId || !userEmail) return;
 
-    console.log("RUNNING THE PATIENT LAYOUT");
-
     try {
       const data = await getUserRole(userEmail);
 

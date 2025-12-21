@@ -1,12 +1,12 @@
 "use client";
 
-import ForgotPassword from "@/components/Patient/ForgotPassword";
+import Settings from "@/components/Patient/Settings";
 import React from "react";
 
 const page = () => {
   return (
     <div>
-      <ForgotPassword />
+      <Settings />
     </div>
   );
 };
