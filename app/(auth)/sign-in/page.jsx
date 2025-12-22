@@ -1,12 +1,14 @@
 "use client";
 
 import SignInPage from "@/components/SignInPage";
-import React from "react";
+import React, { Suspense } from "react";
 
 const page = () => {
   return (
     <div>
-      <SignInPage />
+      <Suspense fallback={<div className="text-center mt-10">Loading...</div>}>
+        <SignInPage />
+      </Suspense>
     </div>
   );
 };
