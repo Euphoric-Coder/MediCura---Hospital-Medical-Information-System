@@ -68,11 +68,11 @@ export default function DoctorDashboardLayout({ children }) {
   // 🔹 Loading State
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-300 transition-colors">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50/50 dark:bg-[#0a0f1c] transition-colors">
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-800 dark:text-white text-lg">
-            Loading Doctor Dashboard...
+          <div className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+          <p className="text-slate-800 dark:text-white text-18-bold">
+            Loading your setup...
           </p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function DoctorDashboardLayout({ children }) {
 
   return (
     <DoctorProvider value={{ doctorData, role, userName, refreshDoctorData }}>
-      <div className="flex h-screen bg-white dark:bg-dark-300">
+      <div className="flex h-screen bg-slate-50/50 dark:bg-[#0a0f1c]">
         {/* Sidebar */}
         <DoctorSidebar
           isOpen={sidebarOpen}
@@ -132,22 +132,22 @@ export default function DoctorDashboardLayout({ children }) {
         />
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto relative">
+        <div className="flex-1 overflow-auto relative custom-scrollbar">
           {/* Mobile Header */}
-          <div className="xl:hidden bg-white/80 dark:bg-dark-200/80 backdrop-blur-xl border-b border-gray-200 dark:border-dark-500/50 sticky top-0 z-30">
-            <div className="flex items-center justify-between px-4 py-3">
+          <div className="xl:hidden bg-white/70 dark:bg-[#0a0f1c]/80 backdrop-blur-2xl border-b border-slate-200 dark:border-slate-800/60 sticky top-0 z-30 transition-colors">
+            <div className="flex items-center justify-between px-5 py-3.5">
               <button
                 onClick={toggleSidebar}
-                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-dark-600/50 dark:hover:bg-dark-400/70 transition-colors"
+                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 transition-colors"
               >
-                <Menu className="w-6 h-6 text-gray-800 dark:text-white" />
+                <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
               </button>
 
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-r from-green-300 to-green-400 dark:from-green-500 dark:to-green-600">
-                  <Plus className="w-4 h-4 text-green-800 dark:text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-600 shadow-md shadow-blue-500/20">
+                  <Plus className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-gray-900 dark:text-white font-medium">
+                <span className="text-slate-900 dark:text-white text-16-bold tracking-tight">
                   MediCura
                 </span>
               </div>
