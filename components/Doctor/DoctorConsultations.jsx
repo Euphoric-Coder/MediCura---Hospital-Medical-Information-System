@@ -71,12 +71,16 @@ const DynamicListSection = ({
   // Map of colors → Tailwind classes
   const colorMap = {
     blue: "bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20 text-blue-700 dark:text-blue-400 marker:bg-blue-500",
-    green: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 marker:bg-emerald-500",
-    yellow: "bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 marker:bg-amber-500",
-    purple: "bg-purple-50 dark:bg-purple-500/10 border-purple-100 dark:border-purple-500/20 text-purple-700 dark:text-purple-400 marker:bg-purple-500",
+    green:
+      "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 marker:bg-emerald-500",
+    yellow:
+      "bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 marker:bg-amber-500",
+    purple:
+      "bg-purple-50 dark:bg-purple-500/10 border-purple-100 dark:border-purple-500/20 text-purple-700 dark:text-purple-400 marker:bg-purple-500",
     red: "bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 marker:bg-rose-500",
     teal: "bg-teal-50 dark:bg-teal-500/10 border-teal-100 dark:border-teal-500/20 text-teal-700 dark:text-teal-400 marker:bg-teal-500",
-    orange: "bg-orange-50 dark:bg-orange-500/10 border-orange-100 dark:border-orange-500/20 text-orange-700 dark:text-orange-400 marker:bg-orange-500",
+    orange:
+      "bg-orange-50 dark:bg-orange-500/10 border-orange-100 dark:border-orange-500/20 text-orange-700 dark:text-orange-400 marker:bg-orange-500",
   };
   const btnMap = {
     blue: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -94,19 +98,28 @@ const DynamicListSection = ({
   return (
     <div className="mt-8 border-b border-slate-100 dark:border-slate-800/60 pb-8 last:border-0 last:pb-0">
       <label className="text-16-bold text-slate-900 dark:text-white block mb-4 flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${appliedClasses.match(/marker:(bg-[^\s]+)/)?.[1] || "bg-blue-500"}`}></div>
+        <div
+          className={`w-2 h-2 rounded-full ${appliedClasses.match(/marker:(bg-[^\s]+)/)?.[1] || "bg-blue-500"}`}
+        ></div>
         {label}
       </label>
       <div className="space-y-4">
         {consultationData[field]?.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             {consultationData[field].map((item, index) => (
-              <div key={index} className={`flex items-start justify-between rounded-2xl p-4 border transition-all hover:shadow-md ${appliedClasses.replace(/marker:[^\s]+/g, '')}`}>
+              <div
+                key={index}
+                className={`flex items-start justify-between rounded-2xl p-4 border transition-all hover:shadow-md ${appliedClasses.replace(/marker:[^\s]+/g, "")}`}
+              >
                 <div className="flex items-start gap-3 mt-0.5">
                   <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 opacity-70" />
                   <span className="text-14-medium leading-relaxed">{item}</span>
                 </div>
-                <button type="button" onClick={() => removeItem(index)} className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 rounded-lg hover:bg-white/50 dark:hover:bg-slate-900/50 ml-2">
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 rounded-lg hover:bg-white/50 dark:hover:bg-slate-900/50 ml-2"
+                >
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -118,11 +131,20 @@ const DynamicListSection = ({
             type="text"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addItem(); } }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addItem();
+              }
+            }}
             placeholder={placeholder}
             className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-2xl pl-5 pr-32 py-4 text-15-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-800 focus:border-slate-300 outline-none transition-all shadow-sm group-hover:shadow-md"
           />
-          <button type="button" onClick={addItem} className={`absolute right-2 top-2 bottom-2 px-6 rounded-xl text-14-medium transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] ${btnClasses}`}>
+          <button
+            type="button"
+            onClick={addItem}
+            className={`absolute right-2 top-2 bottom-2 px-6 rounded-xl text-14-medium transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] ${btnClasses}`}
+          >
             <span>Add</span>
             <Plus className="w-4 h-4" />
           </button>
@@ -145,7 +167,7 @@ const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
 
   // Filter medicines by search input
   const filteredMedicines = medicines.filter((med) =>
-    med.toLowerCase().includes(search.toLowerCase())
+    med.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleSelect = (medicine) => {
@@ -168,16 +190,26 @@ const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
 
   return (
     <div className="relative w-full">
-      <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">Medicine Name <span className="text-rose-500">*</span></label>
+      <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
+        Medicine Name <span className="text-rose-500">*</span>
+      </label>
       <button
         type="button"
         onClick={() => setShowDropdown(!showDropdown)}
-        className={`w-full bg-slate-50 hover:bg-white dark:bg-slate-900/40 dark:hover:bg-slate-900/80 border ${showDropdown ? 'border-purple-500 shadow-[0_0_0_4px_rgba(168,85,247,0.15)] dark:shadow-[0_0_0_4px_rgba(168,85,247,0.2)]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'} rounded-2xl px-5 py-4 text-left text-15-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
+        className={`w-full bg-slate-50 hover:bg-white dark:bg-slate-900/40 dark:hover:bg-slate-900/80 border ${showDropdown ? "border-purple-500 shadow-[0_0_0_4px_rgba(168,85,247,0.15)] dark:shadow-[0_0_0_4px_rgba(168,85,247,0.2)]" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"} rounded-2xl px-5 py-4 text-left text-15-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
       >
-        <span className={selectedMedicine ? "text-slate-900 dark:text-white" : "text-slate-400"}>
+        <span
+          className={
+            selectedMedicine
+              ? "text-slate-900 dark:text-white"
+              : "text-slate-400"
+          }
+        >
           {selectedMedicine || "Search or select medicine..."}
         </span>
-        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${showDropdown ? "rotate-180 text-purple-500" : ""}`} />
+        <ChevronDown
+          className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${showDropdown ? "rotate-180 text-purple-500" : ""}`}
+        />
       </button>
 
       {showDropdown && (
@@ -203,10 +235,14 @@ const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
                   key={medicine}
                   type="button"
                   onClick={() => handleSelect(medicine)}
-                  className={`w-full px-5 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium group ${selectedMedicine === medicine ? 'text-purple-600 dark:text-purple-400 bg-purple-50/80 dark:bg-purple-500/10 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}
+                  className={`w-full px-5 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium group ${selectedMedicine === medicine ? "text-purple-600 dark:text-purple-400 bg-purple-50/80 dark:bg-purple-500/10 font-semibold" : "text-slate-700 dark:text-slate-300"}`}
                 >
-                  <span className="group-hover:translate-x-1 transition-transform">{medicine}</span>
-                  {selectedMedicine === medicine && <Check className="w-4 h-4 text-purple-500" />}
+                  <span className="group-hover:translate-x-1 transition-transform">
+                    {medicine}
+                  </span>
+                  {selectedMedicine === medicine && (
+                    <Check className="w-4 h-4 text-purple-500" />
+                  )}
                 </button>
               ))
             ) : (
@@ -214,9 +250,15 @@ const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
                 <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-2">
                   <Pill className="w-5 h-5 text-slate-400" />
                 </div>
-                <div className="text-14-medium text-slate-900 dark:text-white mb-1">Medicine not found</div>
+                <div className="text-14-medium text-slate-900 dark:text-white mb-1">
+                  Medicine not found
+                </div>
                 <div className="text-13-regular text-slate-500">
-                  Press <kbd className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-12-semibold font-sans">Enter</kbd> to add "{search}"
+                  Press{" "}
+                  <kbd className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-12-semibold font-sans">
+                    Enter
+                  </kbd>{" "}
+                  to add "{search}"
                 </div>
               </div>
             )}
@@ -399,7 +441,7 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
             <button
               type="button"
               onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              className={`w-full bg-slate-50 dark:bg-slate-900/50 border ${showCategoryDropdown ? 'border-teal-500 shadow-[0_0_0_2px_rgba(20,184,166,0.2)]' : 'border-slate-200 dark:border-slate-800'} rounded-xl px-4 py-3 text-left text-14-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
+              className={`w-full bg-slate-50 dark:bg-slate-900/50 border ${showCategoryDropdown ? "border-teal-500 shadow-[0_0_0_2px_rgba(20,184,166,0.2)]" : "border-slate-200 dark:border-slate-800"} rounded-xl px-4 py-3 text-left text-14-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
             >
               <span>{newTestCategory}</span>
               <ChevronDown
@@ -419,7 +461,7 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
                         setNewTestCategory(cat);
                         setShowCategoryDropdown(false);
                       }}
-                      className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium ${newTestCategory === cat ? 'text-teal-600 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-500/10 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}
+                      className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium ${newTestCategory === cat ? "text-teal-600 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-500/10 font-semibold" : "text-slate-700 dark:text-slate-300"}`}
                     >
                       <span>{cat}</span>
                       {newTestCategory === cat && (
@@ -445,23 +487,29 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
       <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
         {labTests.map((test) => {
           const isSelected = consultationData.labTests.some(
-            (t) => t.id === test.id
+            (t) => t.id === test.id,
           );
           return (
             <button
               type="button"
               key={test.id}
               onClick={() => handleLabTestToggle(test)}
-              className={`w-full text-left flex items-center gap-4 cursor-pointer p-4 rounded-2xl transition-all duration-300 border ${isSelected ? 'bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/10 dark:to-emerald-500/10 border-teal-300 dark:border-teal-500/50 shadow-sm' : 'bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-500/50 hover:shadow-md'}`}
+              className={`w-full text-left flex items-center gap-4 cursor-pointer p-4 rounded-2xl transition-all duration-300 border ${isSelected ? "bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/10 dark:to-emerald-500/10 border-teal-300 dark:border-teal-500/50 shadow-sm" : "bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-500/50 hover:shadow-md"}`}
             >
-              <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isSelected ? 'bg-teal-500 border-teal-500 text-white scale-110 shadow-[0_0_12px_rgba(20,184,166,0.4)]' : 'bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600'}`}>
+              <div
+                className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isSelected ? "bg-teal-500 border-teal-500 text-white scale-110 shadow-[0_0_12px_rgba(20,184,166,0.4)]" : "bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600"}`}
+              >
                 {isSelected && <Check className="w-4 h-4" />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className={`text-15-semibold transition-colors duration-300 ${isSelected ? 'text-teal-900 dark:text-teal-100' : 'text-slate-900 dark:text-slate-100'}`}>
+                <div
+                  className={`text-15-semibold transition-colors duration-300 ${isSelected ? "text-teal-900 dark:text-teal-100" : "text-slate-900 dark:text-slate-100"}`}
+                >
                   {test.name}
                 </div>
-                <div className={`text-13-medium transition-colors duration-300 mt-0.5 ${isSelected ? 'text-teal-600 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                <div
+                  className={`text-13-medium transition-colors duration-300 mt-0.5 ${isSelected ? "text-teal-600 dark:text-teal-400" : "text-slate-500 dark:text-slate-400"}`}
+                >
                   {test.category}
                 </div>
               </div>
@@ -478,8 +526,13 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
           </div>
           <div className="flex flex-wrap gap-2">
             {consultationData.labTests.map((t) => (
-              <div key={t.id} className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-500/30 pl-3 pr-1 py-1 rounded-lg shadow-sm">
-                <span className="text-13-medium text-slate-800 dark:text-slate-200">{t.name}</span>
+              <div
+                key={t.id}
+                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-500/30 pl-3 pr-1 py-1 rounded-lg shadow-sm"
+              >
+                <span className="text-13-medium text-slate-800 dark:text-slate-200">
+                  {t.name}
+                </span>
                 <button
                   type="button"
                   onClick={(e) => {
@@ -618,7 +671,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       if (appointmentId) {
         const updatedPatient = updatedPatients.find(
-          (p) => p.appointmentId === appointmentId
+          (p) => p.appointmentId === appointmentId,
         );
         if (updatedPatient) {
           setSelectedPatient(updatedPatient);
@@ -646,9 +699,15 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
           <div className="w-20 h-20 bg-blue-50 dark:bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-blue-100 dark:border-blue-500/20 shadow-sm">
             <Clock className="w-10 h-10 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-24-bold text-slate-900 dark:text-white mb-3">Appointment Status</h3>
+          <h3 className="text-24-bold text-slate-900 dark:text-white mb-3">
+            Appointment Status
+          </h3>
           <p className="text-16-medium text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-            Tracking status for <span className="text-slate-900 dark:text-white font-semibold">{patientName}</span>’s appointment.
+            Tracking status for{" "}
+            <span className="text-slate-900 dark:text-white font-semibold">
+              {patientName}
+            </span>
+            ’s appointment.
           </p>
         </div>
 
@@ -659,11 +718,26 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
             const isActive = index === currentIndex;
 
             return (
-              <div key={step.key} className="flex flex-col items-center relative z-10 w-24">
-                <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border-4 transition-all duration-500 shadow-sm ${isActive ? "border-blue-100 dark:border-blue-900/50 bg-blue-600 dark:bg-blue-500 text-white scale-110 shadow-[0_0_15px_rgba(59,130,246,0.3)]" : isCompleted ? "border-emerald-100 dark:border-emerald-900/50 bg-emerald-500 text-white" : "border-slate-50 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400"}`}>
-                  {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Clock className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />}
+              <div
+                key={step.key}
+                className="flex flex-col items-center relative z-10 w-24"
+              >
+                <div
+                  className={`w-14 h-14 flex items-center justify-center rounded-2xl border-4 transition-all duration-500 shadow-sm ${isActive ? "border-blue-100 dark:border-blue-900/50 bg-blue-600 dark:bg-blue-500 text-white scale-110 shadow-[0_0_15px_rgba(59,130,246,0.3)]" : isCompleted ? "border-emerald-100 dark:border-emerald-900/50 bg-emerald-500 text-white" : "border-slate-50 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400"}`}
+                >
+                  {isCompleted ? (
+                    <CheckCircle className="w-6 h-6" />
+                  ) : (
+                    <Clock
+                      className={`w-6 h-6 ${isActive ? "animate-pulse" : ""}`}
+                    />
+                  )}
                 </div>
-                <span className={`mt-4 text-13-semibold text-center ${isActive ? "text-blue-600 dark:text-blue-400" : isCompleted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-400"}`}>{step.label}</span>
+                <span
+                  className={`mt-4 text-13-semibold text-center ${isActive ? "text-blue-600 dark:text-blue-400" : isCompleted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-400"}`}
+                >
+                  {step.label}
+                </span>
               </div>
             );
           })}
@@ -748,7 +822,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
             frequency: pres.frequency,
             duration: pres.duration,
             instructions: pres.instructions,
-          }))
+          })),
         );
       }
 
@@ -758,7 +832,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
             consultationId,
             testName: test.name,
             category: test.category,
-          }))
+          })),
         );
       }
 
@@ -821,7 +895,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     switch (status) {
       case "scheduled":
         return (
-          <div className={`${baseClasses} bg-blue-100/80 dark:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-400`}>
+          <div
+            className={`${baseClasses} bg-blue-100/80 dark:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-400`}
+          >
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             <span>Scheduled</span>
           </div>
@@ -829,7 +905,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "waiting":
         return (
-          <div className={`${baseClasses} bg-amber-100/80 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400`}>
+          <div
+            className={`${baseClasses} bg-amber-100/80 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400`}
+          >
             <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
             <span>Waiting</span>
           </div>
@@ -837,7 +915,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "arrived":
         return (
-          <div className={`${baseClasses} bg-yellow-100/80 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 text-yellow-700 dark:text-yellow-400`}>
+          <div
+            className={`${baseClasses} bg-yellow-100/80 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 text-yellow-700 dark:text-yellow-400`}
+          >
             <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
             <span>Arrived</span>
           </div>
@@ -845,7 +925,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "checked-in":
         return (
-          <div className={`${baseClasses} bg-teal-100/80 dark:bg-teal-500/20 border border-teal-200 dark:border-teal-500/30 text-teal-700 dark:text-teal-400`}>
+          <div
+            className={`${baseClasses} bg-teal-100/80 dark:bg-teal-500/20 border border-teal-200 dark:border-teal-500/30 text-teal-700 dark:text-teal-400`}
+          >
             <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.5)]"></div>
             <span>Checked-In</span>
           </div>
@@ -853,7 +935,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "in-consultation":
         return (
-          <div className={`${baseClasses} bg-emerald-100/80 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400`}>
+          <div
+            className={`${baseClasses} bg-emerald-100/80 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400`}
+          >
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
             <span>In Consultation</span>
           </div>
@@ -861,7 +945,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "completed":
         return (
-          <div className={`${baseClasses} bg-slate-100 dark:bg-slate-500/20 border border-slate-200 dark:border-slate-500/30 text-slate-600 dark:text-slate-400`}>
+          <div
+            className={`${baseClasses} bg-slate-100 dark:bg-slate-500/20 border border-slate-200 dark:border-slate-500/30 text-slate-600 dark:text-slate-400`}
+          >
             <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
             <span>Completed</span>
           </div>
@@ -869,7 +955,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "cancelled":
         return (
-          <div className={`${baseClasses} bg-rose-100/80 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400`}>
+          <div
+            className={`${baseClasses} bg-rose-100/80 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400`}
+          >
             <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
             <span>Cancelled</span>
           </div>
@@ -877,7 +965,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
       case "no-show":
         return (
-          <div className={`${baseClasses} bg-purple-100/80 dark:bg-purple-500/20 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-400`}>
+          <div
+            className={`${baseClasses} bg-purple-100/80 dark:bg-purple-500/20 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-400`}
+          >
             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
             <span>No Show</span>
           </div>
@@ -912,15 +1002,15 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
       <div className="max-w-8xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
         {/* Message */}
         {message && (
-          <div className={`flex items-center gap-3 p-4 rounded-2xl border mb-6 lg:mb-8 shadow-sm transition-all animate-in fade-in slide-in-from-top-4 ${messageType === "success" ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300" : "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-300"}`}>
+          <div
+            className={`flex items-center gap-3 p-4 rounded-2xl border mb-6 lg:mb-8 shadow-sm transition-all animate-in fade-in slide-in-from-top-4 ${messageType === "success" ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300" : "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-300"}`}
+          >
             {messageType === "success" ? (
               <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
             ) : (
               <AlertTriangle className="w-5 h-5 flex-shrink-0 text-rose-600 dark:text-rose-400" />
             )}
-            <span className="text-14-medium font-medium">
-              {message}
-            </span>
+            <span className="text-14-medium font-medium">{message}</span>
           </div>
         )}
 
@@ -929,12 +1019,17 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-5 lg:p-6 shadow-sm sticky top-28">
               <h2 className="text-16-bold lg:text-18-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Today's Patients
+                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />{" "}
+                Today's Patients
               </h2>
 
               <div className="space-y-3">
                 {patients
-                  .filter((patient) => patient.workflow !== "cancelled" && patient.workflow !== "no-show")
+                  .filter(
+                    (patient) =>
+                      patient.workflow !== "cancelled" &&
+                      patient.workflow !== "no-show",
+                  )
                   .map((patient) => (
                     <button
                       key={patient.id}
@@ -952,13 +1047,18 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                           className="w-11 h-11 lg:w-12 lg:h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm transition-transform group-hover:scale-105"
                         />
                         <div className="min-w-0 flex-1">
-                          <h3 className={`text-14-bold lg:text-15-semibold truncate ${selectedPatient?.id === patient.id ? "text-emerald-900 dark:text-emerald-100" : "text-slate-900 dark:text-white"}`}>
+                          <h3
+                            className={`text-14-bold lg:text-15-semibold truncate ${selectedPatient?.id === patient.id ? "text-emerald-900 dark:text-emerald-100" : "text-slate-900 dark:text-white"}`}
+                          >
                             {patient.name}
                           </h3>
                           <p className="text-12-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
-                            <Clock className="w-3.5 h-3.5" /> {patient.appointmentTime}
+                            <Clock className="w-3.5 h-3.5" />{" "}
+                            {patient.appointmentTime}
                           </p>
-                          <p className={`text-11-medium truncate mt-1 ${selectedPatient?.id === patient.id ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
+                          <p
+                            className={`text-11-medium truncate mt-1 ${selectedPatient?.id === patient.id ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}
+                          >
                             {patient.appointmentType}
                           </p>
                         </div>
@@ -988,7 +1088,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                         </h1>
                         {getStatusBadge(
                           selectedPatient.workflow,
-                          selectedPatient.isUrgent
+                          selectedPatient.isUrgent,
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-14-medium lg:text-15-medium text-slate-500 dark:text-slate-400">
@@ -997,10 +1097,12 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                           {selectedPatient.age} years, {selectedPatient.gender}
                         </span>
                         <span className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4 text-slate-400" /> Today's Consultation
+                          <Calendar className="w-4 h-4 text-slate-400" />{" "}
+                          Today's Consultation
                         </span>
                         <span className="flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-slate-400" /> {selectedPatient.appointmentTime}
+                          <Clock className="w-4 h-4 text-slate-400" />{" "}
+                          {selectedPatient.appointmentTime}
                         </span>
                       </div>
                     </div>
@@ -1023,7 +1125,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                   selectedPatient.workflow !== "in-consultation" &&
                   getStatusTracker(
                     selectedPatient.workflow,
-                    selectedPatient.name
+                    selectedPatient.name,
                   )}
 
                 {/* Made Consultation Form Visible Only for In-Consultation */}
@@ -1121,7 +1223,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                               <label className="text-16-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                                 <Calendar className="w-5 h-5 text-blue-500" />
                                 Next Appointment
-                                <span className="text-13-normal text-slate-400 font-normal ml-2">(Optional)</span>
+                                <span className="text-13-normal text-slate-400 font-normal ml-2">
+                                  (Optional)
+                                </span>
                               </label>
                               <div className="relative max-w-sm">
                                 <input
@@ -1130,7 +1234,7 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                   onChange={(e) =>
                                     handleInputChange(
                                       "nextAppointment",
-                                      e.target.value
+                                      e.target.value,
                                     )
                                   }
                                   className="w-full bg-slate-50 hover:bg-white dark:bg-slate-900/40 dark:hover:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-2xl px-5 py-4 text-15-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/15 focus:border-blue-300 dark:focus:border-blue-500/50 outline-none transition-all shadow-sm [&::-webkit-calendar-picker-indicator]:dark:filter [&::-webkit-calendar-picker-indicator]:dark:invert"
@@ -1175,9 +1279,10 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                           {/* Add New Prescription */}
                           <div className="space-y-5 bg-slate-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 mb-8">
                             <h4 className="text-14-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-2">
-                              <Plus className="w-4 h-4 text-purple-500" /> Add New Medication
+                              <Plus className="w-4 h-4 text-purple-500" /> Add
+                              New Medication
                             </h4>
-                            
+
                             {/* Medication Dropdown */}
                             <MedicineDropdown
                               selectedMedicine={newPrescription.medication}
@@ -1193,7 +1298,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
-                                  Dosage <span className="text-rose-500">*</span>
+                                  Dosage{" "}
+                                  <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                   type="text"
@@ -1252,7 +1358,10 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             {/* Instructions */}
                             <div>
                               <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
-                                Instructions <span className="text-slate-400 font-normal">(Optional)</span>
+                                Instructions{" "}
+                                <span className="text-slate-400 font-normal">
+                                  (Optional)
+                                </span>
                               </label>
                               <textarea
                                 value={newPrescription.instructions}
@@ -1273,7 +1382,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                               onClick={handleAddPrescription}
                               className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 px-4 rounded-xl text-15-semibold transition-all shadow-sm shadow-purple-500/20 dark:shadow-none hover:shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
                             >
-                              <Plus className="w-5 h-5 flex-shrink-0" /> Add to Prescription
+                              <Plus className="w-5 h-5 flex-shrink-0" /> Add to
+                              Prescription
                             </button>
                           </div>
 
@@ -1281,7 +1391,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                           {consultationData.prescriptions.length > 0 ? (
                             <div className="space-y-4">
                               <h4 className="text-16-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-slate-400" /> Prescribed Medications
+                                <FileText className="w-4 h-4 text-slate-400" />{" "}
+                                Prescribed Medications
                               </h4>
                               <div className="grid gap-4">
                                 {consultationData.prescriptions.map(
@@ -1301,7 +1412,9 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                               {prescription.medication}
                                             </div>
                                             <div className="text-13-medium text-purple-600 dark:text-purple-400 flex items-center gap-1.5 mt-0.5">
-                                              {prescription.dosage} <span className="w-1 h-1 rounded-full bg-purple-300 dark:bg-purple-600"></span> {prescription.frequency}
+                                              {prescription.dosage}{" "}
+                                              <span className="w-1 h-1 rounded-full bg-purple-300 dark:bg-purple-600"></span>{" "}
+                                              {prescription.frequency}
                                             </div>
                                           </div>
                                         </div>
@@ -1314,21 +1427,27 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                           <X className="w-4 h-4" />
                                         </button>
                                       </div>
-                                      
+
                                       <div className="pl-11 grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div className="flex items-center gap-2 text-13-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700/50">
                                           <Clock className="w-4 h-4 text-slate-400" />
-                                          {prescription.duration || "Not specified"}
+                                          {prescription.duration ||
+                                            "Not specified"}
                                         </div>
                                         {prescription.instructions && (
                                           <div className="flex items-center gap-2 text-13-medium text-slate-600 dark:text-slate-400 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-100 dark:border-amber-500/20">
                                             <AlertTriangle className="w-4 h-4 text-amber-500" />
-                                            <span className="truncate" title={prescription.instructions}>{prescription.instructions}</span>
+                                            <span
+                                              className="truncate"
+                                              title={prescription.instructions}
+                                            >
+                                              {prescription.instructions}
+                                            </span>
                                           </div>
                                         )}
                                       </div>
                                     </div>
-                                  )
+                                  ),
                                 )}
                               </div>
                             </div>
@@ -1337,8 +1456,12 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                               <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
                                 <Pill className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                               </div>
-                              <h4 className="text-15-semibold text-slate-700 dark:text-slate-300 mb-1">No Prescriptions Yet</h4>
-                              <p className="text-13-regular text-slate-500 dark:text-slate-500">Add medications using the form above</p>
+                              <h4 className="text-15-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                No Prescriptions Yet
+                              </h4>
+                              <p className="text-13-regular text-slate-500 dark:text-slate-500">
+                                Add medications using the form above
+                              </p>
                             </div>
                           )}
                         </div>
@@ -1457,7 +1580,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                     Select a Patient
                   </h3>
                   <p className="text-15-regular lg:text-18-regular text-slate-500 dark:text-slate-400 max-w-md lg:max-w-xl mx-auto leading-relaxed">
-                    Choose a patient from today's appointments on the left to start the consultation and clinical notes.
+                    Choose a patient from today's appointments on the left to
+                    start the consultation and clinical notes.
                   </p>
                 </div>
               </div>
