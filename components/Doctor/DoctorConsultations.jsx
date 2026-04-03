@@ -70,84 +70,61 @@ const DynamicListSection = ({
 
   // Map of colors → Tailwind classes
   const colorMap = {
-    blue: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-    green: "bg-green-500/10 border-green-500/20 text-green-400",
-    yellow: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
-    purple: "bg-purple-500/10 border-purple-500/20 text-purple-400",
-    red: "bg-red-500/10 border-red-500/20 text-red-400",
-    teal: "bg-teal-500/10 border-teal-500/20 text-teal-400",
-    orange: "bg-orange-500/10 border-orange-500/20 text-orange-400",
+    blue: "bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20 text-blue-700 dark:text-blue-400 marker:bg-blue-500",
+    green: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 marker:bg-emerald-500",
+    yellow: "bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 marker:bg-amber-500",
+    purple: "bg-purple-50 dark:bg-purple-500/10 border-purple-100 dark:border-purple-500/20 text-purple-700 dark:text-purple-400 marker:bg-purple-500",
+    red: "bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 marker:bg-rose-500",
+    teal: "bg-teal-50 dark:bg-teal-500/10 border-teal-100 dark:border-teal-500/20 text-teal-700 dark:text-teal-400 marker:bg-teal-500",
+    orange: "bg-orange-50 dark:bg-orange-500/10 border-orange-100 dark:border-orange-500/20 text-orange-700 dark:text-orange-400 marker:bg-orange-500",
+  };
+  const btnMap = {
+    blue: "bg-blue-600 hover:bg-blue-700 text-white",
+    green: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    yellow: "bg-amber-600 hover:bg-amber-700 text-white",
+    purple: "bg-purple-600 hover:bg-purple-700 text-white",
+    red: "bg-rose-600 hover:bg-rose-700 text-white",
+    teal: "bg-teal-600 hover:bg-teal-700 text-white",
+    orange: "bg-orange-600 hover:bg-orange-700 text-white",
   };
 
   const appliedClasses = colorMap[color] || colorMap.blue;
+  const btnClasses = btnMap[color] || btnMap.blue;
 
   return (
-    <div className="mt-8">
-      <label className="shad-input-label block mb-2">{label}</label>
-      <div className="space-y-3">
-        {/* Existing Items */}
+    <div className="mt-8 border-b border-slate-100 dark:border-slate-800/60 pb-8 last:border-0 last:pb-0">
+      <label className="text-16-bold text-slate-900 dark:text-white block mb-4 flex items-center gap-2">
+        <div className={`w-2 h-2 rounded-full ${appliedClasses.match(/marker:(bg-[^\s]+)/)?.[1] || "bg-blue-500"}`}></div>
+        {label}
+      </label>
+      <div className="space-y-4">
         {consultationData[field]?.length > 0 && (
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             {consultationData[field].map((item, index) => (
-              <div
-                key={index}
-                className={`flex items-center justify-between rounded-lg p-3 ${appliedClasses}`}
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${appliedClasses
-                      .split(" ")[0]
-                      .replace("/10", "")}`}
-                  ></div>
-                  <span className="text-14-regular text-white">{item}</span>
+              <div key={index} className={`flex items-start justify-between rounded-2xl p-4 border transition-all hover:shadow-md ${appliedClasses.replace(/marker:[^\s]+/g, '')}`}>
+                <div className="flex items-start gap-3 mt-0.5">
+                  <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 opacity-70" />
+                  <span className="text-14-medium leading-relaxed">{item}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeItem(index)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
-                >
+                <button type="button" onClick={() => removeItem(index)} className="text-slate-400 hover:text-rose-500 transition-colors p-1.5 rounded-lg hover:bg-white/50 dark:hover:bg-slate-900/50 ml-2">
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ))}
           </div>
         )}
-
-        {/* Add New Item */}
-        <div className="flex gap-2">
+        <div className="relative group">
           <input
             type="text"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addItem();
-              }
-            }}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addItem(); } }}
             placeholder={placeholder}
-            className="shad-input flex-1 text-white"
+            className="w-full bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-2xl pl-5 pr-32 py-4 text-15-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-slate-100 dark:focus:ring-slate-800 focus:border-slate-300 outline-none transition-all shadow-sm group-hover:shadow-md"
           />
-          <button
-            type="button"
-            onClick={addItem}
-            className={`px-4 py-2 rounded-lg text-14-medium transition-colors ${
-              color === "blue"
-                ? "bg-blue-500 hover:bg-blue-600 text-white"
-                : color === "green"
-                  ? "bg-green-500 hover:bg-green-600 text-white"
-                  : color === "yellow"
-                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                    : color === "purple"
-                      ? "bg-purple-500 hover:bg-purple-600 text-white"
-                      : color === "red"
-                        ? "bg-red-500 hover:bg-red-600 text-white"
-                        : color === "teal"
-                          ? "bg-teal-500 hover:bg-teal-600 text-white"
-                          : "bg-orange-500 hover:bg-orange-600 text-white"
-            }`}
-          >
-            Add
+          <button type="button" onClick={addItem} className={`absolute right-2 top-2 bottom-2 px-6 rounded-xl text-14-medium transition-all shadow-sm flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] ${btnClasses}`}>
+            <span>Add</span>
+            <Plus className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -191,56 +168,56 @@ const MedicineDropdown = ({ selectedMedicine, setSelectedMedicine }) => {
 
   return (
     <div className="relative w-full">
-      <label className="shad-input-label block mb-2">Medicine Name</label>
+      <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">Medicine Name <span className="text-rose-500">*</span></label>
       <button
         type="button"
         onClick={() => setShowDropdown(!showDropdown)}
-        className="w-full bg-dark-400 border border-dark-500 rounded-lg px-4 py-3 text-left text-white flex items-center justify-between hover:border-purple-500 transition-colors"
+        className={`w-full bg-slate-50 hover:bg-white dark:bg-slate-900/40 dark:hover:bg-slate-900/80 border ${showDropdown ? 'border-purple-500 shadow-[0_0_0_4px_rgba(168,85,247,0.15)] dark:shadow-[0_0_0_4px_rgba(168,85,247,0.2)]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'} rounded-2xl px-5 py-4 text-left text-15-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
       >
-        <span className="text-white">
-          {selectedMedicine || "Select or search medicine"}
+        <span className={selectedMedicine ? "text-slate-900 dark:text-white" : "text-slate-400"}>
+          {selectedMedicine || "Search or select medicine..."}
         </span>
-        <ChevronDown
-          className={`w-5 h-5 text-dark-600 transition-transform ${
-            showDropdown ? "rotate-180" : ""
-          }`}
-        />
+        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${showDropdown ? "rotate-180 text-purple-500" : ""}`} />
       </button>
 
       {showDropdown && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-20 overflow-hidden">
-          {/* Search Input */}
-          <div className="p-3 border-b border-dark-500">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Search or type to add..."
-              className="w-full bg-dark-300 border border-dark-500 rounded-lg px-3 py-2 text-white placeholder-dark-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
-            />
+        <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/80 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top">
+          <div className="p-3 border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type to search or add..."
+                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-3 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-4 focus:ring-purple-500/15 focus:border-purple-300 dark:focus:border-purple-500/50 outline-none transition-all shadow-sm"
+                autoFocus
+              />
+            </div>
           </div>
-
-          {/* Medicine Options */}
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-64 overflow-y-auto py-2 custom-scrollbar">
             {filteredMedicines.length > 0 ? (
               filteredMedicines.map((medicine) => (
                 <button
                   key={medicine}
                   type="button"
                   onClick={() => handleSelect(medicine)}
-                  className="w-full p-3 flex items-center justify-between hover:bg-dark-500 transition-colors text-left"
+                  className={`w-full px-5 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium group ${selectedMedicine === medicine ? 'text-purple-600 dark:text-purple-400 bg-purple-50/80 dark:bg-purple-500/10 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}
                 >
-                  <span className="text-16-medium text-white">{medicine}</span>
-                  {selectedMedicine === medicine && (
-                    <Check className="w-5 h-5 text-purple-500" />
-                  )}
+                  <span className="group-hover:translate-x-1 transition-transform">{medicine}</span>
+                  {selectedMedicine === medicine && <Check className="w-4 h-4 text-purple-500" />}
                 </button>
               ))
             ) : (
-              <div className="p-3 text-14-regular text-dark-600">
-                Press <span className="text-white font-medium">Enter</span> to
-                add “{search}”
+              <div className="p-6 text-center flex flex-col items-center justify-center">
+                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-2">
+                  <Pill className="w-5 h-5 text-slate-400" />
+                </div>
+                <div className="text-14-medium text-slate-900 dark:text-white mb-1">Medicine not found</div>
+                <div className="text-13-regular text-slate-500">
+                  Press <kbd className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-12-semibold font-sans">Enter</kbd> to add "{search}"
+                </div>
               </div>
             )}
           </div>
@@ -381,18 +358,26 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
-      <div className="flex items-center gap-3 mb-4 lg:mb-6">
-        <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-          <TestTube className="w-4 h-4 text-white" />
+    <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+      {/* Inner teal glow */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-teal-100/50 dark:bg-teal-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-14 h-14 bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-600/20 dark:to-teal-500/10 rounded-2xl flex items-center justify-center border border-teal-200/50 dark:border-teal-500/20 shadow-inner">
+          <TestTube className="w-7 h-7 text-teal-600 dark:text-teal-400" />
         </div>
-        <h3 className="text-16-bold lg:text-18-bold text-white">
-          Order Lab Tests
-        </h3>
+        <div>
+          <h3 className="text-24-bold lg:text-28-bold text-slate-900 dark:text-white mb-1">
+            Order Lab Tests
+          </h3>
+          <p className="text-14-medium text-slate-500 dark:text-slate-400">
+            Recommend path tests & imaging
+          </p>
+        </div>
       </div>
 
       {/* Search + Add Test */}
-      <div className="flex items-center justify-center flex-col gap-4 mb-3">
+      <div className="flex flex-col gap-4 mb-6">
         <input
           type="text"
           value={newTestName}
@@ -404,95 +389,108 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
             }
           }}
           placeholder="Search or add new test..."
-          className="w-full shad-input p-3 rounded-xl flex-1 text-white"
+          className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all shadow-sm"
         />
-        {/* Category Dropdown */}
-        <div className="relative w-full">
+        <div className="flex gap-3">
+          {/* Category Dropdown */}
+          <div className="relative flex-1">
+            <button
+              type="button"
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              className={`w-full bg-slate-50 dark:bg-slate-900/50 border ${showCategoryDropdown ? 'border-teal-500 shadow-[0_0_0_2px_rgba(20,184,166,0.2)]' : 'border-slate-200 dark:border-slate-800'} rounded-xl px-4 py-3 text-left text-14-medium text-slate-700 dark:text-slate-200 flex items-center justify-between transition-all cursor-pointer shadow-sm`}
+            >
+              <span>{newTestCategory}</span>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform ${
+                  showCategoryDropdown ? "rotate-180 text-teal-500" : ""
+                }`}
+              />
+            </button>
+            {showCategoryDropdown && (
+              <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="max-h-60 overflow-y-auto py-1.5">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => {
+                        setNewTestCategory(cat);
+                        setShowCategoryDropdown(false);
+                      }}
+                      className={`w-full px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left text-14-medium ${newTestCategory === cat ? 'text-teal-600 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-500/10 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}
+                    >
+                      <span>{cat}</span>
+                      {newTestCategory === cat && (
+                        <Check className="w-4 h-4 text-teal-500" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <button
             type="button"
-            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="w-full bg-dark-400 border border-dark-500 rounded-lg px-3 py-2 text-left text-white flex items-center justify-between hover:border-green-500 transition-colors"
+            onClick={handleAddLabTest}
+            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl transition-all shadow-sm shadow-slate-200 dark:shadow-none hover:shadow-md text-14-medium whitespace-nowrap"
           >
-            <span>{newTestCategory}</span>
-            <ChevronDown
-              className={`w-4 h-4 text-dark-600 transition-transform ${
-                showCategoryDropdown ? "rotate-180" : ""
-              }`}
-            />
+            Add
           </button>
-          {showCategoryDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-dark-400 border border-dark-500 rounded-lg shadow-lg z-10 overflow-hidden">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => {
-                    setNewTestCategory(cat);
-                    setShowCategoryDropdown(false);
-                  }}
-                  className="w-full px-3 py-2 flex items-center justify-between hover:bg-dark-500 text-white"
-                >
-                  <span>{cat}</span>
-                  {newTestCategory === cat && (
-                    <Check className="w-4 h-4 text-green-500" />
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
-        <button
-          type="button"
-          onClick={handleAddLabTest}
-          className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          Add
-        </button>
       </div>
 
       {/* List of Available Lab Tests */}
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
         {labTests.map((test) => {
           const isSelected = consultationData.labTests.some(
             (t) => t.id === test.id
           );
           return (
-            <label
+            <button
+              type="button"
               key={test.id}
-              className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-green-500/10 transition-colors"
+              onClick={() => handleLabTestToggle(test)}
+              className={`w-full text-left flex items-center gap-4 cursor-pointer p-4 rounded-2xl transition-all duration-300 border ${isSelected ? 'bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/10 dark:to-emerald-500/10 border-teal-300 dark:border-teal-500/50 shadow-sm' : 'bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-500/50 hover:shadow-md'}`}
             >
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => handleLabTestToggle(test)}
-                className="w-4 h-4 text-green-500 bg-dark-400 border-dark-500 rounded focus:ring-green-500"
-              />
+              <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isSelected ? 'bg-teal-500 border-teal-500 text-white scale-110 shadow-[0_0_12px_rgba(20,184,166,0.4)]' : 'bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600'}`}>
+                {isSelected && <Check className="w-4 h-4" />}
+              </div>
               <div className="flex-1 min-w-0">
-                <div className="text-12-medium lg:text-14-medium text-white">
+                <div className={`text-15-semibold transition-colors duration-300 ${isSelected ? 'text-teal-900 dark:text-teal-100' : 'text-slate-900 dark:text-slate-100'}`}>
                   {test.name}
                 </div>
-                <div className="text-10-regular lg:text-12-regular text-green-400">
+                <div className={`text-13-medium transition-colors duration-300 mt-0.5 ${isSelected ? 'text-teal-600 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'}`}>
                   {test.category}
                 </div>
               </div>
-            </label>
+            </button>
           );
         })}
       </div>
 
       {/* Selected Tests */}
       {consultationData.labTests.length > 0 && (
-        <div className="mt-4 p-3 bg-green-500/20 rounded-lg">
-          <div className="text-10-medium lg:text-12-medium text-green-400">
-            Selected Tests:
+        <div className="mt-6 p-4 bg-teal-50 dark:bg-teal-500/10 rounded-2xl border border-teal-100 dark:border-teal-500/20">
+          <div className="text-13-semibold text-teal-800 dark:text-teal-300 mb-3 flex items-center justify-between">
+            <span>Selected Tests ({consultationData.labTests.length})</span>
           </div>
-          <ul className="list-disc list-inside text-12-regular text-white mt-2">
+          <div className="flex flex-wrap gap-2">
             {consultationData.labTests.map((t) => (
-              <li key={t.id}>
-                {t.name} <span className="text-green-400">({t.category})</span>
-              </li>
+              <div key={t.id} className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-500/30 pl-3 pr-1 py-1 rounded-lg shadow-sm">
+                <span className="text-13-medium text-slate-800 dark:text-slate-200">{t.name}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLabTestToggle(t);
+                  }}
+                  className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-1 rounded-md transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
@@ -641,75 +639,32 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     const currentIndex = steps.findIndex((s) => s.key === workflow);
 
     return (
-      <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">
-        <div className="text-center py-12 lg:py-20">
-          <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-blue-500/20">
-            <Clock className="w-8 h-8 lg:w-12 lg:h-12 text-blue-400" />
+      <div className="bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-8 lg:p-12 shadow-sm">
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-blue-50 dark:bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-blue-100 dark:border-blue-500/20 shadow-sm">
+            <Clock className="w-10 h-10 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
-            Appointment Status
-          </h3>
-          <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto mb-8">
-            Tracking status for{" "}
-            <span className="text-white font-semibold">{patientName}</span>’s
-            appointment.
+          <h3 className="text-24-bold text-slate-900 dark:text-white mb-3">Appointment Status</h3>
+          <p className="text-16-medium text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            Tracking status for <span className="text-slate-900 dark:text-white font-semibold">{patientName}</span>’s appointment.
           </p>
+        </div>
 
-          {/* Status Tracker */}
-          <div className="flex justify-center gap-4 lg:gap-8 flex-wrap">
-            {steps.map((step, index) => {
-              const isCompleted = index < currentIndex;
-              const isActive = index === currentIndex;
+        <div className="flex justify-center gap-2 lg:gap-6 flex-wrap relative">
+          <div className="hidden lg:block absolute top-7 left-12 right-12 h-1 bg-slate-100 dark:bg-slate-800 -z-10 rounded-full"></div>
+          {steps.map((step, index) => {
+            const isCompleted = index < currentIndex;
+            const isActive = index === currentIndex;
 
-              return (
-                <div
-                  key={step.key}
-                  className={`flex flex-col items-center ${
-                    isActive
-                      ? "text-green-400"
-                      : isCompleted
-                        ? "text-green-500"
-                        : "text-dark-600"
-                  }`}
-                >
-                  {/* Step Circle */}
-                  <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 ${
-                      isActive
-                        ? "border-green-400 bg-green-500/20 animate-pulse"
-                        : isCompleted
-                          ? "border-green-500 bg-green-500/20"
-                          : "border-dark-500 bg-dark-500/20"
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                    ) : isActive ? (
-                      <Clock className="w-5 h-5 text-green-400 animate-pulse" />
-                    ) : (
-                      <Clock className="w-5 h-5 text-dark-600" />
-                    )}
-                  </div>
-
-                  {/* Label */}
-                  <span className="mt-2 text-12-medium">{step.label}</span>
-
-                  {/* Connector Line */}
-                  {index < steps.length - 1 && (
-                    <div
-                      className={`hidden lg:block h-1 w-12 my-2 ${
-                        isCompleted
-                          ? "bg-green-500"
-                          : isActive
-                            ? "bg-green-400 animate-pulse"
-                            : "bg-dark-500/50"
-                      }`}
-                    ></div>
-                  )}
+            return (
+              <div key={step.key} className="flex flex-col items-center relative z-10 w-24">
+                <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border-4 transition-all duration-500 shadow-sm ${isActive ? "border-blue-100 dark:border-blue-900/50 bg-blue-600 dark:bg-blue-500 text-white scale-110 shadow-[0_0_15px_rgba(59,130,246,0.3)]" : isCompleted ? "border-emerald-100 dark:border-emerald-900/50 bg-emerald-500 text-white" : "border-slate-50 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400"}`}>
+                  {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Clock className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />}
                 </div>
-              );
-            })}
-          </div>
+                <span className={`mt-4 text-13-semibold text-center ${isActive ? "text-blue-600 dark:text-blue-400" : isCompleted ? "text-emerald-600 dark:text-emerald-500" : "text-slate-400"}`}>{step.label}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -864,81 +819,65 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
     switch (status) {
       case "scheduled":
         return (
-          <div
-            className={`${baseClasses} bg-blue-500/20 border border-blue-500/30`}
-          >
+          <div className={`${baseClasses} bg-blue-100/80 dark:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-400`}>
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span className="text-blue-400">Scheduled</span>
+            <span>Scheduled</span>
           </div>
         );
 
       case "waiting":
         return (
-          <div
-            className={`${baseClasses} bg-orange-500/20 border border-orange-500/30`}
-          >
-            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-            <span className="text-orange-400">Waiting</span>
+          <div className={`${baseClasses} bg-amber-100/80 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400`}>
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+            <span>Waiting</span>
           </div>
         );
 
       case "arrived":
         return (
-          <div
-            className={`${baseClasses} bg-yellow-500/20 border border-yellow-500/30`}
-          >
+          <div className={`${baseClasses} bg-yellow-100/80 dark:bg-yellow-500/20 border border-yellow-200 dark:border-yellow-500/30 text-yellow-700 dark:text-yellow-400`}>
             <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            <span className="text-yellow-400">Arrived</span>
+            <span>Arrived</span>
           </div>
         );
 
       case "checked-in":
         return (
-          <div
-            className={`${baseClasses} bg-teal-500/20 border border-teal-500/30`}
-          >
-            <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-            <span className="text-teal-400">Checked-In</span>
+          <div className={`${baseClasses} bg-teal-100/80 dark:bg-teal-500/20 border border-teal-200 dark:border-teal-500/30 text-teal-700 dark:text-teal-400`}>
+            <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.5)]"></div>
+            <span>Checked-In</span>
           </div>
         );
 
       case "in-consultation":
         return (
-          <div
-            className={`${baseClasses} bg-green-500/20 border border-green-500/30`}
-          >
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400">In Consultation</span>
+          <div className={`${baseClasses} bg-emerald-100/80 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400`}>
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+            <span>In Consultation</span>
           </div>
         );
 
       case "completed":
         return (
-          <div
-            className={`${baseClasses} bg-gray-500/20 border border-gray-500/30`}
-          >
-            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-            <span className="text-gray-400">Completed</span>
+          <div className={`${baseClasses} bg-slate-100 dark:bg-slate-500/20 border border-slate-200 dark:border-slate-500/30 text-slate-600 dark:text-slate-400`}>
+            <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+            <span>Completed</span>
           </div>
         );
 
       case "cancelled":
         return (
-          <div
-            className={`${baseClasses} bg-red-500/20 border border-red-500/30`}
-          >
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span className="text-red-400">Cancelled</span>
+          <div className={`${baseClasses} bg-rose-100/80 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400`}>
+            <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+            <span>Cancelled</span>
           </div>
         );
 
       case "no-show":
         return (
-          <div
-            className={`${baseClasses} bg-pink-500/20 border border-pink-500/30`}
-          >
-            <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-            <span className="text-pink-400">No Show</span>
+          <div className={`${baseClasses} bg-purple-100/80 dark:bg-purple-500/20 border border-purple-200 dark:border-purple-500/30 text-purple-700 dark:text-purple-400`}>
+            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+            <span>No Show</span>
           </div>
         );
 
@@ -948,19 +887,19 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-slate-50 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-dark-200/80 backdrop-blur-xl border-b border-dark-500/50 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Stethoscope className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+      <div className="bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40 transition-colors">
+        <div className="max-w-8xl mx-auto px-4 lg:px-6 py-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+              <Stethoscope className="w-5 h-5 lg:w-6 lg:h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <span className="text-20-bold lg:text-24-bold text-white">
+              <span className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-white">
                 Patient Consultations
               </span>
-              <p className="text-12-regular lg:text-14-regular text-dark-700">
+              <p className="text-13-regular lg:text-14-regular text-slate-500 dark:text-slate-400">
                 Write consultation notes and prescriptions
               </p>
             </div>
@@ -968,22 +907,16 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
+      <div className="max-w-8xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
         {/* Message */}
         {message && (
-          <div
-            className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm mb-6 lg:mb-8 ${
-              messageType === "success"
-                ? "bg-green-500/10 border-green-500/30 text-green-400"
-                : "bg-red-500/10 border-red-500/30 text-red-400"
-            }`}
-          >
+          <div className={`flex items-center gap-3 p-4 rounded-2xl border mb-6 lg:mb-8 shadow-sm transition-all animate-in fade-in slide-in-from-top-4 ${messageType === "success" ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300" : "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-300"}`}>
             {messageType === "success" ? (
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+              <AlertTriangle className="w-5 h-5 flex-shrink-0 text-rose-600 dark:text-rose-400" />
             )}
-            <span className="text-14-regular lg:text-16-regular">
+            <span className="text-14-medium font-medium">
               {message}
             </span>
           </div>
@@ -992,42 +925,38 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Patient Selection */}
           <div className="lg:col-span-1">
-            <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-6">
-              <h2 className="text-16-bold lg:text-20-bold text-white mb-4 lg:mb-6">
-                Today's Patients
+            <div className="bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-5 lg:p-6 shadow-sm sticky top-28">
+              <h2 className="text-16-bold lg:text-18-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> Today's Patients
               </h2>
 
               <div className="space-y-3">
                 {patients
-                  .filter(
-                    (patient) =>
-                      patient.workflow !== "cancelled" &&
-                      patient.workflow !== "no-show"
-                  )
+                  .filter((patient) => patient.workflow !== "cancelled" && patient.workflow !== "no-show")
                   .map((patient) => (
                     <button
                       key={patient.id}
                       onClick={() => handlePatientSelect(patient)}
-                      className={`w-full p-3 lg:p-4 rounded-2xl border-2 transition-all duration-300 text-left ${
+                      className={`w-full p-3 lg:p-4 rounded-2xl border-2 transition-all duration-300 text-left cursor-pointer group ${
                         selectedPatient?.id === patient.id
-                          ? "border-green-500 bg-green-500/10"
-                          : "border-dark-500 hover:border-dark-400 bg-dark-400/30"
+                          ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 shadow-[0_0_0_1px_rgba(16,185,129,0.1)] shadow-sm"
+                          : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-md"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3.5">
                         <img
                           src={patient.avatar}
                           alt={patient.name}
-                          className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl object-cover"
+                          className="w-11 h-11 lg:w-12 lg:h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm transition-transform group-hover:scale-105"
                         />
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-14-semibold lg:text-16-semibold text-white truncate">
+                          <h3 className={`text-14-bold lg:text-15-semibold truncate ${selectedPatient?.id === patient.id ? "text-emerald-900 dark:text-emerald-100" : "text-slate-900 dark:text-white"}`}>
                             {patient.name}
                           </h3>
-                          <p className="text-12-regular text-dark-700">
-                            {patient.appointmentTime}
+                          <p className="text-12-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                            <Clock className="w-3.5 h-3.5" /> {patient.appointmentTime}
                           </p>
-                          <p className="text-10-regular lg:text-12-regular text-dark-600 truncate">
+                          <p className={`text-11-medium truncate mt-1 ${selectedPatient?.id === patient.id ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
                             {patient.appointmentType}
                           </p>
                         </div>
@@ -1043,27 +972,34 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
             {selectedPatient ? (
               <div className="space-y-6 lg:space-y-8">
                 {/* Patient Header */}
-                <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 backdrop-blur-xl border border-green-500/20 rounded-3xl p-4 lg:p-6">
-                  <div className="flex items-center gap-4 lg:gap-6">
+                <div className="bg-white dark:bg-emerald-900/10 backdrop-blur-xl border border-slate-200 dark:border-emerald-500/20 rounded-3xl p-5 lg:p-8 shadow-sm">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 lg:gap-8">
                     <img
                       src={selectedPatient.avatar}
                       alt={selectedPatient.name}
-                      className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl object-cover border-2 border-dark-500/50"
+                      className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-slate-50 dark:border-slate-800 shadow-md"
                     />
-                    <div>
-                      <h1 className="text-20-bold lg:text-32-bold text-white mb-2 flex items-center gap-3">
-                        {selectedPatient.name}
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-4 mb-3">
+                        <h1 className="text-24-bold lg:text-32-bold text-slate-900 dark:text-white">
+                          {selectedPatient.name}
+                        </h1>
                         {getStatusBadge(
                           selectedPatient.workflow,
                           selectedPatient.isUrgent
                         )}
-                      </h1>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-14-regular lg:text-16-regular text-dark-700">
-                        <span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-14-medium lg:text-15-medium text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 px-3 py-1 rounded-lg">
+                          <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           {selectedPatient.age} years, {selectedPatient.gender}
                         </span>
-                        <span>Today's Consultation</span>
-                        <span>{selectedPatient.appointmentTime}</span>
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-4 h-4 text-slate-400" /> Today's Consultation
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-slate-400" /> {selectedPatient.appointmentTime}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1071,12 +1007,12 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
 
                 <div className="flex justify-center md:justify-end">
                   <Button
-                    className="w-full md:w-auto btn2"
+                    className="w-full md:w-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shadow-sm rounded-xl py-5"
                     onClick={() =>
                       refreshPatientAppointment(selectedPatient.appointmentId)
                     }
                   >
-                    <RefreshCcw />
+                    <RefreshCcw className="w-4 h-4 mr-2" />
                     Refresh Status
                   </Button>
                 </div>
@@ -1095,14 +1031,24 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       {/* Main Consultation Form */}
                       <div className="lg:col-span-2 space-y-6 lg:space-y-8">
                         {/* Clinical Notes */}
-                        <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-4 lg:p-8">
-                          <div className="flex items-center gap-3 mb-6 lg:mb-8">
-                            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                              <FileText className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                        <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+                          {/* Inner soft gradient light */}
+                          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-600/20 dark:to-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-200/50 dark:border-blue-500/20 shadow-inner">
+                                <FileText className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                              </div>
+                              <div>
+                                <h2 className="text-24-bold lg:text-28-bold text-slate-900 dark:text-white mb-1">
+                                  Clinical Notes
+                                </h2>
+                                <p className="text-14-medium text-slate-500 dark:text-slate-400">
+                                  Detailed patient examination and assessment
+                                </p>
+                              </div>
                             </div>
-                            <h2 className="text-18-bold lg:text-24-bold text-white">
-                              Clinical Notes
-                            </h2>
                           </div>
 
                           <div className="space-y-6">
@@ -1167,21 +1113,25 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             />
 
                             {/* Next Appointment */}
-                            <div>
-                              <label className="shad-input-label block mb-2">
+                            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800/80">
+                              <label className="text-16-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                                <Calendar className="w-5 h-5 text-blue-500" />
                                 Next Appointment
+                                <span className="text-13-normal text-slate-400 font-normal ml-2">(Optional)</span>
                               </label>
-                              <input
-                                type="date"
-                                value={consultationData.nextAppointment}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "nextAppointment",
-                                    e.target.value
-                                  )
-                                }
-                                className="shad-input w-full text-white"
-                              />
+                              <div className="relative max-w-sm">
+                                <input
+                                  type="date"
+                                  value={consultationData.nextAppointment}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      "nextAppointment",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full bg-slate-50 hover:bg-white dark:bg-slate-900/40 dark:hover:bg-slate-900/80 border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 rounded-2xl px-5 py-4 text-15-medium text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/15 focus:border-blue-300 dark:focus:border-blue-500/50 outline-none transition-all shadow-sm [&::-webkit-calendar-picker-indicator]:dark:filter [&::-webkit-calendar-picker-indicator]:dark:invert"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1190,18 +1140,38 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       {/* Side Panel */}
                       <div className="space-y-6 lg:space-y-8">
                         {/* Prescriptions */}
-                        <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-4 lg:p-6">
-                          <div className="flex items-center gap-3 mb-4 lg:mb-6">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                              <Pill className="w-4 h-4 text-white" />
+                        <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+                          {/* Inner purple glow */}
+                          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-100/50 dark:bg-purple-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+
+                          <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-600/20 dark:to-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-200/50 dark:border-purple-500/20 shadow-inner">
+                                <Pill className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                              </div>
+                              <div>
+                                <h3 className="text-24-bold lg:text-28-bold text-slate-900 dark:text-white mb-1">
+                                  Prescriptions
+                                </h3>
+                                <p className="text-14-medium text-slate-500 dark:text-slate-400">
+                                  Add and manage medications
+                                </p>
+                              </div>
                             </div>
-                            <h3 className="text-16-bold lg:text-18-bold text-white">
-                              Prescriptions
-                            </h3>
+                            {consultationData.prescriptions.length > 0 && (
+                              <span className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-13-bold px-4 py-1.5 rounded-full border border-purple-200 dark:border-purple-500/30 shadow-sm flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                                {consultationData.prescriptions.length} Added
+                              </span>
+                            )}
                           </div>
 
                           {/* Add New Prescription */}
-                          <div className="space-y-3 mb-4">
+                          <div className="space-y-5 bg-slate-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 mb-8">
+                            <h4 className="text-14-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-2">
+                              <Plus className="w-4 h-4 text-purple-500" /> Add New Medication
+                            </h4>
+                            
                             {/* Medication Dropdown */}
                             <MedicineDropdown
                               selectedMedicine={newPrescription.medication}
@@ -1214,10 +1184,10 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             />
 
                             {/* Dosage & Frequency */}
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="shad-input-label block mb-1">
-                                  Dosage
+                                <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
+                                  Dosage <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                   type="text"
@@ -1228,12 +1198,12 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                       dosage: e.target.value,
                                     }))
                                   }
-                                  placeholder="Ex: 500mg"
-                                  className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                                  placeholder="500mg, 10ml..."
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-4 focus:ring-purple-500/15 focus:border-purple-300 dark:focus:border-purple-500/50 outline-none transition-all shadow-sm"
                                 />
                               </div>
                               <div>
-                                <label className="shad-input-label block mb-1">
+                                <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
                                   Frequency
                                 </label>
                                 <input
@@ -1245,35 +1215,38 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                       frequency: e.target.value,
                                     }))
                                   }
-                                  placeholder="Ex: 2 times a day"
-                                  className="shad-input w-full text-white text-10-regular lg:text-12-regular"
+                                  placeholder="1-0-1, Twice daily..."
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-4 focus:ring-purple-500/15 focus:border-purple-300 dark:focus:border-purple-500/50 outline-none transition-all shadow-sm"
                                 />
                               </div>
                             </div>
 
                             {/* Duration */}
                             <div>
-                              <label className="shad-input-label block mb-1">
+                              <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
                                 Duration
                               </label>
-                              <input
-                                type="text"
-                                value={newPrescription.duration}
-                                onChange={(e) =>
-                                  setNewPrescription((prev) => ({
-                                    ...prev,
-                                    duration: e.target.value,
-                                  }))
-                                }
-                                placeholder="Ex: 5 days"
-                                className="shad-input w-full text-white text-12-regular lg:text-14-regular"
-                              />
+                              <div className="relative">
+                                <Calendar className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                                <input
+                                  type="text"
+                                  value={newPrescription.duration}
+                                  onChange={(e) =>
+                                    setNewPrescription((prev) => ({
+                                      ...prev,
+                                      duration: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="5 Days, 1 Month..."
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-11 pr-4 py-3.5 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-4 focus:ring-purple-500/15 focus:border-purple-300 dark:focus:border-purple-500/50 outline-none transition-all shadow-sm"
+                                />
+                              </div>
                             </div>
 
                             {/* Instructions */}
                             <div>
-                              <label className="shad-input-label block mb-1">
-                                Special Instructions
+                              <label className="text-13-medium text-slate-700 dark:text-slate-300 block mb-1.5 font-medium ml-1">
+                                Instructions <span className="text-slate-400 font-normal">(Optional)</span>
                               </label>
                               <textarea
                                 value={newPrescription.instructions}
@@ -1283,8 +1256,8 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                                     instructions: e.target.value,
                                   }))
                                 }
-                                placeholder="Ex: Take after meals"
-                                className="shad-textArea w-full text-white min-h-[60px] resize-none text-10-regular lg:text-12-regular"
+                                placeholder="Take after food..."
+                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 text-14-medium text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-4 focus:ring-purple-500/15 focus:border-purple-300 dark:focus:border-purple-500/50 outline-none transition-all shadow-sm min-h-[80px] resize-none"
                                 rows={2}
                               />
                             </div>
@@ -1292,49 +1265,76 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                             {/* Add Button */}
                             <button
                               onClick={handleAddPrescription}
-                              className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg text-12-medium lg:text-14-medium transition-colors"
+                              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 px-4 rounded-xl text-15-semibold transition-all shadow-sm shadow-purple-500/20 dark:shadow-none hover:shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
                             >
-                              Add Prescription
+                              <Plus className="w-5 h-5 flex-shrink-0" /> Add to Prescription
                             </button>
                           </div>
 
                           {/* Prescription List */}
-                          <div className="space-y-3">
-                            {consultationData.prescriptions.map(
-                              (prescription, index) => (
-                                <div
-                                  key={index}
-                                  className="bg-purple-500/20 rounded-lg p-3 border border-purple-500/30"
-                                >
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="text-14-medium text-white">
-                                      {prescription.medication}
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        handleRemovePrescription(index)
-                                      }
-                                      className="text-red-400 hover:text-red-300 text-10-regular lg:text-12-regular"
+                          {consultationData.prescriptions.length > 0 ? (
+                            <div className="space-y-4">
+                              <h4 className="text-16-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-slate-400" /> Prescribed Medications
+                              </h4>
+                              <div className="grid gap-4">
+                                {consultationData.prescriptions.map(
+                                  (prescription, index) => (
+                                    <div
+                                      key={index}
+                                      className="group bg-white dark:bg-slate-900/40 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-purple-200 dark:hover:border-purple-500/30 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
                                     >
-                                      Remove
-                                    </button>
-                                  </div>
-                                  <div className="text-10-regular lg:text-12-regular text-purple-300">
-                                    {prescription.dosage} -{" "}
-                                    {prescription.frequency}
-                                  </div>
-                                  <div className="text-10-regular lg:text-12-regular text-purple-300">
-                                    Duration: {prescription.duration}
-                                  </div>
-                                  {prescription.instructions && (
-                                    <div className="text-10-regular lg:text-12-regular text-purple-300 mt-1">
-                                      Instructions: {prescription.instructions}
+                                      <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                                      <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-start gap-3">
+                                          <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center border border-purple-100 dark:border-purple-500/20 text-purple-600 dark:text-purple-400 text-13-bold shadow-sm">
+                                            {index + 1}
+                                          </div>
+                                          <div>
+                                            <div className="text-16-bold text-slate-900 dark:text-white">
+                                              {prescription.medication}
+                                            </div>
+                                            <div className="text-13-medium text-purple-600 dark:text-purple-400 flex items-center gap-1.5 mt-0.5">
+                                              {prescription.dosage} <span className="w-1 h-1 rounded-full bg-purple-300 dark:bg-purple-600"></span> {prescription.frequency}
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <button
+                                          onClick={() =>
+                                            handleRemovePrescription(index)
+                                          }
+                                          className="text-slate-400 hover:text-rose-500 transition-colors bg-slate-50 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-500/10 p-2 rounded-xl shadow-sm opacity-0 group-hover:opacity-100"
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                      
+                                      <div className="pl-11 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="flex items-center gap-2 text-13-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700/50">
+                                          <Clock className="w-4 h-4 text-slate-400" />
+                                          {prescription.duration || "Not specified"}
+                                        </div>
+                                        {prescription.instructions && (
+                                          <div className="flex items-center gap-2 text-13-medium text-slate-600 dark:text-slate-400 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-100 dark:border-amber-500/20">
+                                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                                            <span className="truncate" title={prescription.instructions}>{prescription.instructions}</span>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                  )}
-                                </div>
-                              )
-                            )}
-                          </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center py-10 px-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                              <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Pill className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                              </div>
+                              <h4 className="text-15-semibold text-slate-700 dark:text-slate-300 mb-1">No Prescriptions Yet</h4>
+                              <p className="text-13-regular text-slate-500 dark:text-slate-500">Add medications using the form above</p>
+                            </div>
+                          )}
                         </div>
 
                         {/* Lab Tests */}
@@ -1412,10 +1412,10 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
                       <button
                         onClick={onBack}
-                        className="text-14-regular lg:text-16-regular text-dark-600 hover:text-white transition-colors"
+                        className="text-14-medium lg:text-16-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                       >
                         ← Back to Dashboard
                       </button>
@@ -1423,11 +1423,11 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       <button
                         onClick={handleSaveConsultation}
                         disabled={isSaving}
-                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-6 lg:px-8 py-3 lg:py-4 rounded-xl text-14-semibold lg:text-16-semibold transition-all duration-300 shadow-lg hover:shadow-green-500/25 flex items-center gap-2"
+                        className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:dark:bg-slate-800 disabled:text-slate-500 dark:disabled:text-slate-600 disabled:border-transparent disabled:cursor-not-allowed text-white px-8 lg:px-10 py-3 lg:py-4 rounded-xl text-15-semibold lg:text-16-semibold transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2.5"
                       >
                         {isSaving ? (
                           <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin"></div>
                             Saving...
                           </>
                         ) : (
@@ -1442,17 +1442,16 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                 )}
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-dark-400/30 to-dark-300/30 backdrop-blur-xl border border-dark-500/50 rounded-3xl p-8">
+              <div className="bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-8 lg:p-12 shadow-sm h-full flex flex-col justify-center">
                 <div className="text-center py-12 lg:py-20">
-                  <div className="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-3xl flex items-center justify-center mx-auto mb-6 lg:mb-8 border border-green-500/20">
-                    <Stethoscope className="w-8 h-8 lg:w-12 lg:h-12 text-green-400" />
+                  <div className="w-20 h-20 lg:w-28 lg:h-28 bg-emerald-50 dark:bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                    <Stethoscope className="w-10 h-10 lg:w-14 lg:h-14 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <h3 className="text-20-bold lg:text-24-bold text-white mb-4">
+                  <h3 className="text-24-bold lg:text-32-bold text-slate-900 dark:text-white mb-4 lg:mb-6">
                     Select a Patient
                   </h3>
-                  <p className="text-14-regular lg:text-16-regular text-dark-700 max-w-md mx-auto">
-                    Choose a patient from today's appointments to start the
-                    consultation.
+                  <p className="text-15-regular lg:text-18-regular text-slate-500 dark:text-slate-400 max-w-md lg:max-w-xl mx-auto leading-relaxed">
+                    Choose a patient from today's appointments on the left to start the consultation and clinical notes.
                   </p>
                 </div>
               </div>
