@@ -358,9 +358,11 @@ const LabTestsSection = ({ consultationData, setConsultationData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+    <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative">
       {/* Inner teal glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-teal-100/50 dark:bg-teal-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+      <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-100/50 dark:bg-teal-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+      </div>
 
       <div className="flex items-center gap-4 mb-8">
         <div className="w-14 h-14 bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-600/20 dark:to-teal-500/10 rounded-2xl flex items-center justify-center border border-teal-200/50 dark:border-teal-500/20 shadow-inner">
@@ -1027,13 +1029,15 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                 {/* Made Consultation Form Visible Only for In-Consultation */}
                 {selectedPatient.workflow === "in-consultation" && (
                   <div>
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+                    <div className="flex flex-col space-y-6 lg:space-y-8">
                       {/* Main Consultation Form */}
-                      <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+                      <div className="w-full space-y-6 lg:space-y-8">
                         {/* Clinical Notes */}
-                        <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+                        <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative">
                           {/* Inner soft gradient light */}
-                          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+                          <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+                          </div>
 
                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
                             <div className="flex items-center gap-4">
@@ -1138,11 +1142,13 @@ const DoctorConsultations = ({ onBack, doctorData }) => {
                       </div>
 
                       {/* Side Panel */}
-                      <div className="space-y-6 lg:space-y-8">
+                      <div className="w-full space-y-6 lg:space-y-8">
                         {/* Prescriptions */}
-                        <div className="bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative overflow-hidden">
+                        <div className="w-full bg-white dark:bg-[#0B1120] backdrop-blur-3xl border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 lg:p-10 shadow-lg relative">
                           {/* Inner purple glow */}
-                          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-100/50 dark:bg-purple-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+                          <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-purple-100/50 dark:bg-purple-900/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/3 pointer-events-none"></div>
+                          </div>
 
                           <div className="flex items-center justify-between mb-10">
                             <div className="flex items-center gap-4">
