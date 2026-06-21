@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 
-const ReceptionistReports = ({ onBack }) => {
+const ReceptionistReports = () => {
+  const onBack = () => { if (typeof window !== 'undefined') window.history.back(); };
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedReport, setSelectedReport] = useState("overview");
 

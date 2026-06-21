@@ -307,7 +307,8 @@ const PatientDetailsModal = ({ isOpen, onClose, patient, onUpdate }) => {
   );
 };
 
-const ReceptionistPatients = ({ onBack }) => {
+const ReceptionistPatients = () => {
+  const onBack = () => { if (typeof window !== 'undefined') window.history.back(); };
   const [patients, setPatients] = useState([
     {
       id: 'P001',

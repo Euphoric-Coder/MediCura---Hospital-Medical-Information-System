@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import {
   Plus,
@@ -23,9 +25,12 @@ import { Button } from "../ui/button";
 import { set } from "date-fns";
 import ReceptionistBookManageAppointment from "./ReceptionistBookManageAppointment";
 
-const ReceptionistAppointments = ({ onBack }) => {
+const ReceptionistAppointments = () => {
+  const onBack = () => {
+    if (typeof window !== "undefined") window.history.back();
+  };
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
   const [appointments, setAppointments] = useState([]);
   const [message, setMessage] = useState("");
@@ -52,7 +57,7 @@ const ReceptionistAppointments = ({ onBack }) => {
   };
 
   const fetchIndividualPatientData = async (
-    id = "f4e9e1a8-c823-422a-b8f3-103640a99943"
+    id = "f4e9e1a8-c823-422a-b8f3-103640a99943",
   ) => {
     try {
       // If all patients already fetched, just filter from state
@@ -70,13 +75,13 @@ const ReceptionistAppointments = ({ onBack }) => {
   };
 
   const scheduledCount = appointments.filter(
-    (a) => a.status === "scheduled"
+    (a) => a.status === "scheduled",
   ).length;
   const confirmedCount = appointments.filter(
-    (a) => a.status === "confirmed"
+    (a) => a.status === "confirmed",
   ).length;
   const completedCount = appointments.filter(
-    (a) => a.status === "completed"
+    (a) => a.status === "completed",
   ).length;
   const newPatientCount = appointments.filter((a) => a.isNewPatient).length;
 
@@ -289,7 +294,7 @@ const ReceptionistAppointments = ({ onBack }) => {
                   <div className="max-h-60 overflow-y-auto">
                     {allPatients
                       .filter((p) =>
-                        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                        p.name.toLowerCase().includes(searchTerm.toLowerCase()),
                       )
                       .map((patient) => (
                         <button

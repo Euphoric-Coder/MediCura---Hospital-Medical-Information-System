@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
   Plus,
@@ -21,7 +23,10 @@ import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import { registerPatient } from "@/lib/registerPatient";
 
-const ReceptionistPatientRegistration = ({ onBack }) => {
+const ReceptionistPatientRegistration = () => {
+  const onBack = () => {
+    if (typeof window !== "undefined") window.history.back();
+  };
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -153,7 +158,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
     setFormData((prev) => ({
       ...prev,
       allergies: prev.allergies.filter(
-        (allergy) => allergy !== allergyToRemove
+        (allergy) => allergy !== allergyToRemove,
       ),
     }));
   };
@@ -180,7 +185,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
     setFormData((prev) => ({
       ...prev,
       currentMedications: prev.currentMedications.filter(
-        (med) => med !== medicationToRemove
+        (med) => med !== medicationToRemove,
       ),
     }));
   };
@@ -203,7 +208,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
     setFormData((prev) => ({
       ...prev,
       familyMedicalHistory: prev.familyMedicalHistory.filter(
-        (_, i) => i !== index
+        (_, i) => i !== index,
       ),
     }));
   };
@@ -356,13 +361,13 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
   const filteredAllergies = commonAllergies.filter(
     (allergy) =>
       allergy.toLowerCase().includes(allergySearch.toLowerCase()) &&
-      !formData.allergies.includes(allergy)
+      !formData.allergies.includes(allergy),
   );
 
   const filteredMedications = commonMedications.filter(
     (medication) =>
       medication.toLowerCase().includes(medicationSearch.toLowerCase()) &&
-      !formData.currentMedications.includes(medication)
+      !formData.currentMedications.includes(medication),
   );
 
   const getStepContent = () => {
@@ -590,7 +595,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                       type="button"
                       onClick={() =>
                         setShowEmergencyCountryDropdown(
-                          !showEmergencyCountryDropdown
+                          !showEmergencyCountryDropdown,
                         )
                       }
                       className="bg-dark-400 border border-dark-500 rounded-lg px-3 py-3 text-white flex items-center gap-2 hover:border-green-500 transition-colors min-w-[100px]"
@@ -598,7 +603,7 @@ const ReceptionistPatientRegistration = ({ onBack }) => {
                       <span>
                         {
                           countryCodes.find(
-                            (c) => c.code === emergencyCountryCode
+                            (c) => c.code === emergencyCountryCode,
                           )?.flag
                         }
                       </span>

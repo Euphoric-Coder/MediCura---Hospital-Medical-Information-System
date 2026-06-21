@@ -122,7 +122,8 @@ const PaymentModal = ({ isOpen, onClose, bill, onProcessPayment }) => {
   );
 };
 
-const ReceptionistBilling = ({ onBack }) => {
+const ReceptionistBilling = () => {
+  const onBack = () => { if (typeof window !== 'undefined') window.history.back(); };
   const [bills, setBills] = useState([
     {
       id: "INV-2024-001",

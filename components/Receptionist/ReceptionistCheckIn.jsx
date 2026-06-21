@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import {
   Plus,
@@ -19,7 +21,10 @@ import { and, eq, notInArray } from "drizzle-orm";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 
-const ReceptionistCheckIn = ({ onBack }) => {
+const ReceptionistCheckIn = () => {
+  const onBack = () => {
+    if (typeof window !== "undefined") window.history.back();
+  };
   const [patients, setPatients] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,8 +64,8 @@ const ReceptionistCheckIn = ({ onBack }) => {
           and(
             eq(Appointments.date, todayIST),
             notInArray(Appointments.status, ["cancelled", "no-show"]),
-            notInArray(Appointments.workflow, ["cancelled", "no-show"])
-          )
+            notInArray(Appointments.workflow, ["cancelled", "no-show"]),
+          ),
         );
 
       const mapped = data.map((row) => ({
@@ -280,10 +285,10 @@ const ReceptionistCheckIn = ({ onBack }) => {
   const waitingCount = patients.filter((p) => p.status === "waiting").length;
   const arrivedCount = patients.filter((p) => p.status === "arrived").length;
   const checkedInCount = patients.filter(
-    (p) => p.status === "checked-in"
+    (p) => p.status === "checked-in",
   ).length;
   const inConsultationCount = patients.filter(
-    (p) => p.status === "in-consultation"
+    (p) => p.status === "in-consultation",
   ).length;
 
   return (

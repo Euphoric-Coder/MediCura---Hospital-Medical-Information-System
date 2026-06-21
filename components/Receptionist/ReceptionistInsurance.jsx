@@ -163,7 +163,8 @@ const VerificationModal = ({ isOpen, onClose, verification, onUpdate }) => {
   );
 };
 
-const ReceptionistInsurance = ({ onBack }) => {
+const ReceptionistInsurance = () => {
+  const onBack = () => { if (typeof window !== 'undefined') window.history.back(); };
   const [verifications, setVerifications] = useState([
     {
       id: '1',
