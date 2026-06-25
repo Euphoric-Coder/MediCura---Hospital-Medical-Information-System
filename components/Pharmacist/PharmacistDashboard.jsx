@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const PatientDetailsModal = ({ patient }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +88,7 @@ const PatientDetailsModal = ({ patient }) => {
               Date:{" "}
               {new Date(patient.prescription.createdAt).toLocaleDateString(
                 "en-IN",
-                { day: "numeric", month: "short", year: "numeric" }
+                { day: "numeric", month: "short", year: "numeric" },
               )}
             </p>
           </div>
@@ -98,6 +99,7 @@ const PatientDetailsModal = ({ patient }) => {
 };
 
 const PharmacistDashboard = ({ onLogout }) => {
+  const router = useRouter();
   const [prescriptions, setPrescriptions] = useState([]);
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -203,22 +205,22 @@ const PharmacistDashboard = ({ onLogout }) => {
 
   // Counts
   const pendingCount = prescriptions.filter(
-    (p) => p.status === "pending"
+    (p) => p.status === "pending",
   ).length;
   const verifiedCount = prescriptions.filter(
-    (p) => p.status === "verified"
+    (p) => p.status === "verified",
   ).length;
   const dispensedCount = prescriptions.filter(
-    (p) => p.status === "dispensed"
+    (p) => p.status === "dispensed",
   ).length;
   const urgentCount = prescriptions.filter(
-    (p) => p.priority === "urgent"
+    (p) => p.priority === "urgent",
   ).length;
   const lowStockCount = inventoryAlerts.filter(
-    (a) => a.alertType === "low-stock"
+    (a) => a.alertType === "low-stock",
   ).length;
   const expiringCount = inventoryAlerts.filter(
-    (a) => a.alertType === "expiring-soon"
+    (a) => a.alertType === "expiring-soon",
   ).length;
 
   const handleViewPrescription = async (prescription) => {
@@ -388,7 +390,7 @@ const PharmacistDashboard = ({ onLogout }) => {
                             </h3>
                             {getStatusBadge(
                               prescription.status,
-                              prescription.priority
+                              prescription.priority,
                             )}
                           </div>
 
@@ -406,7 +408,7 @@ const PharmacistDashboard = ({ onLogout }) => {
                             </span>{" "}
                             on{" "}
                             {new Date(
-                              prescription.createdAt
+                              prescription.createdAt,
                             ).toLocaleDateString("en-IN", {
                               day: "numeric",
                               month: "short",
