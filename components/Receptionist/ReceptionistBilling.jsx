@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
   Plus,
@@ -123,7 +125,9 @@ const PaymentModal = ({ isOpen, onClose, bill, onProcessPayment }) => {
 };
 
 const ReceptionistBilling = () => {
-  const onBack = () => { if (typeof window !== 'undefined') window.history.back(); };
+  const onBack = () => {
+    if (typeof window !== "undefined") window.history.back();
+  };
   const [bills, setBills] = useState([
     {
       id: "INV-2024-001",
@@ -282,10 +286,10 @@ const ReceptionistBilling = () => {
       doc.text(`${index + 1}. ${item.description}`, 30, yPos);
       doc.text(
         `   Quantity: ${item.quantity} × $${item.unitPrice.toFixed(
-          2
+          2,
         )} = $${item.total.toFixed(2)}`,
         30,
-        yPos + 10
+        yPos + 10,
       );
       yPos += 25;
     });
@@ -302,13 +306,13 @@ const ReceptionistBilling = () => {
     doc.text(
       `Insurance Coverage: $${bill.insuranceCovered.toFixed(2)}`,
       30,
-      yPos + 55
+      yPos + 55,
     );
     doc.setFontSize(14);
     doc.text(
       `Patient Responsibility: $${bill.patientResponsibility.toFixed(2)}`,
       30,
-      yPos + 70
+      yPos + 70,
     );
 
     if (bill.paymentMethod) {
@@ -330,13 +334,13 @@ const ReceptionistBilling = () => {
               paymentMethod,
               paidDate: new Date().toISOString().split("T")[0],
             }
-          : bill
-      )
+          : bill,
+      ),
     );
 
     const bill = bills.find((b) => b.id === billId);
     setMessage(
-      `Payment of $${amount.toFixed(2)} processed for ${bill?.patientName}`
+      `Payment of $${amount.toFixed(2)} processed for ${bill?.patientName}`,
     );
     setMessageType("success");
 
