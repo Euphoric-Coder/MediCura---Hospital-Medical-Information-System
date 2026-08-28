@@ -30,7 +30,7 @@
     "drizzle-orm": "^0.44.5",
     "imagekit": "^6.0.0",
     "imagekit-javascript": "^4.0.1",
-    "inngest": "^3.42.3",
+    "inngest": "^4.18.1",
     "jspdf": "^3.0.2",
     "lucide-react": "^0.544.0",
     "next": "^15.5.9",
